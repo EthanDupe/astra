@@ -1,898 +1,649 @@
-<!doctype html>
-<html lang="en" class="scroll-smooth">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>UNBLOCKED GAMES — Tools Integrated</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Tools Section</title>
+<style>
+  /* General resets */
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0;
+    background: #0b1a3d;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #eee;
+    overflow-x: hidden;
+  }
 
-  <!-- Tailwind CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
+  /* Container for tools */
+  .tools-container {
+    max-width: 900px;
+    margin: 2rem auto 5rem;
+    padding: 0 1rem;
+  }
 
-  <!-- Google Font -->
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;600;800&display=swap" rel="stylesheet">
+  /* Navigation buttons */
+  .tools-nav {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .tools-nav button {
+    background: transparent;
+    border: 2px solid #3666ff;
+    color: #9bb7ff;
+    padding: 0.5rem 1.25rem;
+    font-size: 1.1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .tools-nav button:hover:not(.active) {
+    background-color: #2141a1;
+    color: #cddcff;
+  }
+  .tools-nav button.active {
+    background-color: #2d47d9;
+    color: #fff;
+    border-color: #5a7aff;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% {
+      box-shadow: 0 0 6px 2px #5a7aff;
+    }
+    50% {
+      box-shadow: 0 0 12px 4px #8faeff;
+    }
+  }
 
-  <!-- GSAP -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  /* Tool frame container */
+  .tool-frame {
+    position: relative;
+    background: #112a67;
+    border-radius: 12px;
+    max-width: 100%;
+    max-height: 70vh;
+    min-height: 320px;
+    margin: 0 auto;
+    padding: 1rem;
+    box-shadow:
+      0 0 10px rgba(54, 102, 255, 0.6),
+      inset 0 0 20px rgba(54, 102, 255, 0.3);
+    overflow-y: auto;
+    opacity: 0;
+    transform: scale(0.8);
+    animation-fill-mode: forwards;
+  }
+  .tool-frame.show {
+    animation: expandIn 0.5s forwards;
+  }
+  @keyframes expandIn {
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
 
-  <style>
-    :root{
-      --bg: #0A192F;
-      --accent: #00FFFF;
-      --text: #CCD6F6;
-      --muted: #6e7a9a;
-      --frame-radius: 14px;
-    }
-    html,body{height:100%}
-    body{
-      margin:0;
-      font-family: "Montserrat", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-      background: var(--bg);
-      color: var(--text);
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
-      overflow-x:hidden;
-    }
+  /* Scrollbar styling */
+  .tool-frame::-webkit-scrollbar {
+    width: 8px;
+  }
+  .tool-frame::-webkit-scrollbar-track {
+    background: #0a1834;
+    border-radius: 6px;
+  }
+  .tool-frame::-webkit-scrollbar-thumb {
+    background: #3458db;
+    border-radius: 6px;
+  }
 
-    /* App container */
-    #app {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 28px 18px 60px;
-      position: relative;
-      z-index: 20;
-    }
+  /* Calculator Styles */
+  .calculator {
+    max-width: 360px;
+    margin: 0 auto;
+    background: #1a2c6b;
+    border-radius: 10px;
+    padding: 1rem;
+    color: #eee;
+    user-select: none;
+  }
+  .calc-display {
+    width: 100%;
+    height: 50px;
+    background: #0e1a3a;
+    border-radius: 8px;
+    font-size: 1.8rem;
+    padding: 0.5rem 1rem;
+    text-align: right;
+    color: #aaccff;
+    margin-bottom: 1rem;
+    box-shadow: inset 0 0 8px #183875;
+    overflow-wrap: break-word;
+  }
+  .calc-buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+  .calc-buttons button {
+    background: #25418b;
+    border: none;
+    border-radius: 8px;
+    color: #cddcff;
+    font-size: 1.4rem;
+    padding: 1rem;
+    cursor: pointer;
+    transition: background-color 0.25s ease;
+  }
+  .calc-buttons button:hover {
+    background: #3d5eda;
+  }
+  .calc-buttons button.operator {
+    background: #5971f0;
+    color: #e1e9ff;
+  }
+  .calc-buttons button.operator:hover {
+    background: #7d95f8;
+  }
 
-    /* Title */
-    #main-title {
-      font-weight: 800;
-      font-size: clamp(28px, 5vw, 42px);
-      text-transform: uppercase;
-      letter-spacing: 0.22em;
-      color: var(--accent);
-      text-align: center;
-      margin-bottom: 8px;
-    }
+  /* Notepad Styles */
+  .notepad {
+    max-width: 600px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+  .notepad textarea {
+    flex: 1;
+    background: #f0f4ff;
+    border-radius: 10px;
+    border: none;
+    padding: 1rem;
+    font-family: monospace, monospace;
+    font-size: 1.1rem;
+    color: #222;
+    resize: none;
+    box-shadow: inset 0 0 8px #a6bbe9;
+  }
+  .notepad .notepad-controls {
+    margin-top: 0.75rem;
+    display: flex;
+    justify-content: flex-end;
+  }
+  .notepad button.save-btn {
+    background: #2d47d9;
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+  }
+  .notepad button.save-btn:hover {
+    background: #5a7aff;
+  }
+  .notepad .save-msg {
+    margin-left: 1rem;
+    align-self: center;
+    font-size: 0.9rem;
+    color: #a0d468;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .notepad .save-msg.show {
+    opacity: 1;
+  }
 
-    /* Nav */
-    nav {
-      display:flex;
-      justify-content:center;
-      gap:18px;
-      margin-bottom:18px;
-    }
-    nav button {
-      border-radius:999px;
-      padding:8px 18px;
-      color:var(--text);
-      background:transparent;
-      border:1.5px solid rgba(0,255,255,0.18);
-      font-weight:600;
-      letter-spacing:0.07em;
-      cursor:pointer;
-      transition: all .25s ease;
-    }
-    nav button:hover{ transform: translateY(-3px); border-color:var(--accent) }
-    nav button.active {
-      background: linear-gradient(90deg, rgba(0,255,255,0.12), rgba(0,255,255,0.06));
-      border-color: var(--accent);
-      box-shadow: 0 0 18px rgba(0,255,255,0.09);
-    }
+  /* Unit Converter Styles */
+  .unit-converter {
+    max-width: 600px;
+    margin: 0 auto;
+    color: #eee;
+  }
+  .unit-converter label {
+    display: block;
+    margin-bottom: 0.25rem;
+    font-weight: 600;
+  }
+  .unit-converter select,
+  .unit-converter input {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    margin-bottom: 1rem;
+    border-radius: 8px;
+    border: none;
+    font-size: 1rem;
+    background: #193075;
+    color: #cddcff;
+    box-shadow: inset 0 0 8px #2c4bbf;
+    appearance: none;
+  }
+  .unit-converter select:focus,
+  .unit-converter input:focus {
+    outline: none;
+    box-shadow: 0 0 8px #5a7aff;
+    background: #25418b;
+  }
+  .unit-converter .result {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #aaccff;
+    margin-top: 1rem;
+    min-height: 28px;
+  }
 
-    /* Search */
-    #search-container{ display:flex; justify-content:center; margin:22px 0 26px }
-    #search-input {
-      width:100%;
-      max-width:640px;
-      background:transparent;
-      border-radius:999px;
-      border:1.5px solid rgba(0,255,255,0.08);
-      padding:12px 18px;
-      color:var(--text);
-      outline:none;
-      font-size:1rem;
+  /* Responsive */
+  @media (max-width: 480px) {
+    .tools-nav button {
+      font-size: 1rem;
+      padding: 0.4rem 0.8rem;
     }
-    #search-input:focus {
-      box-shadow: 0 0 16px var(--accent);
-      border-color: var(--accent);
+    .calculator, .notepad, .unit-converter {
+      max-width: 100%;
     }
-    #search-input::placeholder{ color:var(--muted) }
+  }
 
-    /* Sections */
-    main { position:relative; z-index:10 }
-    section { display:none; opacity:0 }
-    section.active { display:block; opacity:1 }
-
-    /* Games grid */
-    #games-grid {
-      display:grid;
-      grid-template-columns: repeat(auto-fit, minmax(130px,1fr));
-      gap:16px;
-    }
-    .game-button {
-      background: linear-gradient(145deg,#061827,#082438);
-      border-radius:12px;
-      padding:18px 12px;
-      text-align:center;
-      font-weight:700;
-      color:var(--accent);
-      cursor:pointer;
-      transform-origin:center;
-      box-shadow: 0 8px 20px rgba(0,255,255,0.04);
-      border:1px solid rgba(255,255,255,0.03);
-      perspective:800px;
-      position:relative;
-      overflow:hidden;
-    }
-    .game-button::after{
-      content:"";
-      position:absolute;
-      inset: -40%;
-      background: radial-gradient(circle at 20% 20%, rgba(0,255,255,0.06), transparent 40%);
-      transform: translateX(-100%) translateY(-100%);
-      transition: transform .9s cubic-bezier(.19,1,.22,1);
-    }
-    .game-button:hover::after{ transform: translateX(0) translateY(0); }
-    .game-button:hover{ transform: rotateY(10deg) scale(1.06); box-shadow: 0 18px 50px rgba(0,255,255,0.12) }
-
-    /* Tools frame container */
-    .tool-frame-wrap{
-      margin-top:18px;
-      display:flex;
-      justify-content:center;
-    }
-    .tool-frame {
-      width:100%;
-      max-width:900px;
-      min-height:340px;
-      border-radius:var(--frame-radius);
-      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-      border: 1.5px solid rgba(0,255,255,0.06);
-      box-shadow: 0 10px 40px rgba(0,0,0,0.6);
-      position:relative;
-      overflow:hidden;
-      transition: box-shadow .3s ease, transform .35s ease;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-    }
-
-    .tool-frame.glow {
-      box-shadow:
-        0 8px 30px rgba(0,255,255,0.05),
-        inset 0 0 40px rgba(0,255,255,0.02),
-        0 0 30px rgba(0,255,255,0.08);
-      border-color: rgba(0,255,255,0.12);
-    }
-
-    /* Animated border outline */
-    .tool-frame::before{
-      content:"";
-      position:absolute;
-      inset:-3px;
-      border-radius:calc(var(--frame-radius) + 3px);
-      background: linear-gradient(90deg, rgba(0,255,255,0.06), rgba(0,255,255,0.02));
-      filter: blur(8px);
-      opacity:0;
-      transition: opacity .35s ease;
-      pointer-events:none;
-    }
-    .tool-frame.pulse::before { opacity:1; }
-
-    /* iframe style */
-    .tool-iframe {
-      width:100%;
-      height:100%;
-      border:0;
-      border-radius:var(--frame-radius);
-      display:block;
-    }
-
-    /* tool buttons list (inside Tools section header) */
-    .tools-list {
-      display:flex;
-      gap:12px;
-      justify-content:center;
-      margin-bottom:12px;
-      flex-wrap:wrap;
-    }
-    .tool-select {
-      padding:8px 14px;
-      border-radius:999px;
-      background:transparent;
-      border:1px solid rgba(0,255,255,0.06);
-      color:var(--text);
-      cursor:pointer;
-      font-weight:600;
-      transition: all .25s ease;
-    }
-    .tool-select.active {
-      background:var(--accent);
-      color:var(--bg);
-      box-shadow: 0 0 18px rgba(0,255,255,0.12);
-      animation: tool-pulse 2s infinite;
-    }
-    @keyframes tool-pulse {
-      0% { box-shadow: 0 0 10px rgba(0,255,255,0.06) }
-      50% { box-shadow: 0 0 26px rgba(0,255,255,0.12) }
-      100% { box-shadow: 0 0 10px rgba(0,255,255,0.06) }
-    }
-
-    /* Apps/Tools list styles */
-    .list-container { display:flex; flex-direction:column; gap:12px; max-width:480px; margin:0 auto }
-    .list-item {
-      padding:12px 16px; border-radius:999px; background:linear-gradient(145deg,#061827,#082438); color:var(--accent); border:1px solid rgba(255,255,255,0.03); font-weight:700; cursor:pointer;
-    }
-    .list-item:hover { transform: translateY(-4px); box-shadow:0 10px 30px rgba(0,255,255,0.06) }
-
-    /* mouse follower */
-    #mouse-follower {
-      position:fixed; left:0; top:0;
-      width:18px; height:18px; border-radius:50%;
-      background: rgba(0,255,255,0.14);
-      transform: translate(-50%,-50%);
-      pointer-events:none; z-index:9999;
-      transition: width .18s ease, height .18s ease, background .18s ease, transform .06s linear;
-      mix-blend-mode: screen;
-      filter: drop-shadow(0 0 6px rgba(0,255,255,0.12));
-    }
-    #mouse-follower.active { width:36px; height:36px; background: rgba(0,255,255,0.36); filter: drop-shadow(0 0 12px rgba(0,255,255,0.45)) }
-
-    /* small responsive */
-    @media (max-width:640px){
-      .tool-frame { min-height:420px }
-      #games-grid { grid-template-columns: repeat(auto-fit,minmax(110px,1fr)); gap:12px }
-    }
-  </style>
+  /* Mouse Follower */
+  .mouse-follower {
+    pointer-events: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background-color: #5a7affcc;
+    transition: background-color 0.25s ease, transform 0.1s ease;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    mix-blend-mode: difference;
+  }
+  .mouse-follower.active-hover {
+    background-color: #ff9a45cc;
+    transform: translate(-50%, -50%) scale(1.5);
+  }
+</style>
 </head>
 <body>
 
-  <!-- Particle canvas (subtle background) -->
-  <canvas id="particle-canvas" style="position:fixed;inset:0;z-index:5;pointer-events:none;"></canvas>
+<div class="tools-container">
+  <nav class="tools-nav" role="tablist" aria-label="Tools Navigation">
+    <button role="tab" aria-selected="true" aria-controls="calculator" id="btn-calculator" class="active">Calculator</button>
+    <button role="tab" aria-selected="false" aria-controls="notepad" id="btn-notepad">Notepad</button>
+    <button role="tab" aria-selected="false" aria-controls="unitconverter" id="btn-unitconverter">Unit Converter</button>
+  </nav>
 
-  <!-- Mouse follower -->
-  <div id="mouse-follower" aria-hidden="true"></div>
+  <section id="tool-frame" class="tool-frame" role="tabpanel" aria-live="polite" tabindex="0">
+    <!-- Tool content injected here -->
+  </section>
+</div>
 
-  <div id="app">
-    <header>
-      <h1 id="main-title">UNBLOCKED GAMES</h1>
+<div class="mouse-follower"></div>
 
-      <nav aria-label="Main navigation">
-        <button class="active" data-target="games-section">Games</button>
-        <button data-target="tools-section">Tools</button>
-        <button data-target="apps-section">Apps</button>
-      </nav>
+<script>
+  (() => {
+    const toolFrame = document.getElementById('tool-frame');
+    const buttons = document.querySelectorAll('.tools-nav button');
+    const mouseFollower = document.querySelector('.mouse-follower');
 
-      <div id="search-container">
-        <input id="search-input" type="search" placeholder="Search games, tools, apps..." />
-      </div>
-    </header>
-
-    <main>
-      <!-- GAMES -->
-      <section id="games-section" class="active" aria-live="polite">
-        <h2 class="sr-only">Games</h2>
-        <div id="games-grid" class="mb-6">
-          <button class="game-button">Among Us</button>
-          <button class="game-button">Slope</button>
-          <button class="game-button">Vex 5</button>
-          <button class="game-button">Run 3</button>
-          <button class="game-button">Retro Bowl</button>
-        </div>
-      </section>
-
-      <!-- TOOLS -->
-      <section id="tools-section" aria-live="polite" style="min-height:360px;">
-        <h2 class="sr-only">Tools</h2>
-
-        <div class="tools-list" role="tablist" aria-label="Tools list">
-          <button class="tool-select" data-tool="calculator">Calculator</button>
-          <button class="tool-select" data-tool="notepad">Notepad</button>
-          <button class="tool-select" data-tool="converter">Unit Converter</button>
-        </div>
-
-        <div class="tool-frame-wrap">
-          <div id="tool-frame" class="tool-frame" role="region" aria-label="Tool workspace">
-            <!-- iframe inserted here dynamically -->
-            <!-- Placeholder prompt -->
-            <div id="tool-placeholder" style="text-align:center; padding:30px; color:var(--muted);">
-              Select a tool above to open it.
-            </div>
+    // Tool HTML templates
+    const templates = {
+      calculator: `
+        <div class="calculator" tabindex="0" aria-label="Calculator tool">
+          <div class="calc-display" aria-live="polite" aria-atomic="true" role="textbox" id="calcDisplay" aria-readonly="true">0</div>
+          <div class="calc-buttons" role="group" aria-label="Calculator buttons">
+            <button type="button" data-val="7">7</button>
+            <button type="button" data-val="8">8</button>
+            <button type="button" data-val="9">9</button>
+            <button type="button" data-val="/" class="operator" aria-label="Divide">÷</button>
+            <button type="button" data-val="4">4</button>
+            <button type="button" data-val="5">5</button>
+            <button type="button" data-val="6">6</button>
+            <button type="button" data-val="*" class="operator" aria-label="Multiply">×</button>
+            <button type="button" data-val="1">1</button>
+            <button type="button" data-val="2">2</button>
+            <button type="button" data-val="3">3</button>
+            <button type="button" data-val="-" class="operator" aria-label="Subtract">−</button>
+            <button type="button" data-val="0">0</button>
+            <button type="button" data-val=".">.</button>
+            <button type="button" data-val="C" aria-label="Clear">C</button>
+            <button type="button" data-val="+" class="operator" aria-label="Add">+</button>
+            <button type="button" data-val="=" style="grid-column: span 4; background:#4969ff; font-weight: 700;">=</button>
           </div>
         </div>
-      </section>
-
-      <!-- APPS -->
-      <section id="apps-section" aria-live="polite">
-        <h2 class="sr-only">Apps</h2>
-        <div class="list-container">
-          <a class="list-item" href="#" role="link">Youtube</a>
-          <a class="list-item" href="#" role="link">Spotify</a>
-          <a class="list-item" href="#" role="link">Discord</a>
+      `,
+      notepad: `
+        <div class="notepad" tabindex="0" aria-label="Notepad tool">
+          <textarea aria-label="Notepad text area" id="notepadTextarea" placeholder="Type your notes here..."></textarea>
+          <div class="notepad-controls">
+            <button class="save-btn" type="button" aria-label="Save notes">Save</button>
+            <span class="save-msg" aria-live="polite" role="status" aria-atomic="true">Saved!</span>
+          </div>
         </div>
-      </section>
-    </main>
-  </div>
-
-  <script>
-  /*************************************************************************
-   * Helper: GSAP letter animation for title & simple page nav behavior
-   **************************************************************************/
-  const mainTitle = document.getElementById('main-title');
-
-  // letter wave on load
-  (function animateTitle(){
-    const text = mainTitle.textContent.trim();
-    mainTitle.textContent = '';
-    [...text].forEach((c, i) => {
-      const span = document.createElement('span');
-      span.textContent = c;
-      span.style.display = 'inline-block';
-      span.style.opacity = '0';
-      span.style.transform = 'translateY(16px)';
-      mainTitle.appendChild(span);
-    });
-    gsap.to(mainTitle.children, {duration:1, opacity:1, y:0, stagger:0.06, ease:'power3.out'});
-  })();
-
-  /*************************************************************************
-   * Particle background (subtle)
-   **************************************************************************/
-  const canvas = document.getElementById('particle-canvas');
-  const ctx = canvas.getContext('2d');
-  let W = innerWidth, H = innerHeight;
-  canvas.width = W; canvas.height = H;
-  window.addEventListener('resize', ()=>{ W = innerWidth; H = innerHeight; canvas.width = W; canvas.height = H; });
-
-  const PARTS = [];
-  for(let i=0;i<80;i++){
-    PARTS.push({
-      x: Math.random()*W, y: Math.random()*H,
-      r: 0.6 + Math.random()*1.8,
-      vx: (Math.random()-0.5)*0.3, vy:(Math.random()-0.5)*0.3,
-      o: 0.08 + Math.random()*0.12
-    });
-  }
-  (function render(){
-    ctx.clearRect(0,0,W,H);
-    for(const p of PARTS){
-      p.x += p.vx; p.y += p.vy;
-      if(p.x<0||p.x>W||p.y<0||p.y>H){ p.x = Math.random()*W; p.y = Math.random()*H; }
-      ctx.beginPath();
-      ctx.fillStyle = `rgba(0,255,255,${p.o})`;
-      ctx.shadowColor = 'rgba(0,255,255,0.15)';
-      ctx.shadowBlur = 6;
-      ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-      ctx.fill();
-    }
-    requestAnimationFrame(render);
-  })();
-
-  /*************************************************************************
-   * Navigation between sections (Games / Tools / Apps)
-   **************************************************************************/
-  const navButtons = document.querySelectorAll('nav button');
-  const sections = document.querySelectorAll('main section');
-
-  function showSection(id){
-    const current = document.querySelector('section.active');
-    const next = document.getElementById(id);
-    if(current === next) return;
-    // fade/slide out current
-    if(current){
-      gsap.to(current, {duration:0.42, opacity:0, x:-60, ease:'power2.in', onComplete: ()=>{ current.classList.remove('active'); current.style.transform=''; }});
-    }
-    // update nav active
-    navButtons.forEach(b=> b.classList.toggle('active', b.dataset.target === id));
-    // show next
-    next.classList.add('active');
-    gsap.fromTo(next, {opacity:0, x:60}, {duration:0.6, opacity:1, x:0, ease:'power2.out', onStart: ()=> next.style.display='block'});
-  }
-
-  navButtons.forEach(btn=>{
-    btn.addEventListener('click', ()=> showSection(btn.dataset.target));
-  });
-
-  /*************************************************************************
-   * Tools: tool selector, iframe injection (srcdoc), animations, active state
-   **************************************************************************/
-
-  const toolSelectButtons = document.querySelectorAll('.tool-select');
-  const toolFrameContainer = document.getElementById('tool-frame');
-  const toolPlaceholder = document.getElementById('tool-placeholder');
-
-  // Tool HTML templates (srcdoc). Each includes JS to notify parent window
-  // when interactive elements are hovered (postMessage: { type:'interactive', enter:true/false })
-  const calculatorSrc = `
-  <!doctype html>
-  <html>
-  <head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <style>
-      :root{ --bg:#071827; --accent:#00FFFF; --text:#0A192F; --panel:#F7FAFF }
-      html,body{height:100%;margin:0;font-family:Montserrat, Arial, sans-serif;background:transparent}
-      .wrap{display:flex;align-items:center;justify-content:center;height:100%;padding:20px;}
-      .calc{
-        width:320px;border-radius:12px;padding:14px;background:linear-gradient(180deg,#0b2a3a,#082230);
-        box-shadow: 0 8px 30px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.02);
-        color:var(--accent);
-      }
-      .display{background:rgba(255,255,255,0.04);border-radius:8px;padding:12px;font-size:20px;text-align:right;color:var(--accent);margin-bottom:12px;min-height:44px}
-      .keys{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-      button.k{
-        border-radius:8px;padding:12px;font-weight:700;border:0;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);
-        color:var(--accent); cursor:pointer; box-shadow: 0 6px 12px rgba(0,0,0,0.45);
-      }
-      button.k.op{ background: linear-gradient(180deg, rgba(0,255,255,0.12), rgba(0,255,255,0.06)); color: #07202a }
-      button.k:hover{ transform: translateY(-4px); box-shadow: 0 12px 28px rgba(0,255,255,0.08) }
-      .top-row{display:flex;gap:8px;margin-bottom:8px}
-      .wide{grid-column:span 2}
-      .small{font-size:0.86rem;padding:8px}
-      .save-btn{margin-top:10px;padding:8px 10px;border-radius:8px;background:linear-gradient(90deg,#00ffff22,#00ffff11); border:1px solid rgba(0,255,255,0.06); color:var(--accent); cursor:pointer}
-    </style>
-  </head>
-  <body>
-    <div class="wrap">
-      <div class="calc" role="application" aria-label="Calculator">
-        <div id="display" class="display" aria-live="polite">0</div>
-        <div class="keys" role="group" aria-label="Calculator keys">
-          <button class="k small" data-key="C">C</button>
-          <button class="k small" data-key="±">±</button>
-          <button class="k small" data-key="%">%</button>
-          <button class="k op" data-key="/">÷</button>
-
-          <button class="k" data-key="7">7</button>
-          <button class="k" data-key="8">8</button>
-          <button class="k" data-key="9">9</button>
-          <button class="k op" data-key="*">×</button>
-
-          <button class="k" data-key="4">4</button>
-          <button class="k" data-key="5">5</button>
-          <button class="k" data-key="6">6</button>
-          <button class="k op" data-key="-">−</button>
-
-          <button class="k" data-key="1">1</button>
-          <button class="k" data-key="2">2</button>
-          <button class="k" data-key="3">3</button>
-          <button class="k op" data-key="+">+</button>
-
-          <button class="k wide" data-key="0">0</button>
-          <button class="k" data-key=".">.</button>
-          <button class="k op" data-key="=">=</button>
-        </div>
-      </div>
-    </div>
-
-    <script>
-      // Accessibility: notify parent that interactive elements exist
-      function notifyParentEnter(){ parent.postMessage({type:'interactive', enter:true}, '*') }
-      function notifyParentLeave(){ parent.postMessage({type:'interactive', enter:false}, '*') }
-
-      const keys = document.querySelectorAll('button.k');
-      const display = document.getElementById('display');
-      let current = '';
-      let last = '';
-      let resultShown = false;
-
-      function updateDisplay(v){ display.textContent = v }
-
-      function computeExpression(expr){
-        // safe evaluate basic operators only
-        try {
-          // replace unicode ÷×− with JS ops
-          expr = expr.replace(/÷/g,'/').replace(/×/g,'*').replace(/−/g,'-');
-          // prevent letters
-          if(/[a-zA-Z]/.test(expr)) return 'ERR';
-          // Use Function for controlled eval
-          const val = Function('"use strict";return ('+expr+')')();
-          return Number.isFinite(val) ? (Math.round(val * 1e12) / 1e12).toString() : 'ERR';
-        } catch { return 'ERR' }
-      }
-
-      keys.forEach(k=>{
-        k.addEventListener('mouseenter', notifyParentEnter);
-        k.addEventListener('mouseleave', notifyParentLeave);
-
-        k.addEventListener('click', ()=>{
-          const key = k.dataset.key;
-          if(key === 'C'){ current = ''; updateDisplay('0'); return; }
-          if(key === '±'){ if(current){ current = (parseFloat(current)*-1).toString(); updateDisplay(current); } return; }
-          if(key === '%'){ if(current){ current = (parseFloat(current)/100).toString(); updateDisplay(current); } return; }
-          if(key === '='){ 
-            if(!current) return;
-            const out = computeExpression(current);
-            updateDisplay(out);
-            current = out;
-            resultShown = true;
-            return;
-          }
-          if('+-*/'.includes(key)){
-            if(resultShown){ resultShown = false; }
-            // avoid repeated operators
-            if(current.slice(-1).match(/[+\-*/]/)) current = current.slice(0,-1) + key;
-            else current += key;
-            updateDisplay(current);
-            return;
-          }
-          // numbers / decimal
-          if(resultShown && /\d/.test(key)){ current = key; resultShown = false; updateDisplay(current); return; }
-          current += key;
-          updateDisplay(current);
-        })
-      });
-
-      // Keyboard support
-      document.addEventListener('keydown', (e)=>{
-        const map = {'/':'/','*':'*','-':'-','+':'+','Enter':'=','Backspace':'C','Escape':'C'};
-        if(e.key in map) {
-          const key = map[e.key];
-          const btn = [...keys].find(b=> b.dataset.key === key);
-          if(btn) btn.click();
-        } else if(/\d|\./.test(e.key)){
-          const btn = [...keys].find(b=> b.dataset.key === e.key);
-          if(btn) btn.click();
-        }
-      });
-
-    </script>
-  </body>
-  </html>
-  `;
-
-  const notepadSrc = `
-  <!doctype html>
-  <html>
-  <head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <style>
-      :root{ --bg:#ffffff; --accent:#00FFFF; --ink:#0A192F }
-      html,body{height:100%;margin:0;font-family:Montserrat,Arial,sans-serif;background:transparent}
-      .wrap{height:100%;display:flex;align-items:center;justify-content:center;padding:18px}
-      .note {
-        width:100%;max-width:900px;background:#fff;border-radius:12px; padding:14px; box-shadow: 0 12px 30px rgba(2,10,18,0.6);
-      }
-      .toolbar{display:flex;gap:8px;justify-content:flex-end;margin-bottom:8px}
-      .btn{padding:8px 10px;border-radius:8px;border:1px solid rgba(0,0,0,0.06);background:linear-gradient(180deg,#f4f7fb,#eef4ff);cursor:pointer}
-      textarea{
-        width:100%; min-height:320px;border-radius:8px;padding:12px;border:1px solid #e6eefb;font-size:15px; color:var(--ink); resize:vertical;
-        background:#fff; box-shadow: inset 0 1px 0 rgba(0,0,0,0.02)
-      }
-      .status{font-size:12px;color:#6b7280;margin-top:8px}
-    </style>
-  </head>
-  <body>
-    <div class="wrap">
-      <div class="note" role="region" aria-label="Notepad">
-        <div class="toolbar">
-          <button class="btn" id="save">Save</button>
-          <button class="btn" id="load">Load</button>
-          <button class="btn" id="clear">Clear</button>
-        </div>
-        <textarea id="editor" placeholder="Type here..."></textarea>
-        <div class="status" id="status">Autosaves to localStorage when you click Save.</div>
-      </div>
-    </div>
-
-    <script>
-      function notifyEnter(){ parent.postMessage({type:'interactive', enter:true}, '*') }
-      function notifyLeave(){ parent.postMessage({type:'interactive', enter:false}, '*') }
-
-      const editor = document.getElementById('editor');
-      const saveBtn = document.getElementById('save');
-      const loadBtn = document.getElementById('load');
-      const clearBtn = document.getElementById('clear');
-      const status = document.getElementById('status');
-
-      // send events when interactive elements hovered
-      [saveBtn,loadBtn,clearBtn,editor].forEach(el=>{
-        el.addEventListener('mouseenter', notifyEnter);
-        el.addEventListener('mouseleave', notifyLeave);
-      });
-
-      saveBtn.addEventListener('click', ()=>{
-        localStorage.setItem('unblocked_notepad', editor.value);
-        status.textContent = 'Saved to localStorage ✔';
-      });
-      loadBtn.addEventListener('click', ()=>{
-        const d = localStorage.getItem('unblocked_notepad') || '';
-        editor.value = d;
-        status.textContent = 'Loaded from localStorage';
-      });
-      clearBtn.addEventListener('click', ()=>{
-        editor.value = '';
-        status.textContent = 'Cleared';
-      });
-
-      // Attempt autosave on unload
-      window.addEventListener('beforeunload', ()=> {
-        try { localStorage.setItem('unblocked_notepad', editor.value); } catch(e){}
-      });
-    </script>
-  </body>
-  </html>
-  `;
-
-  const converterSrc = `
-  <!doctype html>
-  <html>
-  <head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <style>
-      :root{ --bg:#071827; --accent:#00FFFF; --panel:#0f2a38; --text:#dff8ff }
-      html,body{height:100%;margin:0;font-family:Montserrat,Arial,sans-serif;background:transparent;color:var(--text)}
-      .wrap{height:100%;display:flex;align-items:center;justify-content:center;padding:18px}
-      .card{width:100%;max-width:720px;background:linear-gradient(180deg,#071827,#082230);padding:16px;border-radius:12px;box-shadow:0 12px 30px rgba(0,0,0,0.6)}
-      .row{display:flex;gap:8px;margin-bottom:10px;align-items:center}
-      select,input{padding:10px;border-radius:8px;border:0;background:rgba(255,255,255,0.02);color:var(--text)}
-      .result{margin-top:12px;padding:12px;border-radius:8px;background:rgba(255,255,255,0.02)}
-      .btn{padding:10px 12px;border-radius:8px;border:0;background:linear-gradient(90deg,#00ffff22,#00ffff11);cursor:pointer;color:var(--text)}
-    </style>
-  </head>
-  <body>
-    <div class="wrap">
-      <div class="card" role="region" aria-label="Unit converter">
-        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px">
-          <select id="mode">
+      `,
+      unitconverter: `
+        <div class="unit-converter" tabindex="0" aria-label="Unit converter tool">
+          <label for="unitType">Select Unit Type:</label>
+          <select id="unitType" aria-controls="unitInput unitFrom unitTo conversionResult">
             <option value="length">Length</option>
             <option value="weight">Weight</option>
-            <option value="temp">Temperature</option>
+            <option value="temperature">Temperature</option>
           </select>
 
-          <input id="value" type="number" placeholder="Value" style="min-width:120px"/>
+          <label for="unitInput">Enter Value:</label>
+          <input id="unitInput" type="number" step="any" aria-describedby="unitInputDesc" placeholder="Enter value" />
 
-          <select id="from"></select>
-          <div style="font-weight:700">→</div>
-          <select id="to"></select>
-          <button class="btn" id="convert">Convert</button>
+          <label for="unitFrom">From:</label>
+          <select id="unitFrom" aria-controls="conversionResult"></select>
+
+          <label for="unitTo">To:</label>
+          <select id="unitTo" aria-controls="conversionResult"></select>
+
+          <div class="result" id="conversionResult" aria-live="polite" aria-atomic="true"></div>
         </div>
+      `
+    };
 
-        <div class="result" id="result">Result will appear here</div>
-      </div>
-    </div>
+    // Unit conversion data
+    const units = {
+      length: {
+        meter: 1,
+        kilometer: 1000,
+        centimeter: 0.01,
+        millimeter: 0.001,
+        mile: 1609.34,
+        yard: 0.9144,
+        foot: 0.3048,
+        inch: 0.0254,
+      },
+      weight: {
+        gram: 1,
+        kilogram: 1000,
+        milligram: 0.001,
+        pound: 453.592,
+        ounce: 28.3495,
+      },
+      temperature: ['Celsius', 'Fahrenheit', 'Kelvin'],
+    };
 
-    <script>
-      function notifyEnter(){ parent.postMessage({type:'interactive', enter:true}, '*') }
-      function notifyLeave(){ parent.postMessage({type:'interactive', enter:false}, '*') }
+    // Currently active tool
+    let activeTool = 'calculator';
 
-      const mode = document.getElementById('mode');
-      const input = document.getElementById('value');
-      const from = document.getElementById('from');
-      const to = document.getElementById('to');
-      const convert = document.getElementById('convert');
-      const result = document.getElementById('result');
+    // Load a tool's HTML content and initialize tool logic
+    function loadTool(tool) {
+      activeTool = tool;
+      toolFrame.classList.remove('show'); // start hiding frame for animation reset
+      setTimeout(() => {
+        toolFrame.innerHTML = templates[tool];
+        toolFrame.classList.add('show');
+        initToolLogic(tool);
+      }, 250);
+    }
 
-      [mode,input,from,to,convert].forEach(el=>{
-        el.addEventListener('mouseenter', notifyEnter);
-        el.addEventListener('mouseleave', notifyLeave);
+    // Update nav buttons active state and ARIA
+    function updateNav() {
+      buttons.forEach(btn => {
+        const isActive = btn.id === `btn-${activeTool}`;
+        btn.classList.toggle('active', isActive);
+        btn.setAttribute('aria-selected', isActive);
       });
+    }
 
-      const units = {
-        length: ['meters','kilometers','feet','miles'],
-        weight: ['grams','kilograms','pounds','ounces'],
-        temp: ['C','F','K']
-      };
+    // Calculator logic
+    function initCalculator() {
+      const display = document.getElementById('calcDisplay');
+      let currentInput = '0';
+      let lastInput = null;
+      let resetNext = false;
 
-      function populate(u){
-        from.innerHTML = ''; to.innerHTML = '';
-        u.forEach(x=>{
-          const o1 = document.createElement('option'); o1.value = x; o1.textContent = x; from.appendChild(o1);
-          const o2 = document.createElement('option'); o2.value = x; o2.textContent = x; to.appendChild(o2);
-        });
+      function updateDisplay() {
+        display.textContent = currentInput;
       }
-      populate(units.length);
 
-      mode.addEventListener('change', ()=> populate(units[mode.value]));
-
-      function convertValue(){
-        const v = parseFloat(input.value);
-        if(isNaN(v)){ result.textContent = 'Enter a number'; return; }
-        const f = from.value, t = to.value;
-        let out = v;
-        if(mode.value === 'length'){
-          // convert everything to meters first
-          const toMeters = { meters:1, kilometers:1000, feet:0.3048, miles:1609.344 };
-          out = v * toMeters[f] / toMeters[t];
-        } else if(mode.value === 'weight'){
-          const toGrams = { grams:1, kilograms:1000, pounds:453.59237, ounces:28.3495231 };
-          out = v * toGrams[f] / toGrams[t];
-        } else {
-          // temperature
-          if(f === t){ out = v; }
-          else {
-            // convert to C then to target
-            let c;
-            if(f === 'C') c = v;
-            if(f === 'F') c = (v - 32) * (5/9);
-            if(f === 'K') c = v - 273.15;
-            if(t === 'C') out = c;
-            if(t === 'F') out = (c * 9/5) + 32;
-            if(t === 'K') out = c + 273.15;
+      function calculateExpression(expr) {
+        try {
+          // Only allow safe characters: digits, operators, decimal point
+          if (/^[0-9+\-*/.() ]+$/.test(expr)) {
+            let result = Function('"use strict";return (' + expr + ')')();
+            if (typeof result === 'number' && isFinite(result)) {
+              return +result.toFixed(10); // avoid floating point long decimals
+            }
           }
-        }
-        result.textContent = String(Math.round(out * 100000)/100000) + ' ' + t;
+        } catch {}
+        return null;
       }
-      convert.addEventListener('click', convertValue);
-    </script>
-  </body>
-  </html>
-  `;
 
-  // Utility to create iframe element with srcdoc string
-  function createToolIframe(srcdoc){
-    const ifr = document.createElement('iframe');
-    ifr.className = 'tool-iframe';
-    ifr.setAttribute('aria-label','Tool frame');
-    ifr.srcdoc = srcdoc;
-    ifr.loading = 'eager';
-    ifr.style.opacity = '0';
-    return ifr;
-  }
+      display.textContent = currentInput;
 
-  // Keep reference to current iframe
-  let currentIframe = null;
-  // track which tool button is active
-  function setActiveToolButton(nameButton){
-    toolSelectButtons.forEach(b=>{
-      const is = b.dataset.tool === nameButton;
-      b.classList.toggle('active', is);
-    });
-  }
+      toolFrame.querySelectorAll('.calc-buttons button').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const val = btn.dataset.val;
 
-  // Animate frame in
-  function animateFrameIn(frameEl){
-    // add "glow" state then gsap scale from .9 to 1
-    frameEl.classList.add('glow');
-    frameEl.classList.add('pulse');
-    gsap.fromTo(frameEl, {y:-20, scale:0.96, opacity:0}, {duration:0.6, y:0, scale:1, opacity:1, ease:'power3.out'});
-  }
+          if (val === 'C') {
+            currentInput = '0';
+            resetNext = false;
+            updateDisplay();
+            return;
+          }
+          if (val === '=') {
+            const res = calculateExpression(currentInput);
+            if (res !== null) {
+              currentInput = res.toString();
+              resetNext = true;
+            } else {
+              currentInput = 'Error';
+              resetNext = true;
+            }
+            updateDisplay();
+            return;
+          }
+          // If resetNext true (after result), overwrite input unless operator pressed
+          if (resetNext) {
+            if (/[+\-*/]/.test(val)) {
+              resetNext = false;
+              currentInput += val;
+            } else {
+              currentInput = val === '.' ? '0.' : val;
+              resetNext = false;
+            }
+            updateDisplay();
+            return;
+          }
 
-  // Animate frame out
-  function animateFrameOut(frameEl, onComplete){
-    gsap.to(frameEl, {duration:0.38, y:-14, opacity:0, scale:0.98, ease:'power2.in', onComplete:()=>{
-      frameEl.classList.remove('glow','pulse');
-      if(onComplete) onComplete();
-    }});
-  }
+          // Prevent multiple decimals in a number segment
+          if (val === '.') {
+            // last number segment from right
+            let parts = currentInput.split(/[\+\-\*\/]/);
+            if (parts[parts.length - 1].includes('.')) return;
+          }
 
-  // function to open a tool (calculator/notepad/converter)
-  function openTool(toolName){
-    // set active button UI
-    setActiveToolButton(toolName);
-    // remove placeholder if present
-    if(toolPlaceholder) toolPlaceholder.style.display = 'none';
-
-    // if an iframe currently exists, animate it out then replace
-    if(currentIframe){
-      animateFrameOut(currentIframe, () => {
-        currentIframe.remove();
-        currentIframe = null;
-        createAndInsert(toolName);
+          if (currentInput === '0' && val !== '.') {
+            currentInput = val;
+          } else {
+            currentInput += val;
+          }
+          updateDisplay();
+        });
       });
-    } else {
-      createAndInsert(toolName);
     }
-  }
 
-  function createAndInsert(toolName){
-    let src;
-    if(toolName==='calculator') src = calculatorSrc;
-    else if(toolName==='notepad') src = notepadSrc;
-    else src = converterSrc;
+    // Notepad logic
+    function initNotepad() {
+      const textarea = document.getElementById('notepadTextarea');
+      const saveBtn = toolFrame.querySelector('.save-btn');
+      const saveMsg = toolFrame.querySelector('.save-msg');
 
-    const iframe = createToolIframe(src);
-    // insert and animate
-    toolFrameContainer.appendChild(iframe);
-    currentIframe = iframe;
+      const storageKey = 'tools_notepad_content';
 
-    // After added, animate
-    requestAnimationFrame(()=> animateFrameIn(toolFrameContainer) );
+      // Load saved content if any
+      textarea.value = localStorage.getItem(storageKey) || '';
 
-    // Fade iframe in when loaded enough
-    iframe.addEventListener('load', ()=>{
-      gsap.to(iframe, {duration:0.45, opacity:1, ease:'power2.out'});
-      // Attempt to attach hover listeners via postMessage listener responding to messages
-      // (iframes send messages when their interactive elements are hovered; parent listens below)
-    });
-
-    // Accessibility: focus on frame
-    iframe.setAttribute('tabindex','0');
-    iframe.focus();
-  }
-
-  // wire up tool buttons
-  toolSelectButtons.forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      const tool = btn.dataset.tool;
-      openTool(tool);
-    });
-  });
-
-  /*************************************************************************
-   * Mouse follower behavior + messages from iframes
-   * The iframes postMessage({ type:'interactive', enter:true/false })
-   **************************************************************************/
-  const mouseFollower = document.getElementById('mouse-follower');
-
-  // move follower
-  window.addEventListener('mousemove', e=>{
-    mouseFollower.style.transform = \`translate(\${e.clientX}px, \${e.clientY}px) translate(-50%,-50%)\`;
-  });
-
-  // messages from iframe
-  window.addEventListener('message', (ev)=>{
-    if(!ev.data || ev.data.type !== 'interactive') return;
-    if(ev.data.enter) mouseFollower.classList.add('active');
-    else mouseFollower.classList.remove('active');
-  });
-
-  // Additionally, when hovering *in the parent* over interactive elements (game buttons, tool selects, list items),
-  // also highlight the follower
-  const parentInteractives = document.querySelectorAll('.game-button, .tool-select, .list-item, nav button, #search-input');
-  parentInteractives.forEach(el=>{
-    el.addEventListener('mouseenter', ()=> mouseFollower.classList.add('active'));
-    el.addEventListener('mouseleave', ()=> mouseFollower.classList.remove('active'));
-  });
-
-  /*************************************************************************
-   * Search filter (applies to games, tools, apps)
-   **************************************************************************/
-  const searchInput = document.getElementById('search-input');
-  searchInput.addEventListener('input', ()=>{
-    const q = searchInput.value.trim().toLowerCase();
-    // games
-    document.querySelectorAll('#games-grid .game-button').forEach(b=>{
-      const s = b.textContent.trim().toLowerCase();
-      b.style.display = s.includes(q) ? 'block' : 'none';
-    });
-    // tools (tool-select)
-    document.querySelectorAll('.tool-select').forEach(b=>{
-      const s = b.textContent.trim().toLowerCase();
-      b.style.display = s.includes(q) ? 'inline-flex' : 'none';
-    });
-    // apps/tools lists
-    document.querySelectorAll('.list-item').forEach(a=>{
-      a.style.display = a.textContent.trim().toLowerCase().includes(q) ? 'block' : 'none';
-    });
-  });
-
-  /*************************************************************************
-   * Keyboard accessibility: tool selection with keyboard
-   **************************************************************************/
-  toolSelectButtons.forEach(b=>{
-    b.addEventListener('keydown', (e)=>{
-      if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); b.click(); }
-    });
-  });
-
-  // Optional: open Calculator by default when Tools section is shown for first time
-  // We'll open calculator if user clicks Tools nav (showSection will make tools active)
-  const toolsNavButton = [...navButtons].find(b=> b.dataset.target === 'tools-section');
-  let toolsOpenedOnce = false;
-  toolsNavButton.addEventListener('click', ()=>{
-    if(!toolsOpenedOnce){
-      setTimeout(()=>{ // small delay so section transition finishes
-        openTool('calculator');
-        // show tool-select active
-        document.querySelectorAll('.tool-select').forEach(ts=> ts.classList.toggle('active', ts.dataset.tool === 'calculator'));
-      }, 300);
-      toolsOpenedOnce = true;
+      saveBtn.addEventListener('click', () => {
+        localStorage.setItem(storageKey, textarea.value);
+        saveMsg.classList.add('show');
+        setTimeout(() => {
+          saveMsg.classList.remove('show');
+        }, 1500);
+      });
     }
-  });
 
-  /*************************************************************************
-   * Small enhancement: clip tool-frame pulse off when clicking outside
-   **************************************************************************/
-  document.addEventListener('click', (e)=>{
-    if(!toolFrameContainer.contains(e.target)) {
-      // keep glow but remove pulse class
-      toolFrameContainer.classList.remove('pulse');
-    } else {
-      toolFrameContainer.classList.add('pulse');
+    // Unit Converter logic
+    function initUnitConverter() {
+      const unitType = document.getElementById('unitType');
+      const inputValue = document.getElementById('unitInput');
+      const unitFrom = document.getElementById('unitFrom');
+      const unitTo = document.getElementById('unitTo');
+      const resultDisplay = document.getElementById('conversionResult');
+
+      function populateUnits(type) {
+        unitFrom.innerHTML = '';
+        unitTo.innerHTML = '';
+        if (type === 'temperature') {
+          units.temperature.forEach(u => {
+            const option1 = document.createElement('option');
+            option1.value = u;
+            option1.textContent = u;
+            unitFrom.appendChild(option1);
+            const option2 = document.createElement('option');
+            option2.value = u;
+            option2.textContent = u;
+            unitTo.appendChild(option2);
+          });
+        } else {
+          Object.keys(units[type]).forEach(u => {
+            const option1 = document.createElement('option');
+            option1.value = u;
+            option1.textContent = capitalize(u);
+            unitFrom.appendChild(option1);
+            const option2 = document.createElement('option');
+            option2.value = u;
+            option2.textContent = capitalize(u);
+            unitTo.appendChild(option2);
+          });
+        }
+        unitFrom.selectedIndex = 0;
+        unitTo.selectedIndex = 1;
+        updateResult();
+      }
+
+      function capitalize(str) {
+        return str.charAt(0).toUpperCase() + str.slice(1);
+      }
+
+      function convert(value, fromUnit, toUnit, type) {
+        if (type === 'temperature') {
+          return convertTemperature(value, fromUnit, toUnit);
+        }
+        // length and weight conversion via base unit
+        const baseValue = value * units[type][fromUnit];
+        return baseValue / units[type][toUnit];
+      }
+
+      function convertTemperature(value, from, to) {
+        let val = parseFloat(value);
+        if (isNaN(val)) return '';
+        // Celsius to others
+        if (from === to) return val.toFixed(4);
+
+        switch (from) {
+          case 'Celsius':
+            if (to === 'Fahrenheit') return (val * 9/5 + 32).toFixed(4);
+            if (to === 'Kelvin') return (val + 273.15).toFixed(4);
+            break;
+          case 'Fahrenheit':
+            if (to === 'Celsius') return ((val - 32) * 5/9).toFixed(4);
+            if (to === 'Kelvin') return ((val - 32) * 5/9 + 273.15).toFixed(4);
+            break;
+          case 'Kelvin':
+            if (to === 'Celsius') return (val - 273.15).toFixed(4);
+            if (to === 'Fahrenheit') return ((val - 273.15) * 9/5 + 32).toFixed(4);
+            break;
+        }
+        return '';
+      }
+
+      function updateResult() {
+        const val = parseFloat(inputValue.value);
+        if (isNaN(val)) {
+          resultDisplay.textContent = '';
+          return;
+        }
+        const from = unitFrom.value;
+        const to = unitTo.value;
+        const type = unitType.value;
+        if (from === to) {
+          resultDisplay.textContent = `${val} ${to}`;
+          return;
+        }
+        const converted = convert(val, from, to, type);
+        if (converted === '') {
+          resultDisplay.textContent = 'Invalid conversion';
+        } else {
+          resultDisplay.textContent = `${converted} ${to}`;
+        }
+      }
+
+      unitType.addEventListener('change', () => {
+        populateUnits(unitType.value);
+      });
+      unitFrom.addEventListener('change', updateResult);
+      unitTo.addEventListener('change', updateResult);
+      inputValue.addEventListener('input', updateResult);
+
+      // Initialize
+      populateUnits(unitType.value);
     }
-  });
 
-  </script>
+    // Initialize tool logic depending on tool
+    function initToolLogic(tool) {
+      switch (tool) {
+        case 'calculator': return initCalculator();
+        case 'notepad': return initNotepad();
+        case 'unitconverter': return initUnitConverter();
+      }
+    }
+
+    // Initial load
+    loadTool(activeTool);
+    updateNav();
+
+    // Navigation button clicks
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (btn.classList.contains('active')) return;
+        activeTool = btn.id.replace('btn-', '');
+        updateNav();
+        loadTool(activeTool);
+      });
+    });
+
+    // Mouse follower logic
+    document.addEventListener('mousemove', e => {
+      mouseFollower.style.left = e.clientX + 'px';
+      mouseFollower.style.top = e.clientY + 'px';
+    });
+
+    // Add hover effect to interactive elements inside tools
+    document.body.addEventListener('mouseover', e => {
+      if (e.target.closest('button, select, input, textarea')) {
+        mouseFollower.classList.add('active-hover');
+      }
+    });
+    document.body.addEventListener('mouseout', e => {
+      if (e.target.closest('button, select, input, textarea')) {
+        mouseFollower.classList.remove('active-hover');
+      }
+    });
+  })();
+</script>
+
 </body>
 </html>
