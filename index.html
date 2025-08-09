@@ -3,264 +3,108 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Tools Section</title>
+<title>Unblocked Games & Tools</title>
 <style>
-  /* General resets */
+  /* Basic Reset */
   * {
     box-sizing: border-box;
   }
   body {
     margin: 0;
-    background: #0b1a3d;
+    background: #0A192F;
+    color: #CCD6F6;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: #eee;
     overflow-x: hidden;
   }
-
-  /* Container for tools */
-  .tools-container {
-    max-width: 900px;
-    margin: 2rem auto 5rem;
-    padding: 0 1rem;
+  header {
+    text-align: center;
+    padding: 2rem 1rem 1rem;
+    font-family: 'Playfair Display', serif;
+    font-size: 2.8rem;
+    letter-spacing: 0.15em;
+    color: #00FFFF;
+    user-select: none;
   }
-
-  /* Navigation buttons */
-  .tools-nav {
+  nav {
     display: flex;
     justify-content: center;
-    gap: 1rem;
+    gap: 2rem;
     margin-bottom: 1.5rem;
   }
-  .tools-nav button {
+  nav button {
     background: transparent;
-    border: 2px solid #3666ff;
-    color: #9bb7ff;
-    padding: 0.5rem 1.25rem;
-    font-size: 1.1rem;
-    border-radius: 6px;
+    border: 2px solid #00FFFF;
+    color: #00FFFF;
+    font-size: 1.15rem;
+    padding: 0.5rem 1.5rem;
+    border-radius: 8px;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: background-color 0.3s ease, color 0.3s ease;
     position: relative;
     overflow: hidden;
   }
-  .tools-nav button:hover:not(.active) {
-    background-color: #2141a1;
-    color: #cddcff;
-  }
-  .tools-nav button.active {
-    background-color: #2d47d9;
-    color: #fff;
-    border-color: #5a7aff;
+  nav button.active {
+    background-color: #00FFFF;
+    color: #0A192F;
     animation: pulse 2s infinite;
+  }
+  nav button:hover:not(.active) {
+    background-color: rgba(0, 255, 255, 0.15);
   }
   @keyframes pulse {
     0%, 100% {
-      box-shadow: 0 0 6px 2px #5a7aff;
+      box-shadow: 0 0 6px 3px #00FFFF;
     }
     50% {
-      box-shadow: 0 0 12px 4px #8faeff;
+      box-shadow: 0 0 14px 6px #00FFFF;
     }
   }
-
-  /* Tool frame container */
-  .tool-frame {
-    position: relative;
-    background: #112a67;
-    border-radius: 12px;
-    max-width: 100%;
-    max-height: 70vh;
-    min-height: 320px;
-    margin: 0 auto;
-    padding: 1rem;
-    box-shadow:
-      0 0 10px rgba(54, 102, 255, 0.6),
-      inset 0 0 20px rgba(54, 102, 255, 0.3);
-    overflow-y: auto;
-    opacity: 0;
-    transform: scale(0.8);
-    animation-fill-mode: forwards;
-  }
-  .tool-frame.show {
-    animation: expandIn 0.5s forwards;
-  }
-  @keyframes expandIn {
-    to {
-      opacity: 1;
-      transform: scale(1);
-    }
-  }
-
-  /* Scrollbar styling */
-  .tool-frame::-webkit-scrollbar {
-    width: 8px;
-  }
-  .tool-frame::-webkit-scrollbar-track {
-    background: #0a1834;
-    border-radius: 6px;
-  }
-  .tool-frame::-webkit-scrollbar-thumb {
-    background: #3458db;
-    border-radius: 6px;
-  }
-
-  /* Calculator Styles */
-  .calculator {
-    max-width: 360px;
-    margin: 0 auto;
-    background: #1a2c6b;
-    border-radius: 10px;
-    padding: 1rem;
-    color: #eee;
-    user-select: none;
-  }
-  .calc-display {
-    width: 100%;
-    height: 50px;
-    background: #0e1a3a;
-    border-radius: 8px;
-    font-size: 1.8rem;
-    padding: 0.5rem 1rem;
-    text-align: right;
-    color: #aaccff;
-    margin-bottom: 1rem;
-    box-shadow: inset 0 0 8px #183875;
-    overflow-wrap: break-word;
-  }
-  .calc-buttons {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-  }
-  .calc-buttons button {
-    background: #25418b;
-    border: none;
-    border-radius: 8px;
-    color: #cddcff;
-    font-size: 1.4rem;
-    padding: 1rem;
-    cursor: pointer;
-    transition: background-color 0.25s ease;
-  }
-  .calc-buttons button:hover {
-    background: #3d5eda;
-  }
-  .calc-buttons button.operator {
-    background: #5971f0;
-    color: #e1e9ff;
-  }
-  .calc-buttons button.operator:hover {
-    background: #7d95f8;
-  }
-
-  /* Notepad Styles */
-  .notepad {
-    max-width: 600px;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-  }
-  .notepad textarea {
-    flex: 1;
-    background: #f0f4ff;
-    border-radius: 10px;
-    border: none;
-    padding: 1rem;
-    font-family: monospace, monospace;
-    font-size: 1.1rem;
-    color: #222;
-    resize: none;
-    box-shadow: inset 0 0 8px #a6bbe9;
-  }
-  .notepad .notepad-controls {
-    margin-top: 0.75rem;
-    display: flex;
-    justify-content: flex-end;
-  }
-  .notepad button.save-btn {
-    background: #2d47d9;
-    color: #fff;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: background-color 0.3s ease;
-  }
-  .notepad button.save-btn:hover {
-    background: #5a7aff;
-  }
-  .notepad .save-msg {
-    margin-left: 1rem;
-    align-self: center;
-    font-size: 0.9rem;
-    color: #a0d468;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
-  .notepad .save-msg.show {
-    opacity: 1;
-  }
-
-  /* Unit Converter Styles */
-  .unit-converter {
-    max-width: 600px;
-    margin: 0 auto;
-    color: #eee;
-  }
-  .unit-converter label {
+  #searchBar {
     display: block;
-    margin-bottom: 0.25rem;
-    font-weight: 600;
-  }
-  .unit-converter select,
-  .unit-converter input {
-    width: 100%;
-    padding: 0.5rem 0.75rem;
-    margin-bottom: 1rem;
-    border-radius: 8px;
+    margin: 0 auto 2rem;
+    max-width: 400px;
+    width: 90%;
+    padding: 0.6rem 1rem;
+    font-size: 1.1rem;
+    border-radius: 10px;
     border: none;
-    font-size: 1rem;
-    background: #193075;
-    color: #cddcff;
-    box-shadow: inset 0 0 8px #2c4bbf;
-    appearance: none;
-  }
-  .unit-converter select:focus,
-  .unit-converter input:focus {
     outline: none;
-    box-shadow: 0 0 8px #5a7aff;
-    background: #25418b;
+    background: #0e2a54;
+    color: #cdeeff;
+    box-shadow: 0 0 6px transparent;
+    transition: box-shadow 0.3s ease;
   }
-  .unit-converter .result {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: #aaccff;
-    margin-top: 1rem;
-    min-height: 28px;
+  #searchBar:focus {
+    box-shadow: 0 0 15px 3px #00FFFF;
+    background: #153a83;
   }
-
-  /* Responsive */
-  @media (max-width: 480px) {
-    .tools-nav button {
-      font-size: 1rem;
-      padding: 0.4rem 0.8rem;
-    }
-    .calculator, .notepad, .unit-converter {
-      max-width: 100%;
-    }
+  main#content {
+    max-width: 960px;
+    margin: 0 auto 4rem;
+    padding: 0 1rem;
+    min-height: 400px;
+    position: relative;
+  }
+  /* Fade out/in */
+  main.fade-out {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  main.fade-in {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.5s ease, transform 0.5s ease;
   }
 
   /* Mouse Follower */
   .mouse-follower {
     pointer-events: none;
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 18px;
-    height: 18px;
+    top: 0; left: 0;
+    width: 18px; height: 18px;
     border-radius: 50%;
-    background-color: #5a7affcc;
+    background-color: #00FFFFaa;
     transition: background-color 0.25s ease, transform 0.1s ease;
     z-index: 9999;
     transform: translate(-50%, -50%);
@@ -274,375 +118,120 @@
 </head>
 <body>
 
-<div class="tools-container">
-  <nav class="tools-nav" role="tablist" aria-label="Tools Navigation">
-    <button role="tab" aria-selected="true" aria-controls="calculator" id="btn-calculator" class="active">Calculator</button>
-    <button role="tab" aria-selected="false" aria-controls="notepad" id="btn-notepad">Notepad</button>
-    <button role="tab" aria-selected="false" aria-controls="unitconverter" id="btn-unitconverter">Unit Converter</button>
-  </nav>
+<header>UNBLOCKED GAMES</header>
 
-  <section id="tool-frame" class="tool-frame" role="tabpanel" aria-live="polite" tabindex="0">
-    <!-- Tool content injected here -->
-  </section>
-</div>
+<nav role="navigation" aria-label="Main Navigation">
+  <button id="btn-games" class="active" aria-current="page">Games</button>
+  <button id="btn-tools">Tools</button>
+  <button id="btn-apps">Apps</button>
+</nav>
+
+<input type="search" id="searchBar" placeholder="Search..." aria-label="Search games, tools, apps" />
+
+<main id="content" role="main" tabindex="0" aria-live="polite">
+  <!-- Dynamic content loads here -->
+</main>
 
 <div class="mouse-follower"></div>
 
 <script>
-  (() => {
-    const toolFrame = document.getElementById('tool-frame');
-    const buttons = document.querySelectorAll('.tools-nav button');
-    const mouseFollower = document.querySelector('.mouse-follower');
+  const content = document.getElementById('content');
+  const buttons = {
+    games: document.getElementById('btn-games'),
+    tools: document.getElementById('btn-tools'),
+    apps: document.getElementById('btn-apps'),
+  };
+  const mouseFollower = document.querySelector('.mouse-follower');
 
-    // Tool HTML templates
-    const templates = {
-      calculator: `
-        <div class="calculator" tabindex="0" aria-label="Calculator tool">
-          <div class="calc-display" aria-live="polite" aria-atomic="true" role="textbox" id="calcDisplay" aria-readonly="true">0</div>
-          <div class="calc-buttons" role="group" aria-label="Calculator buttons">
-            <button type="button" data-val="7">7</button>
-            <button type="button" data-val="8">8</button>
-            <button type="button" data-val="9">9</button>
-            <button type="button" data-val="/" class="operator" aria-label="Divide">÷</button>
-            <button type="button" data-val="4">4</button>
-            <button type="button" data-val="5">5</button>
-            <button type="button" data-val="6">6</button>
-            <button type="button" data-val="*" class="operator" aria-label="Multiply">×</button>
-            <button type="button" data-val="1">1</button>
-            <button type="button" data-val="2">2</button>
-            <button type="button" data-val="3">3</button>
-            <button type="button" data-val="-" class="operator" aria-label="Subtract">−</button>
-            <button type="button" data-val="0">0</button>
-            <button type="button" data-val=".">.</button>
-            <button type="button" data-val="C" aria-label="Clear">C</button>
-            <button type="button" data-val="+" class="operator" aria-label="Add">+</button>
-            <button type="button" data-val="=" style="grid-column: span 4; background:#4969ff; font-weight: 700;">=</button>
-          </div>
-        </div>
-      `,
-      notepad: `
-        <div class="notepad" tabindex="0" aria-label="Notepad tool">
-          <textarea aria-label="Notepad text area" id="notepadTextarea" placeholder="Type your notes here..."></textarea>
-          <div class="notepad-controls">
-            <button class="save-btn" type="button" aria-label="Save notes">Save</button>
-            <span class="save-msg" aria-live="polite" role="status" aria-atomic="true">Saved!</span>
-          </div>
-        </div>
-      `,
-      unitconverter: `
-        <div class="unit-converter" tabindex="0" aria-label="Unit converter tool">
-          <label for="unitType">Select Unit Type:</label>
-          <select id="unitType" aria-controls="unitInput unitFrom unitTo conversionResult">
-            <option value="length">Length</option>
-            <option value="weight">Weight</option>
-            <option value="temperature">Temperature</option>
-          </select>
+  // Load initial section: games
+  loadSection('games');
 
-          <label for="unitInput">Enter Value:</label>
-          <input id="unitInput" type="number" step="any" aria-describedby="unitInputDesc" placeholder="Enter value" />
-
-          <label for="unitFrom">From:</label>
-          <select id="unitFrom" aria-controls="conversionResult"></select>
-
-          <label for="unitTo">To:</label>
-          <select id="unitTo" aria-controls="conversionResult"></select>
-
-          <div class="result" id="conversionResult" aria-live="polite" aria-atomic="true"></div>
-        </div>
-      `
-    };
-
-    // Unit conversion data
-    const units = {
-      length: {
-        meter: 1,
-        kilometer: 1000,
-        centimeter: 0.01,
-        millimeter: 0.001,
-        mile: 1609.34,
-        yard: 0.9144,
-        foot: 0.3048,
-        inch: 0.0254,
-      },
-      weight: {
-        gram: 1,
-        kilogram: 1000,
-        milligram: 0.001,
-        pound: 453.592,
-        ounce: 28.3495,
-      },
-      temperature: ['Celsius', 'Fahrenheit', 'Kelvin'],
-    };
-
-    // Currently active tool
-    let activeTool = 'calculator';
-
-    // Load a tool's HTML content and initialize tool logic
-    function loadTool(tool) {
-      activeTool = tool;
-      toolFrame.classList.remove('show'); // start hiding frame for animation reset
-      setTimeout(() => {
-        toolFrame.innerHTML = templates[tool];
-        toolFrame.classList.add('show');
-        initToolLogic(tool);
-      }, 250);
-    }
-
-    // Update nav buttons active state and ARIA
-    function updateNav() {
-      buttons.forEach(btn => {
-        const isActive = btn.id === `btn-${activeTool}`;
-        btn.classList.toggle('active', isActive);
-        btn.setAttribute('aria-selected', isActive);
-      });
-    }
-
-    // Calculator logic
-    function initCalculator() {
-      const display = document.getElementById('calcDisplay');
-      let currentInput = '0';
-      let lastInput = null;
-      let resetNext = false;
-
-      function updateDisplay() {
-        display.textContent = currentInput;
-      }
-
-      function calculateExpression(expr) {
-        try {
-          // Only allow safe characters: digits, operators, decimal point
-          if (/^[0-9+\-*/.() ]+$/.test(expr)) {
-            let result = Function('"use strict";return (' + expr + ')')();
-            if (typeof result === 'number' && isFinite(result)) {
-              return +result.toFixed(10); // avoid floating point long decimals
-            }
-          }
-        } catch {}
-        return null;
-      }
-
-      display.textContent = currentInput;
-
-      toolFrame.querySelectorAll('.calc-buttons button').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const val = btn.dataset.val;
-
-          if (val === 'C') {
-            currentInput = '0';
-            resetNext = false;
-            updateDisplay();
-            return;
-          }
-          if (val === '=') {
-            const res = calculateExpression(currentInput);
-            if (res !== null) {
-              currentInput = res.toString();
-              resetNext = true;
-            } else {
-              currentInput = 'Error';
-              resetNext = true;
-            }
-            updateDisplay();
-            return;
-          }
-          // If resetNext true (after result), overwrite input unless operator pressed
-          if (resetNext) {
-            if (/[+\-*/]/.test(val)) {
-              resetNext = false;
-              currentInput += val;
-            } else {
-              currentInput = val === '.' ? '0.' : val;
-              resetNext = false;
-            }
-            updateDisplay();
-            return;
-          }
-
-          // Prevent multiple decimals in a number segment
-          if (val === '.') {
-            // last number segment from right
-            let parts = currentInput.split(/[\+\-\*\/]/);
-            if (parts[parts.length - 1].includes('.')) return;
-          }
-
-          if (currentInput === '0' && val !== '.') {
-            currentInput = val;
-          } else {
-            currentInput += val;
-          }
-          updateDisplay();
-        });
-      });
-    }
-
-    // Notepad logic
-    function initNotepad() {
-      const textarea = document.getElementById('notepadTextarea');
-      const saveBtn = toolFrame.querySelector('.save-btn');
-      const saveMsg = toolFrame.querySelector('.save-msg');
-
-      const storageKey = 'tools_notepad_content';
-
-      // Load saved content if any
-      textarea.value = localStorage.getItem(storageKey) || '';
-
-      saveBtn.addEventListener('click', () => {
-        localStorage.setItem(storageKey, textarea.value);
-        saveMsg.classList.add('show');
-        setTimeout(() => {
-          saveMsg.classList.remove('show');
-        }, 1500);
-      });
-    }
-
-    // Unit Converter logic
-    function initUnitConverter() {
-      const unitType = document.getElementById('unitType');
-      const inputValue = document.getElementById('unitInput');
-      const unitFrom = document.getElementById('unitFrom');
-      const unitTo = document.getElementById('unitTo');
-      const resultDisplay = document.getElementById('conversionResult');
-
-      function populateUnits(type) {
-        unitFrom.innerHTML = '';
-        unitTo.innerHTML = '';
-        if (type === 'temperature') {
-          units.temperature.forEach(u => {
-            const option1 = document.createElement('option');
-            option1.value = u;
-            option1.textContent = u;
-            unitFrom.appendChild(option1);
-            const option2 = document.createElement('option');
-            option2.value = u;
-            option2.textContent = u;
-            unitTo.appendChild(option2);
-          });
-        } else {
-          Object.keys(units[type]).forEach(u => {
-            const option1 = document.createElement('option');
-            option1.value = u;
-            option1.textContent = capitalize(u);
-            unitFrom.appendChild(option1);
-            const option2 = document.createElement('option');
-            option2.value = u;
-            option2.textContent = capitalize(u);
-            unitTo.appendChild(option2);
-          });
-        }
-        unitFrom.selectedIndex = 0;
-        unitTo.selectedIndex = 1;
-        updateResult();
-      }
-
-      function capitalize(str) {
-        return str.charAt(0).toUpperCase() + str.slice(1);
-      }
-
-      function convert(value, fromUnit, toUnit, type) {
-        if (type === 'temperature') {
-          return convertTemperature(value, fromUnit, toUnit);
-        }
-        // length and weight conversion via base unit
-        const baseValue = value * units[type][fromUnit];
-        return baseValue / units[type][toUnit];
-      }
-
-      function convertTemperature(value, from, to) {
-        let val = parseFloat(value);
-        if (isNaN(val)) return '';
-        // Celsius to others
-        if (from === to) return val.toFixed(4);
-
-        switch (from) {
-          case 'Celsius':
-            if (to === 'Fahrenheit') return (val * 9/5 + 32).toFixed(4);
-            if (to === 'Kelvin') return (val + 273.15).toFixed(4);
-            break;
-          case 'Fahrenheit':
-            if (to === 'Celsius') return ((val - 32) * 5/9).toFixed(4);
-            if (to === 'Kelvin') return ((val - 32) * 5/9 + 273.15).toFixed(4);
-            break;
-          case 'Kelvin':
-            if (to === 'Celsius') return (val - 273.15).toFixed(4);
-            if (to === 'Fahrenheit') return ((val - 273.15) * 9/5 + 32).toFixed(4);
-            break;
-        }
-        return '';
-      }
-
-      function updateResult() {
-        const val = parseFloat(inputValue.value);
-        if (isNaN(val)) {
-          resultDisplay.textContent = '';
-          return;
-        }
-        const from = unitFrom.value;
-        const to = unitTo.value;
-        const type = unitType.value;
-        if (from === to) {
-          resultDisplay.textContent = `${val} ${to}`;
-          return;
-        }
-        const converted = convert(val, from, to, type);
-        if (converted === '') {
-          resultDisplay.textContent = 'Invalid conversion';
-        } else {
-          resultDisplay.textContent = `${converted} ${to}`;
-        }
-      }
-
-      unitType.addEventListener('change', () => {
-        populateUnits(unitType.value);
-      });
-      unitFrom.addEventListener('change', updateResult);
-      unitTo.addEventListener('change', updateResult);
-      inputValue.addEventListener('input', updateResult);
-
-      // Initialize
-      populateUnits(unitType.value);
-    }
-
-    // Initialize tool logic depending on tool
-    function initToolLogic(tool) {
-      switch (tool) {
-        case 'calculator': return initCalculator();
-        case 'notepad': return initNotepad();
-        case 'unitconverter': return initUnitConverter();
-      }
-    }
-
-    // Initial load
-    loadTool(activeTool);
-    updateNav();
-
-    // Navigation button clicks
-    buttons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        if (btn.classList.contains('active')) return;
-        activeTool = btn.id.replace('btn-', '');
-        updateNav();
-        loadTool(activeTool);
-      });
-    });
-
-    // Mouse follower logic
-    document.addEventListener('mousemove', e => {
-      mouseFollower.style.left = e.clientX + 'px';
-      mouseFollower.style.top = e.clientY + 'px';
-    });
-
-    // Add hover effect to interactive elements inside tools
-    document.body.addEventListener('mouseover', e => {
-      if (e.target.closest('button, select, input, textarea')) {
-        mouseFollower.classList.add('active-hover');
+  // Set active button styling
+  function setActiveBtn(active) {
+    Object.entries(buttons).forEach(([key, btn]) => {
+      if(key === active) {
+        btn.classList.add('active');
+        btn.setAttribute('aria-current', 'page');
+      } else {
+        btn.classList.remove('active');
+        btn.removeAttribute('aria-current');
       }
     });
-    document.body.addEventListener('mouseout', e => {
-      if (e.target.closest('button, select, input, textarea')) {
-        mouseFollower.classList.remove('active-hover');
-      }
-    });
-  })();
+  }
+
+  // Load section content dynamically with smooth transition
+  async function loadSection(section) {
+    setActiveBtn(section);
+
+    // Fade out current content
+    content.classList.add('fade-out');
+    await new Promise(r => setTimeout(r, 400)); // wait for fade out
+
+    try {
+      let response = await fetch(`${section}.html`);
+      if(!response.ok) throw new Error('Failed to load');
+      let html = await response.text();
+      content.innerHTML = html;
+    } catch(e) {
+      content.innerHTML = `<p style="color:#ff4444; text-align:center;">Failed to load ${section} content.</p>`;
+    }
+
+    // Focus main content for accessibility
+    content.focus();
+
+    // Fade in new content
+    content.classList.remove('fade-out');
+    content.classList.add('fade-in');
+
+    // Remove fade-in after animation so it can be repeated
+    setTimeout(() => content.classList.remove('fade-in'), 600);
+
+    // If tools section loaded, initialize its scripts
+    if(section === 'tools') {
+      initToolsSection();
+    }
+    if(section === 'games') {
+      initGamesSection();
+    }
+    if(section === 'apps') {
+      initAppsSection();
+    }
+  }
+
+  // Nav button click handlers
+  buttons.games.addEventListener('click', () => loadSection('games'));
+  buttons.tools.addEventListener('click', () => loadSection('tools'));
+  buttons.apps.addEventListener('click', () => loadSection('apps'));
+
+  // Mouse follower logic
+  document.addEventListener('mousemove', e => {
+    mouseFollower.style.left = e.clientX + 'px';
+    mouseFollower.style.top = e.clientY + 'px';
+  });
+
+  document.body.addEventListener('mouseover', e => {
+    if (e.target.closest('button, a, input, select, textarea')) {
+      mouseFollower.classList.add('active-hover');
+    }
+  });
+  document.body.addEventListener('mouseout', e => {
+    if (e.target.closest('button, a, input, select, textarea')) {
+      mouseFollower.classList.remove('active-hover');
+    }
+  });
+
+  // Stub: Tools init placeholder (will be overridden by tools.html)
+  function initToolsSection() {
+    // No-op default
+  }
+  // Stub: Games init placeholder (will be overridden by games.html)
+  function initGamesSection() {
+    // No-op default
+  }
+  // Stub: Apps init placeholder
+  function initAppsSection() {
+    // Could add logic later
+  }
 </script>
 
 </body>
