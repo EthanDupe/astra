@@ -1,0 +1,108 @@
+<div role="region" aria-label="Games section" style="max-width: 960px; margin: 0 auto;">
+  <h2 style="color:#00FFFF; font-family:'Playfair Display', serif; font-size:2rem; text-align:center; margin-bottom:1rem;">Games</h2>
+  <div id="gamesGrid" style="
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 1rem;
+    justify-items: center;
+    padding: 0 1rem;
+  ">
+    <button class="game-btn" data-url="https://example.com/amongus" aria-label="Play Among Us" style="
+      background: linear-gradient(135deg, #00FFFF, #004466);
+      border: none;
+      color: #0A192F;
+      font-weight: 700;
+      border-radius: 14px;
+      padding: 1rem 0.5rem;
+      width: 100%;
+      max-width: 160px;
+      cursor: pointer;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-size: 1.1rem;
+      box-shadow: 0 0 10px #00FFFFaa;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    ">Among Us</button>
+
+    <button class="game-btn" data-url="https://example.com/slope" aria-label="Play Slope" style="
+      background: linear-gradient(135deg, #00FFFF, #004466);
+      border: none;
+      color: #0A192F;
+      font-weight: 700;
+      border-radius: 14px;
+      padding: 1rem 0.5rem;
+      width: 100%;
+      max-width: 160px;
+      cursor: pointer;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-size: 1.1rem;
+      box-shadow: 0 0 10px #00FFFFaa;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    ">Slope</button>
+
+    <button class="game-btn" data-url="https://example.com/vex5" aria-label="Play Vex 5" style="
+      background: linear-gradient(135deg, #00FFFF, #004466);
+      border: none;
+      color: #0A192F;
+      font-weight: 700;
+      border-radius: 14px;
+      padding: 1rem 0.5rem;
+      width: 100%;
+      max-width: 160px;
+      cursor: pointer;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-size: 1.1rem;
+      box-shadow: 0 0 10px #00FFFFaa;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    ">Vex 5</button>
+
+    <button class="game-btn" data-url="https://example.com/run3" aria-label="Play Run 3" style="
+      background: linear-gradient(135deg, #00FFFF, #004466);
+      border: none;
+      color: #0A192F;
+      font-weight: 700;
+      border-radius: 14px;
+      padding: 1rem 0.5rem;
+      width: 100%;
+      max-width: 160px;
+      cursor: pointer;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-size: 1.1rem;
+      box-shadow: 0 0 10px #00FFFFaa;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    ">Run 3</button>
+
+    <button class="game-btn" data-url="https://example.com/retrobowl" aria-label="Play Retro Bowl" style="
+      background: linear-gradient(135deg, #00FFFF, #004466);
+      border: none;
+      color: #0A192F;
+      font-weight: 700;
+      border-radius: 14px;
+      padding: 1rem 0.5rem;
+      width: 100%;
+      max-width: 160px;
+      cursor: pointer;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-size: 1.1rem;
+      box-shadow: 0 0 10px #00FFFFaa;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    ">Retro Bowl</button>
+  </div>
+</div>
+
+<script>
+  const gameButtons = document.querySelectorAll('.game-btn');
+  gameButtons.forEach(btn => {
+    btn.addEventListener('mouseenter', () => {
+      btn.style.transform = 'rotateX(10deg) scale(1.05)';
+      btn.style.boxShadow = '0 0 18px #00FFFF';
+    });
+    btn.addEventListener('mouseleave', () => {
+      btn.style.transform = 'rotateX(0) scale(1)';
+      btn.style.boxShadow = '0 0 10px #00FFFFaa';
+    });
+    btn.addEventListener('click', () => {
+      const url = btn.getAttribute('data-url');
+      window.open(url, '_blank', 'noopener');
+    });
+  });
+</script>
