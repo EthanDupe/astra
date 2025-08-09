@@ -1,1 +1,174 @@
-<title>Apps</title>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Astra – Apps</title>
+<style>
+  body {
+    background: #0c0f14;
+    color: #e6f0ff;
+    font-family: system-ui, sans-serif;
+    margin: 0;
+    padding: 20px;
+    cursor: none;
+  }
+
+  .cursor {
+    position: fixed;
+    width: 14px;
+    height: 14px;
+    border: 2px solid #e6f0ff;
+    border-radius: 50%;
+    pointer-events: none;
+    transform: translate(-50%, -50%) scale(1);
+    transition: transform 0.15s ease, background-color 0.3s ease;
+    z-index: 10000;
+  }
+
+  .button-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 18px;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .link-btn {
+    background: rgba(255,255,255,0.03);
+    border: none;
+    padding: 16px;
+    border-radius: 12px;
+    text-align: center;
+    color: inherit;
+    cursor: none;
+    transition: transform 0.3s ease, background 0.3s ease;
+  }
+  .link-btn:hover {
+    background: rgba(125,211,252,0.06);
+    transform: translateY(-4px) scale(1.04);
+  }
+  .link-btn img {
+    width: 36px;
+    height: 36px;
+    margin-bottom: 8px;
+  }
+  .link-btn span {
+    display: block;
+    font-size: 14px;
+  }
+
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(2,6,23,0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    z-index: 999;
+  }
+  .overlay.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+  .overlay iframe {
+    width: 80%;
+    height: 80%;
+    border: none;
+    border-radius: 12px;
+    background: #111;
+  }
+  .overlay .close {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    font-size: 24px;
+    color: #e6f0ff;
+    background: none;
+    border: none;
+    cursor: none;
+    transition: transform 0.2s ease;
+  }
+  .overlay .close:hover {
+    transform: scale(1.2);
+  }
+</style>
+</head>
+<body>
+  <div class="cursor" id="cursor"></div>
+
+  <div class="button-grid">
+    <button class="link-btn" data-url="https://ixl.com.de/frog/ixl/hvtrs8%252F-wuw%252Ctkkvoi.aoo%252Fgxrlmrg">
+      <img src="https://cdn-icons-png.flaticon.com/512/3046/3046123.png" alt="TikTok" />
+      <span>TikTok</span>
+    </button>
+
+    <button class="link-btn" data-url="https://ixl.com.de/frog/ixl/hvtrs8%252F-tmonbcz%252Ccmm-wpivep%252Fahct%252Fgrt%252Fantgrlavite">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_Logo.svg" alt="ChatGPT" style="width:36px; height:36px;"/>
+      <span>ChatGPT</span>
+    </button>
+
+    <button class="link-btn" data-url="https://ixl.com.de/frog/ixl/hvtrs8%252F-pna%257B.eedopcgnmw%252Ccmm-mcln%252F">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/2/21/NVIDIA_GeForce_NOW_logo.svg" alt="NVIDIA GeForce Now" style="width:36px; height:36px;" />
+      <span>NVIDIA GeForce Now</span>
+    </button>
+
+    <button class="link-btn" data-url="https://ixl.com.de/frog/ixl/hvtrs8%252F-wuw%252Cngwermuldq.aoo%252F">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/7/7a/Newgrounds_logo.svg" alt="Newgrounds" style="width:36px; height:36px;" />
+      <span>Newgrounds</span>
+    </button>
+
+    <button class="link-btn" data-url="https://ixl.com.de/frog/ixl/hvtrs8%252F-rgs%252Clfrgsadl.aoo%252Fgaqydul%252Frc-eze-Ecs%257Bfwn%252Ceze%253Dn%253FEcs%257Bfwn%255Del_70202_nd%252Ceze">
+      <img src="https://cdn-icons-png.flaticon.com/512/1077/1077012.png" alt="Easy Fun" />
+      <span>Easy Fun</span>
+    </button>
+
+    <button class="link-btn" data-url="https://ixl.com.de/frog/ixl/hvtrs8%252F-ilvkdkows%252Cngrfvrn%252Cdg%252Fhs-hcnflgrq.hs%253Dv%253F6a043634">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/4/42/YouTube_icon_%282013-2017%29.png" alt="YouTube" style="width:36px; height:36px;" />
+      <span>YouTube</span>
+    </button>
+  </div>
+
+  <div class="overlay" id="iframeOverlay">
+    <button class="close" id="closeBtn">&times;</button>
+    <iframe src=""></iframe>
+  </div>
+
+<script>
+  const cursor = document.getElementById('cursor');
+  document.addEventListener('mousemove', e => {
+    cursor.style.left = e.clientX + 'px';
+    cursor.style.top = e.clientY + 'px';
+  });
+
+  document.querySelectorAll('.link-btn, .close').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      cursor.style.transform = 'scale(2)';
+      cursor.style.backgroundColor = 'rgba(125,211,252,0.5)';
+    });
+    el.addEventListener('mouseleave', () => {
+      cursor.style.transform = 'scale(1)';
+      cursor.style.backgroundColor = 'transparent';
+    });
+  });
+
+  const overlay = document.getElementById('iframeOverlay');
+  const iframe = overlay.querySelector('iframe');
+  document.querySelectorAll('.link-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      iframe.src = btn.dataset.url;
+      overlay.classList.add('active');
+    });
+  });
+
+  document.getElementById('closeBtn').addEventListener('click', () => {
+    overlay.classList.remove('active');
+    setTimeout(() => iframe.src = '', 300);
+  });
+</script>
+
+</body>
+</html>
