@@ -1,612 +1,130 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Astra</title>
-
-  <!--
-    Astra - Minimalist unblocked games site
-    Single file (HTML+CSS+JS). No external resources.
-    Author: ChatGPT (example)
-  -->
-
-  <style>
-    /* ===========================
-       Variables & Base
-       =========================== */
-    :root{
-      --bg: #0b0f13;
-      --panel: #0f1418;
-      --muted: #9aa6b2;
-      --accent: linear-gradient(90deg,#7dd3fc,#60a5fa 40%,#a78bfa 100%);
-      --primary: #e6f0ff;
-      --glass: rgba(255,255,255,0.03);
-      --glass-2: rgba(255,255,255,0.025);
-      --radius: 14px;
-      --gap: 18px;
-      --nav-height: 64px;
-      --transition: 320ms cubic-bezier(.2,.9,.25,1);
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Astra</title>
+<style>
+    /* Reset & Fonts */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    body {
+        background-color: #0f0f0f;
+        color: #ffffff;
+        font-family: 'Segoe UI', sans-serif;
+        overflow-x: hidden;
     }
 
-    /* Respect user reduced motion */
-    @media (prefers-reduced-motion: reduce){
-      :root{ --transition: 0ms; }
+    /* Loading Screen */
+    #loading-screen {
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background-color: #0f0f0f;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        font-size: 2em;
+        font-weight: bold;
+        opacity: 1;
+        transition: opacity 1s ease;
+    }
+    #loading-screen.fade-out {
+        opacity: 0;
+        pointer-events: none;
     }
 
-    *{box-sizing:border-box}
-    html,body{
-      height:100%;
-      margin:0;
-      background: radial-gradient(1200px 600px at 10% 10%, rgba(96,165,250,0.06), transparent 8%),
-                  radial-gradient(1000px 400px at 90% 90%, rgba(167,139,250,0.04), transparent 8%),
-                  var(--bg);
-      color:var(--primary);
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
-      -webkit-tap-highlight-color: transparent;
+    /* Header Title */
+    header {
+        text-align: center;
+        padding: 1rem;
+        font-size: 2rem;
+        font-weight: bold;
+        letter-spacing: 2px;
+        animation: fadeInDown 1s ease;
     }
 
-    /* ===========================
-       Loading Screen
-       =========================== */
-    .loader-wrap{
-      position:fixed;
-      inset:0;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      z-index:9999;
-      background:linear-gradient(180deg, rgba(6,8,10,0.95), rgba(8,10,12,0.85));
-      backdrop-filter: blur(6px);
-      transition: opacity var(--transition) ease, visibility var(--transition);
+    /* Navbar */
+    nav {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        padding: 1rem;
+        animation: fadeInUp 1.2s ease;
     }
-    .loader-wrap.hidden{
-      opacity:0;
-      visibility:hidden;
-      pointer-events:none;
+    nav button {
+        background: none;
+        border: 2px solid #ffffff;
+        color: #ffffff;
+        padding: 0.5rem 1.2rem;
+        font-size: 1rem;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: all 0.3s ease;
     }
-    .loader {
-      text-align:center;
-      transform: translateY(0);
-    }
-    .loader h1{
-      margin:0;
-      font-size: clamp(20px, 3.4vw, 36px);
-      letter-spacing: 0.06em;
-      color:var(--primary);
-      opacity:1;
-      transition: opacity 420ms ease, transform 420ms ease;
-      font-weight:600;
+    nav button:hover {
+        transform: scale(1.08);
+        background-color: #ffffff;
+        color: #0f0f0f;
     }
 
-    /* ===========================
-       Site Frame & Header
-       =========================== */
-    .site {
-      min-height:100%;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      padding: 28px;
-      gap:12px;
+    /* Fade-in animations */
+    @keyframes fadeInDown {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 
-    header.brand {
-      width:100%;
-      max-width:1100px;
-      display:flex;
-      align-items:center;
-      flex-direction:column;
-      gap:8px;
-      pointer-events:none; /* keep brand static */
+    /* Content Placeholder */
+    main {
+        text-align: center;
+        padding: 2rem;
+        opacity: 0;
+        animation: fadeIn 1.5s ease forwards;
+        animation-delay: 0.3s;
     }
-
-    header .title {
-      pointer-events:auto;
-      user-select:none;
-      font-weight:700;
-      font-size: clamp(22px, 3.6vw, 40px);
-      letter-spacing: 0.02em;
-      color:var(--primary);
-      text-align:center;
-      padding: 8px 20px;
-      border-radius: 999px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-      box-shadow: 0 6px 30px rgba(2,6,23,0.6), inset 0 -1px 0 rgba(255,255,255,0.02);
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
     }
-
-    /* Navigation bar under title */
-    nav.main-nav {
-      width:100%;
-      max-width:1100px;
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      gap:16px;
-      height: var(--nav-height);
-      pointer-events:auto;
-    }
-
-    .nav-btn {
-      --size:130px;
-      min-width:120px;
-      max-width:240px;
-      height:46px;
-      border-radius: 12px;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:12px;
-      padding: 8px 14px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.012), rgba(255,255,255,0.01));
-      color:var(--primary);
-      cursor:pointer;
-      border: 1px solid rgba(255,255,255,0.03);
-      transition: transform var(--transition), box-shadow var(--transition), background var(--transition);
-      position:relative;
-      font-weight:600;
-      letter-spacing:0.02em;
-      backdrop-filter: blur(6px);
-      user-select:none;
-    }
-
-    .nav-btn .icon {
-      width:20px;
-      height:20px;
-      display:inline-block;
-      opacity:0;
-      transform: translateY(-6px) scale(.9);
-      transition: opacity calc(var(--transition) * 1.2) ease, transform var(--transition);
-      flex-shrink:0;
-    }
-
-    /* Hover/focus effects */
-    .nav-btn:hover, .nav-btn:focus {
-      transform: translateY(-6px) scale(1.02);
-      box-shadow: 0 10px 30px rgba(35,100,255,0.08), 0 2px 8px rgba(0,0,0,0.5);
-      outline: none;
-      background: linear-gradient(90deg, rgba(125,211,252,0.06), rgba(167,139,250,0.06));
-      border-color: rgba(125,211,252,0.16);
-    }
-    .nav-btn:hover .icon, .nav-btn:focus .icon {
-      opacity:1;
-      transform: translateY(0) scale(1);
-    }
-
-    /* Active tab */
-    .nav-btn.active{
-      background: linear-gradient(90deg, rgba(125,211,252,0.08), rgba(167,139,250,0.06));
-      box-shadow: 0 14px 40px rgba(96,165,250,0.06);
-      border-color: rgba(167,139,250,0.16);
-    }
-
-    /* Layout for content area */
-    main.container {
-      width:100%;
-      max-width:1100px;
-      margin-top:8px;
-      flex:1 1 auto;
-      display:flex;
-      gap: var(--gap);
-      align-items:flex-start;
-      justify-content:center;
-    }
-
-    /* Panels */
-    .panel {
-      width:100%;
-      background: linear-gradient(180deg,var(--panel), rgba(255,255,255,0.01));
-      border-radius: var(--radius);
-      padding:20px;
-      box-shadow: 0 8px 40px rgba(2,6,23,0.6);
-      border: 1px solid rgba(255,255,255,0.02);
-      min-height: 320px;
-      transition: opacity var(--transition), transform var(--transition);
-      overflow: hidden;
-    }
-
-    /* Section transitions (fade/slide). We switch visible via JS classes */
-    .section {
-      display:none;
-      opacity:0;
-      transform: translateY(8px);
-    }
-    .section.visible {
-      display:block;
-      opacity:1;
-      transform: translateY(0);
-    }
-
-    /* Card grid for items (games/tools/apps) */
-    .grid {
-      display:grid;
-      grid-template-columns: repeat(auto-fit, minmax(170px,1fr));
-      gap:14px;
-      margin-top:14px;
-    }
-
-    .card {
-      background: linear-gradient(180deg, rgba(255,255,255,0.012), rgba(255,255,255,0.01));
-      border-radius:12px;
-      padding:12px;
-      min-height:110px;
-      display:flex;
-      flex-direction:column;
-      justify-content:space-between;
-      transition: transform var(--transition), box-shadow var(--transition);
-      border:1px solid rgba(255,255,255,0.02);
-      cursor:pointer;
-      user-select:none;
-    }
-    .card:hover{
-      transform: translateY(-6px);
-      box-shadow: 0 12px 30px rgba(2,6,23,0.7), 0 4px 8px rgba(96,165,250,0.05);
-    }
-    .meta {
-      font-size:13px;
-      color:var(--muted);
-    }
-    .title-small {
-      font-weight:700;
-      font-size:15px;
-      color:var(--primary);
-    }
-
-    /* Footer-ish hint bar */
-    .hint {
-      margin-top:14px;
-      color:var(--muted);
-      font-size:13px;
-      text-align:center;
-    }
-
-    /* Responsive tweaks */
-    @media (max-width:700px){
-      .nav-btn { min-width:90px; padding:8px 10px; height:44px; }
-      .grid{ grid-template-columns: repeat(auto-fit, minmax(140px,1fr)); }
-      .site{ padding:16px; }
-    }
-
-    /* Tiny icon SVG style */
-    svg.icon-svg{ display:block; width:100%; height:100%; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6)); }
-  </style>
+</style>
 </head>
 <body>
 
-  <!-- Loading screen -->
-  <div class="loader-wrap" id="loader">
-    <div class="loader" aria-hidden="true">
-      <h1 id="welcomeText">Welcome</h1>
-    </div>
-  </div>
+<!-- Loading Screen -->
+<div id="loading-screen">Welcome</div>
 
-  <!-- Site content -->
-  <div class="site" id="siteRoot" aria-hidden="true">
-    <header class="brand" role="banner" aria-label="Astra header">
-      <div class="title" id="siteTitle" tabindex="-1">Astra</div>
+<!-- Website Title -->
+<header>Astra</header>
 
-      <nav class="main-nav" role="navigation" aria-label="Main navigation">
-        <button class="nav-btn active" data-target="games" id="btnGames" aria-controls="section-games" aria-pressed="true">
-          <span class="icon" aria-hidden="true">
-            <!-- gamepad icon -->
-            <svg class="icon-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M6 9v6a3 3 0 0 0 3 3h6a3 3 0 0 0 3-3V9" />
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M9 12h.01M15 10h.01M12 6v2" />
-            </svg>
-          </span>
-          <span>Games</span>
-        </button>
+<!-- Navbar -->
+<nav>
+    <button onclick="window.location.href='https://ethandupe.github.io/games-main/'">Games</button>
+    <button onclick="window.location.href='/tools.html'">Tools</button>
+    <button onclick="window.location.href='/apps.html'">Apps</button>
+</nav>
 
-        <button class="nav-btn" data-target="tools" id="btnTools" aria-controls="section-tools" aria-pressed="false">
-          <span class="icon" aria-hidden="true">
-            <!-- wrench icon -->
-            <svg class="icon-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M14.7 10.3a4 4 0 1 0-5.6 5.6l4.2-4.2z" />
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M20 4l-6 6" />
-            </svg>
-          </span>
-          <span>Tools</span>
-        </button>
+<!-- Main Content -->
+<main>
+    <h2>Welcome to Astra</h2>
+    <p>Your minimalist unblocked games, tools, and apps hub.</p>
+</main>
 
-        <button class="nav-btn" data-target="apps" id="btnApps" aria-controls="section-apps" aria-pressed="false">
-          <span class="icon" aria-hidden="true">
-            <!-- app grid icon -->
-            <svg class="icon-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor">
-              <rect x="3" y="3" width="7" height="7" rx="1" stroke-width="1.6" />
-              <rect x="14" y="3" width="7" height="7" rx="1" stroke-width="1.6" />
-              <rect x="3" y="14" width="7" height="7" rx="1" stroke-width="1.6" />
-              <rect x="14" y="14" width="7" height="7" rx="1" stroke-width="1.6" />
-            </svg>
-          </span>
-          <span>Apps</span>
-        </button>
-      </nav>
-    </header>
+<script>
+    // Loading Screen Fade Out
+    window.addEventListener('load', () => {
+        setTimeout(() => {
+            document.getElementById('loading-screen').classList.add('fade-out');
+        }, 1500); // 1.5 second delay
+    });
+</script>
 
-    <main class="container" role="main" id="main">
-      <section class="panel section visible" id="section-games" aria-labelledby="btnGames" tabindex="0">
-        <h2 style="margin:0;font-size:18px;font-weight:700;">Games</h2>
-        <p class="meta" style="margin-top:6px;">A curated list of lightweight, unblocked web games — click a tile to launch.</p>
-
-        <div class="grid" id="gamesGrid">
-          <!-- Example cards: replace hrefs with playable pages or embedded iframes -->
-          <div class="card" role="button" tabindex="0" onclick="openDemo('Maze Runner','A lightweight maze game demo')">
-            <div>
-              <div class="title-small">Maze Runner</div>
-              <div class="meta">Casual • 2–10 min</div>
-            </div>
-            <div class="meta">Click to open demo.</div>
-          </div>
-
-          <div class="card" role="button" tabindex="0" onclick="openDemo('Pixel Jump','Side-scrolling jumper')">
-            <div>
-              <div class="title-small">Pixel Jump</div>
-              <div class="meta">Arcade • Tap to jump</div>
-            </div>
-            <div class="meta">Click to open demo.</div>
-          </div>
-
-          <div class="card" role="button" tabindex="0" onclick="openDemo('Retro Racer','Top-down racer')">
-            <div>
-              <div class="title-small">Retro Racer</div>
-              <div class="meta">Racing • Local leaderboards</div>
-            </div>
-            <div class="meta">Click to open demo.</div>
-          </div>
-
-          <!-- Placeholder additional cards -->
-          <div class="card" role="button" tabindex="0" onclick="alert('Add your unblocked game URL here.')">
-            <div>
-              <div class="title-small">Add Game</div>
-              <div class="meta">Your game tile</div>
-            </div>
-            <div class="meta">Edit code to link content.</div>
-          </div>
-        </div>
-
-        <div class="hint">Tip: Add games by editing the HTML — each card can point to a local HTML/iframe or open a new tab.</div>
-      </section>
-
-      <section class="panel section" id="section-tools" aria-labelledby="btnTools" tabindex="0">
-        <h2 style="margin:0;font-size:18px;font-weight:700;">Tools</h2>
-        <p class="meta" style="margin-top:6px;">Handy browser tools that run client-side (no servers required).</p>
-
-        <div class="grid" id="toolsGrid">
-          <div class="card" role="button" tabindex="0" onclick="openTool('Color Picker')">
-            <div>
-              <div class="title-small">Color Picker</div>
-              <div class="meta">Design • Client-side</div>
-            </div>
-            <div class="meta">Opens simple JS tool.</div>
-          </div>
-
-          <div class="card" role="button" tabindex="0" onclick="openTool('Notepad')">
-            <div>
-              <div class="title-small">Notepad</div>
-              <div class="meta">Edit & save locally</div>
-            </div>
-            <div class="meta">Opens lightweight editor.</div>
-          </div>
-
-          <div class="card" role="button" tabindex="0" onclick="openTool('Timer')">
-            <div>
-              <div class="title-small">Timer</div>
-              <div class="meta">Focus sessions</div>
-            </div>
-            <div class="meta">Simple countdown timer.</div>
-          </div>
-        </div>
-
-        <div class="hint">All tools are intentionally simple, client-only, and easy to host locally.</div>
-      </section>
-
-      <section class="panel section" id="section-apps" aria-labelledby="btnApps" tabindex="0">
-        <h2 style="margin:0;font-size:18px;font-weight:700;">Apps</h2>
-        <p class="meta" style="margin-top:6px;">Lightweight web apps — great for unblocked environments.</p>
-
-        <div class="grid" id="appsGrid">
-          <div class="card" role="button" tabindex="0" onclick="openApp('Sketch')">
-            <div>
-              <div class="title-small">Sketch</div>
-              <div class="meta">Canvas doodles</div>
-            </div>
-            <div class="meta">Open a small drawing app.</div>
-          </div>
-
-          <div class="card" role="button" tabindex="0" onclick="openApp('Calculator')">
-            <div>
-              <div class="title-small">Calculator</div>
-              <div class="meta">Quick math</div>
-            </div>
-            <div class="meta">Basic arithmetic</div>
-          </div>
-
-          <div class="card" role="button" tabindex="0" onclick="openApp('File Viewer')">
-            <div>
-              <div class="title-small">File Viewer</div>
-              <div class="meta">Local files (browser)</div>
-            </div>
-            <div class="meta">Load local images/text for preview.</div>
-          </div>
-        </div>
-
-        <div class="hint">Pro tip: Keep your apps small and client-side to ensure compatibility with filters.</div>
-      </section>
-    </main>
-
-    <footer style="max-width:1100px;width:100%;text-align:center;padding:12px 0;color:var(--muted);font-size:13px;">
-      Built for speed • Minimalist UX • Astra
-    </footer>
-  </div>
-
-  <!-- Small modal / iframe container for launching demos (lightweight) -->
-  <div id="modal" style="position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:9998;">
-    <div id="modalBack" style="position:absolute;inset:0;background:rgba(2,6,23,0.6);backdrop-filter: blur(4px);" onclick="closeModal()"></div>
-    <div style="position:relative;max-width:1100px;width:94%;height:78%;border-radius:12px;overflow:hidden;background:var(--panel);box-shadow:0 20px 80px rgba(2,6,23,0.7);border:1px solid rgba(255,255,255,0.02);">
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));">
-        <div id="modalTitle" style="font-weight:700"></div>
-        <button onclick="closeModal()" style="background:transparent;border:none;color:var(--muted);cursor:pointer;font-weight:700;padding:8px 12px;">✕</button>
-      </div>
-      <iframe id="modalFrame" src="" style="width:100%;height:calc(100% - 44px);border:none;background:transparent;"></iframe>
-    </div>
-  </div>
-
-  <script>
-    /* ===========================
-       Basic App Logic
-       - Loading screen fades
-       - Navigation tab switching with smooth transitions
-       - Modal demo launcher (iframe)
-       - Small accessibility touches
-       =========================== */
-
-    (function(){
-      const loader = document.getElementById('loader');
-      const welcomeText = document.getElementById('welcomeText');
-      const siteRoot = document.getElementById('siteRoot');
-
-      // Show loader for 1.4s, then fade out (fits 1-2s requirement)
-      const LOADER_MS = 1400;
-      // Ensure keyboard users can tab into content after load
-      function revealSite(){
-        // Fade out welcome text and loader
-        welcomeText.style.opacity = "0";
-        welcomeText.style.transform = "translateY(-6px)";
-        setTimeout(()=>{
-          loader.classList.add('hidden');
-          siteRoot.removeAttribute('aria-hidden');
-          // focus main content for keyboard users
-          document.getElementById('main').focus();
-        }, 420);
-      }
-      setTimeout(revealSite, LOADER_MS);
-
-      // Navigation switching
-      const navBtns = document.querySelectorAll('.nav-btn');
-      const sections = document.querySelectorAll('.section');
-
-      function setActive(targetId){
-        // manage nav button states
-        navBtns.forEach(btn=>{
-          const t = btn.dataset.target;
-          const is = (t === targetId);
-          btn.classList.toggle('active', is);
-          btn.setAttribute('aria-pressed', is ? 'true' : 'false');
-        });
-
-        // manage sections
-        sections.forEach(sec=>{
-          if(sec.id === 'section-' + targetId){
-            sec.classList.add('visible');
-            // mark visible for accessibility
-            sec.setAttribute('aria-hidden','false');
-          } else {
-            sec.classList.remove('visible');
-            sec.setAttribute('aria-hidden','true');
-          }
-        });
-
-        // subtle focus ring: focus first focusable child of the visible section
-        const visible = document.querySelector('.section.visible');
-        if(visible){
-          const btn = visible.querySelector('[role="button"], a, button, input, textarea');
-          if(btn) btn.focus({preventScroll:true});
-        }
-      }
-
-      navBtns.forEach(btn=>{
-        btn.addEventListener('click', ()=>{
-          const t = btn.dataset.target;
-          setActive(t);
-        });
-        // keyboard support
-        btn.addEventListener('keydown', (e)=>{
-          if(e.key === 'Enter' || e.key === ' '){
-            e.preventDefault();
-            btn.click();
-          }
-        });
-      });
-
-      // Demo launcher — default behavior: open internal demo pages if available
-      window.openDemo = function(title, desc){
-        // Example: the site is unblocked so you can host games locally.
-        // For demo purposes we show an alert or a simple embedded "demo".
-        // Replace srcUrl with a local page or a data URL with game HTML.
-        const srcUrl = "data:text/html;charset=utf-8," + encodeURIComponent(`
-          <!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-          <title>${title}</title>
-          <style>body{margin:0;background:#081018;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;font-family:system-ui,Segoe UI,Roboto,Arial}h1{font-size:20px}</style>
-          </head><body><h1>${title} — demo placeholder<br><small style="opacity:.7">${desc}</small></h1></body></html>
-        `);
-
-        openModal(title, srcUrl);
-      };
-
-      window.openTool = function(name){
-        // simple example: open a small HTML tool
-        const srcUrl = "data:text/html;charset=utf-8," + encodeURIComponent(`
-          <!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-          <title>${name}</title>
-          <style>body{margin:0;font-family:system-ui,Segoe UI,Roboto,Arial;background:#0c0f14;color:#e6f0ff;display:flex;align-items:center;justify-content:center;height:100vh}#wrap{padding:20px;background:rgba(255,255,255,0.03);border-radius:10px;}</style>
-          </head><body><div id="wrap"><h1>${name}</h1><p style="opacity:.8">This is a simple client-side tool placeholder. Build your tool here.</p></div></body></html>
-        `);
-        openModal(name, srcUrl);
-      };
-
-      window.openApp = function(name){
-        // simple app placeholder
-        const srcUrl = "data:text/html;charset=utf-8," + encodeURIComponent(`
-          <!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-          <title>${name}</title>
-          <style>body{margin:0;font-family:system-ui,Segoe UI,Roboto,Arial;background:#07101a;color:#e6f0ff;display:flex;align-items:center;justify-content:center;height:100vh}h1{font-size:18px}</style>
-          </head><body><h1>${name} — app placeholder</h1></body></html>
-        `);
-        openModal(name, srcUrl);
-      };
-
-      // Modal open/close
-      const modal = document.getElementById('modal');
-      const modalFrame = document.getElementById('modalFrame');
-      const modalTitle = document.getElementById('modalTitle');
-
-      window.openModal = function(title, src){
-        modalTitle.textContent = title;
-        modalFrame.src = src;
-        modal.style.display = 'flex';
-        // Slight delay to allow CSS rendering; focus iframe for keyboard
-        setTimeout(()=>{ try { modalFrame.focus(); } catch(e){} }, 120);
-      };
-
-      window.closeModal = function(){
-        modalFrame.src = '';
-        modal.style.display = 'none';
-      };
-
-      // Initial accessibility: make sure the first section is visible
-      setTimeout(()=> setActive('games'), 10);
-
-      // Keyboard shortcut: numbers 1,2,3 to switch
-      document.addEventListener('keydown', (e)=>{
-        if(e.target.tagName.toLowerCase() === 'input' || e.target.tagName.toLowerCase() === 'textarea') return;
-        if(e.key === '1') setActive('games');
-        if(e.key === '2') setActive('tools');
-        if(e.key === '3') setActive('apps');
-        if(e.key === 'Escape') closeModal();
-      });
-
-      // Minor performance: remove loader from DOM after hidden (clean up)
-      const obs = new MutationObserver(()=> {
-        if(loader.classList.contains('hidden')){
-          setTimeout(()=> loader.remove(), 700);
-          obs.disconnect();
-        }
-      });
-      obs.observe(loader, { attributes: true, attributeFilter: ['class'] });
-
-    })();
-  </script>
 </body>
 </html>
