@@ -71,4 +71,278 @@
     unitconverter: `
       <div class="unit-converter" tabindex="0" aria-label="Unit converter tool" style="max-width:600px; margin:0 auto; color:#eee;">
         <label for="unitType" style="display:block; margin-bottom:0.25rem; font-weight:600;">Select Unit Type:</label>
-        <select id="unitType" aria-controls="unitInput unitFrom unitTo conversionResult" style="width:100%; padding:0.5rem 0.75rem; margin-bottom:1rem; border
+        <select id="unitType" aria-controls="unitInput unitFrom unitTo conversionResult" style="width:100%; padding:0.5rem 0.75rem; margin-bottom:1rem; border-radius:6px; border:none; background:#0e2a54; color:#cdeeff; font-size:1rem; box-shadow: inset 0 0 6px #15407e;">
+          <option value="length">Length</option>
+          <option value="weight">Weight</option>
+          <option value="temperature">Temperature</option>
+        </select>
+
+        <label for="unitInput" style="display:block; margin-bottom:0.25rem; font-weight:600;">Enter Value:</label>
+        <input type="number" id="unitInput" aria-describedby="unitFrom unitTo conversionResult" placeholder="Enter a number" style="width:100%; padding:0.5rem 0.75rem; border-radius:6px; border:none; margin-bottom:1rem; font-size:1rem; background:#0e2a54; color:#cdeeff; box-shadow: inset 0 0 6px #15407e;" />
+
+        <label for="unitFrom" style="display:block; margin-bottom:0.25rem; font-weight:600;">From:</label>
+        <select id="unitFrom" style="width:100%; padding:0.5rem 0.75rem; margin-bottom:1rem; border-radius:6px; border:none; background:#0e2a54; color:#cdeeff; font-size:1rem; box-shadow: inset 0 0 6px #15407e;"></select>
+
+        <label for="unitTo" style="display:block; margin-bottom:0.25rem; font-weight:600;">To:</label>
+        <select id="unitTo" style="width:100%; padding:0.5rem 0.75rem; margin-bottom:1rem; border-radius:6px; border:none; background:#0e2a54; color:#cdeeff; font-size:1rem; box-shadow: inset 0 0 6px #15407e;"></select>
+
+        <div id="conversionResult" aria-live="polite" role="alert" style="font-weight:700; font-size:1.25rem; margin-top:1rem; color:#00ffff; min-height:1.5rem;"></div>
+      </div>
+    `
+  };
+
+  let activeTool = 'calculator';
+
+  const btnCalc = document.getElementById('btn-calculator');
+  const btnNote = document.getElementById('btn-notepad');
+  const btnUnit = document.getElementById('btn-unitconverter');
+
+  function updateNav() {
+    buttons.forEach(btn => {
+      btn.classList.remove('active');
+      btn.setAttribute('aria-selected', 'false');
+    });
+    if(activeTool === 'calculator') {
+      btnCalc.classList.add('active');
+      btnCalc.setAttribute('aria-selected', 'true');
+    } else if(activeTool === 'notepad') {
+      btnNote.classList.add('active');
+      btnNote.setAttribute('aria-selected', 'true');
+    } else if(activeTool === 'unitconverter') {
+      btnUnit.classList.add('active');
+      btnUnit.setAttribute('aria-selected', 'true');
+    }
+  }
+
+  function animateFrameIn() {
+    toolFrame.style.opacity = '0';
+    toolFrame.style.transform = 'scale(0.85)';
+    setTimeout(() => {
+      toolFrame.style.opacity = '1';
+      toolFrame.style.transform = 'scale(1)';
+    }, 50);
+  }
+
+  function loadTool(tool) {
+    if (!templates[tool]) return;
+    toolFrame.innerHTML = templates[tool];
+    activeTool = tool;
+    updateNav();
+    animateFrameIn();
+    initToolLogic(tool);
+  }
+
+  function initCalculator() {
+    const display = toolFrame.querySelector('#calcDisplay');
+    const buttons = toolFrame.querySelectorAll('.calc-buttons button');
+
+    let current = '';
+
+    function updateDisplay(val) {
+      display.textContent = val || '0';
+    }
+
+    function calculate(expr) {
+      try {
+        if (/[^0-9+\-*/.]/.test(expr)) return 'Error';
+        let result = eval(expr);
+        if (result === undefined) return '0';
+        return result;
+      } catch {
+        return 'Error';
+      }
+    }
+
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const val = btn.getAttribute('data-val');
+
+        if(val === 'C') {
+          current = '';
+          updateDisplay(current);
+          return;
+        }
+        if(val === '=') {
+          let res = calculate(current);
+          current = String(res);
+          updateDisplay(current);
+          return;
+        }
+
+        current += val;
+        updateDisplay(current);
+      });
+    });
+  }
+
+  function initNotepad() {
+    const textarea = toolFrame.querySelector('#notepadTextarea');
+    const saveBtn = toolFrame.querySelector('.save-btn');
+    const saveMsg = toolFrame.querySelector('.save-msg');
+
+    const savedNotes = localStorage.getItem('unblocked_notepad');
+    if(savedNotes) textarea.value = savedNotes;
+
+    saveBtn.addEventListener('click', () => {
+      localStorage.setItem('unblocked_notepad', textarea.value);
+      saveMsg.style.opacity = '1';
+      setTimeout(() => {
+        saveMsg.style.opacity = '0';
+      }, 1500);
+    });
+  }
+
+  function initUnitConverter() {
+    const unitType = toolFrame.querySelector('#unitType');
+    const unitFrom = toolFrame.querySelector('#unitFrom');
+    const unitTo = toolFrame.querySelector('#unitTo');
+    const inputValue = toolFrame.querySelector('#unitInput');
+    const resultDisplay = toolFrame.querySelector('#conversionResult');
+
+    const units = {
+      length: {
+        meter: 1,
+        kilometer: 1000,
+        centimeter: 0.01,
+        millimeter: 0.001,
+        mile: 1609.34,
+        yard: 0.9144,
+        foot: 0.3048,
+        inch: 0.0254,
+      },
+      weight: {
+        kilogram: 1,
+        gram: 0.001,
+        milligram: 0.000001,
+        pound: 0.453592,
+        ounce: 0.0283495,
+      },
+      temperature: {
+        Celsius: null,
+        Fahrenheit: null,
+        Kelvin: null,
+      }
+    };
+
+    function populateUnits(type) {
+      unitFrom.innerHTML = '';
+      unitTo.innerHTML = '';
+      if(type === 'temperature') {
+        ['Celsius', 'Fahrenheit', 'Kelvin'].forEach(u => {
+          const option1 = document.createElement('option');
+          option1.value = u;
+          option1.textContent = u;
+          unitFrom.appendChild(option1);
+          const option2 = document.createElement('option');
+          option2.value = u;
+          option2.textContent = u;
+          unitTo.appendChild(option2);
+        });
+      } else {
+        Object.keys(units[type]).forEach(u => {
+          const option1 = document.createElement('option');
+          option1.value = u;
+          option1.textContent = capitalize(u);
+          unitFrom.appendChild(option1);
+          const option2 = document.createElement('option');
+          option2.value = u;
+          option2.textContent = capitalize(u);
+          unitTo.appendChild(option2);
+        });
+      }
+      unitFrom.selectedIndex = 0;
+      unitTo.selectedIndex = 1;
+      updateResult();
+    }
+
+    function capitalize(str) {
+      return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
+    function convert(value, fromUnit, toUnit, type) {
+      if(type === 'temperature') return convertTemperature(value, fromUnit, toUnit);
+      const baseValue = value * units[type][fromUnit];
+      return baseValue / units[type][toUnit];
+    }
+
+    function convertTemperature(value, from, to) {
+      let val = parseFloat(value);
+      if(isNaN(val)) return '';
+      if(from === to) return val.toFixed(4);
+
+      switch(from) {
+        case 'Celsius':
+          if(to === 'Fahrenheit') return (val * 9/5 + 32).toFixed(4);
+          if(to === 'Kelvin') return (val + 273.15).toFixed(4);
+          break;
+        case 'Fahrenheit':
+          if(to === 'Celsius') return ((val - 32) * 5/9).toFixed(4);
+          if(to === 'Kelvin') return ((val - 32) * 5/9 + 273.15).toFixed(4);
+          break;
+        case 'Kelvin':
+          if(to === 'Celsius') return (val - 273.15).toFixed(4);
+          if(to === 'Fahrenheit') return ((val - 273.15) * 9/5 + 32).toFixed(4);
+          break;
+      }
+      return '';
+    }
+
+    function updateResult() {
+      const val = parseFloat(inputValue.value);
+      if(isNaN(val)) {
+        resultDisplay.textContent = '';
+        return;
+      }
+      const from = unitFrom.value;
+      const to = unitTo.value;
+      const type = unitType.value;
+      if(from === to) {
+        resultDisplay.textContent = `${val} ${to}`;
+        return;
+      }
+      const converted = convert(val, from, to, type);
+      if(converted === '') {
+        resultDisplay.textContent = 'Invalid conversion';
+      } else {
+        resultDisplay.textContent = `${converted} ${to}`;
+      }
+    }
+
+    unitType.addEventListener('change', () => {
+      populateUnits(unitType.value);
+    });
+    unitFrom.addEventListener('change', updateResult);
+    unitTo.addEventListener('change', updateResult);
+    inputValue.addEventListener('input', updateResult);
+
+    populateUnits(unitType.value);
+  }
+
+  function initToolLogic(tool) {
+    if(tool === 'calculator') initCalculator();
+    else if(tool === 'notepad') initNotepad();
+    else if(tool === 'unitconverter') initUnitConverter();
+  }
+
+  loadTool(activeTool);
+
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      if(btn.classList.contains('active')) return;
+      activeTool = btn.id.replace('btn-', '');
+      loadTool(activeTool);
+    });
+  });
+
+  document.body.addEventListener('mouseover', e => {
+    if(e.target.closest('button, input, select, textarea')) {
+      document.querySelector('.mouse-follower').classList.add('active-hover');
+    }
+  });
+  document.body.addEventListener('mouseout', e => {
+    if(e.target.closest('button, input, select, textarea')) {
+      document.querySelector('.mouse-follower').classList.remove('active-hover');
+    }
+  });
+})();
+</script>
