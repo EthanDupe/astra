@@ -1,237 +1,125 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Unblocked Games & Tools</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maximalist Web OS</title>
 <style>
-  /* Basic Reset */
-  * {
-    box-sizing: border-box;
-  }
-  body {
-    margin: 0;
-    background: #0A192F;
-    color: #CCD6F6;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    overflow-x: hidden;
-  }
-  header {
-    text-align: center;
-    padding: 2rem 1rem 1rem;
-    font-family: 'Playfair Display', serif;
-    font-size: 2.8rem;
-    letter-spacing: 0.15em;
-    color: #00FFFF;
-    user-select: none;
-  }
-  nav {
-    display: flex;
-    justify-content: center;
-    gap: 2rem;
-    margin-bottom: 1.5rem;
-  }
-  nav button {
-    background: transparent;
-    border: 2px solid #00FFFF;
-    color: #00FFFF;
-    font-size: 1.15rem;
-    padding: 0.5rem 1.5rem;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, color 0.3s ease;
-    position: relative;
-    overflow: hidden;
-  }
-  nav button.active {
-    background-color: #00FFFF;
-    color: #0A192F;
-    animation: pulse 2s infinite;
-  }
-  nav button:hover:not(.active) {
-    background-color: rgba(0, 255, 255, 0.15);
-  }
-  @keyframes pulse {
-    0%, 100% {
-      box-shadow: 0 0 6px 3px #00FFFF;
+    body {
+        margin: 0;
+        font-family: 'Segoe UI', sans-serif;
+        background: linear-gradient(45deg, #ff0077, #7700ff);
+        color: white;
+        overflow: hidden;
     }
-    50% {
-      box-shadow: 0 0 14px 6px #00FFFF;
+    header {
+        position: fixed;
+        top: 0;
+        width: 100%;
+        background: rgba(0,0,0,0.8);
+        padding: 10px;
+        display: flex;
+        gap: 10px;
+        z-index: 1000;
     }
-  }
-  #searchBar {
-    display: block;
-    margin: 0 auto 2rem;
-    max-width: 400px;
-    width: 90%;
-    padding: 0.6rem 1rem;
-    font-size: 1.1rem;
-    border-radius: 10px;
-    border: none;
-    outline: none;
-    background: #0e2a54;
-    color: #cdeeff;
-    box-shadow: 0 0 6px transparent;
-    transition: box-shadow 0.3s ease;
-  }
-  #searchBar:focus {
-    box-shadow: 0 0 15px 3px #00FFFF;
-    background: #153a83;
-  }
-  main#content {
-    max-width: 960px;
-    margin: 0 auto 4rem;
-    padding: 0 1rem;
-    min-height: 400px;
-    position: relative;
-  }
-  /* Fade out/in */
-  main.fade-out {
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.5s ease, transform 0.5s ease;
-  }
-  main.fade-in {
-    opacity: 1;
-    transform: translateY(0);
-    transition: opacity 0.5s ease, transform 0.5s ease;
-  }
-
-  /* Mouse Follower */
-  .mouse-follower {
-    pointer-events: none;
-    position: fixed;
-    top: 0; left: 0;
-    width: 18px; height: 18px;
-    border-radius: 50%;
-    background-color: #00FFFFaa;
-    transition: background-color 0.25s ease, transform 0.1s ease;
-    z-index: 9999;
-    transform: translate(-50%, -50%);
-    mix-blend-mode: difference;
-  }
-  .mouse-follower.active-hover {
-    background-color: #ff9a45cc;
-    transform: translate(-50%, -50%) scale(1.5);
-  }
+    button {
+        padding: 8px 16px;
+        background: #ff00aa;
+        border: none;
+        color: white;
+        font-weight: bold;
+        cursor: pointer;
+        border-radius: 5px;
+        transition: transform 0.1s ease;
+    }
+    button:hover {
+        transform: scale(1.05);
+        background: #ff55cc;
+    }
+    iframe {
+        width: 100%;
+        height: calc(100% - 50px);
+        border: none;
+    }
+    .window {
+        position: fixed;
+        top: 50px;
+        left: 50px;
+        width: 600px;
+        height: 400px;
+        background: white;
+        color: black;
+        border-radius: 10px;
+        overflow: hidden;
+        display: none;
+        flex-direction: column;
+        z-index: 999;
+        box-shadow: 0px 0px 20px rgba(0,0,0,0.5);
+    }
+    .window-header {
+        background: #333;
+        color: white;
+        padding: 8px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .close-btn {
+        background: red;
+        border: none;
+        color: white;
+        font-weight: bold;
+        cursor: pointer;
+        padding: 2px 6px;
+        border-radius: 4px;
+    }
 </style>
 </head>
 <body>
 
-<header>UNBLOCKED GAMES</header>
+<header>
+    <button onclick="openGames()">🎮 Games</button>
+    <button onclick="openTool('calc')">🖩 Calculator</button>
+    <button onclick="openTool('note')">📝 Notepad</button>
+    <button onclick="openTool('unit')">📏 Unit Converter</button>
+</header>
 
-<nav role="navigation" aria-label="Main Navigation">
-  <button id="btn-games" class="active" aria-current="page">Games</button>
-  <button id="btn-tools">Tools</button>
-  <button id="btn-apps">Apps</button>
-</nav>
+<!-- Tool Windows -->
+<div id="calc" class="window">
+    <div class="window-header">
+        <span>Calculator</span>
+        <button class="close-btn" onclick="closeWindow('calc')">X</button>
+    </div>
+    <iframe src="https://www.online-calculator.com/full-screen-calculator/"></iframe>
+</div>
 
-<input type="search" id="searchBar" placeholder="Search..." aria-label="Search games, tools, apps" />
+<div id="note" class="window">
+    <div class="window-header">
+        <span>Notepad</span>
+        <button class="close-btn" onclick="closeWindow('note')">X</button>
+    </div>
+    <iframe src="https://anotepad.com/"></iframe>
+</div>
 
-<main id="content" role="main" tabindex="0" aria-live="polite">
-  <!-- Dynamic content loads here -->
-</main>
-
-<div class="mouse-follower"></div>
+<div id="unit" class="window">
+    <div class="window-header">
+        <span>Unit Converter</span>
+        <button class="close-btn" onclick="closeWindow('unit')">X</button>
+    </div>
+    <iframe src="https://www.unitconverters.net/"></iframe>
+</div>
 
 <script>
-  const content = document.getElementById('content');
-  const buttons = {
-    games: document.getElementById('btn-games'),
-    tools: document.getElementById('btn-tools'),
-    apps: document.getElementById('btn-apps'),
-  };
-  const mouseFollower = document.querySelector('.mouse-follower');
-
-  // Load initial section: games
-  loadSection('games');
-
-  // Set active button styling
-  function setActiveBtn(active) {
-    Object.entries(buttons).forEach(([key, btn]) => {
-      if(key === active) {
-        btn.classList.add('active');
-        btn.setAttribute('aria-current', 'page');
-      } else {
-        btn.classList.remove('active');
-        btn.removeAttribute('aria-current');
-      }
-    });
-  }
-
-  // Load section content dynamically with smooth transition
-  async function loadSection(section) {
-    setActiveBtn(section);
-
-    // Fade out current content
-    content.classList.add('fade-out');
-    await new Promise(r => setTimeout(r, 400)); // wait for fade out
-
-    try {
-      let response = await fetch(`${section}.html`);
-      if(!response.ok) throw new Error('Failed to load');
-      let html = await response.text();
-      content.innerHTML = html;
-    } catch(e) {
-      content.innerHTML = `<p style="color:#ff4444; text-align:center;">Failed to load ${section} content.</p>`;
-    }
-
-    // Focus main content for accessibility
-    content.focus();
-
-    // Fade in new content
-    content.classList.remove('fade-out');
-    content.classList.add('fade-in');
-
-    // Remove fade-in after animation so it can be repeated
-    setTimeout(() => content.classList.remove('fade-in'), 600);
-
-    // If tools section loaded, initialize its scripts
-    if(section === 'tools') {
-      initToolsSection();
-    }
-    if(section === 'games') {
-      initGamesSection();
-    }
-    if(section === 'apps') {
-      initAppsSection();
-    }
-  }
-
-  // Nav button click handlers
-  buttons.games.addEventListener('click', () => loadSection('games'));
-  buttons.tools.addEventListener('click', () => loadSection('tools'));
-  buttons.apps.addEventListener('click', () => loadSection('apps'));
-
-  // Mouse follower logic
-  document.addEventListener('mousemove', e => {
-    mouseFollower.style.left = e.clientX + 'px';
-    mouseFollower.style.top = e.clientY + 'px';
-  });
-
-  document.body.addEventListener('mouseover', e => {
-    if (e.target.closest('button, a, input, select, textarea')) {
-      mouseFollower.classList.add('active-hover');
-    }
-  });
-  document.body.addEventListener('mouseout', e => {
-    if (e.target.closest('button, a, input, select, textarea')) {
-      mouseFollower.classList.remove('active-hover');
-    }
-  });
-
-  // Stub: Tools init placeholder (will be overridden by tools.html)
-  function initToolsSection() {
-    // No-op default
-  }
-  // Stub: Games init placeholder (will be overridden by games.html)
-  function initGamesSection() {
-    // No-op default
-  }
-  // Stub: Apps init placeholder
-  function initAppsSection() {
-    // Could add logic later
-  }
+function openGames() {
+    window.open("https://example.com/games", "_blank");
+}
+function openTool(id) {
+    document.querySelectorAll('.window').forEach(win => win.style.display = 'none');
+    document.getElementById(id).style.display = 'flex';
+}
+function closeWindow(id) {
+    document.getElementById(id).style.display = 'none';
+}
 </script>
 
 </body>
