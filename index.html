@@ -1,494 +1,528 @@
 <!DOCTYPE html>
-
 <html lang="en" class="scroll-smooth">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Minimalist-Maximalist Site</title>
-  <!-- Tailwind CDN -->
+  <title>Unblocked Games & Tools & Apps</title>
+
+  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+
   <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,700;1,700&family=Montserrat:wght@300;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet" />
+
   <!-- GSAP CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
   <style>
     :root {
+      --color-bg: #0A192F;
+      --color-accent: #00FFFF;
+      --color-text: #CCD6F6;
       --font-sans: 'Montserrat', sans-serif;
-      --font-serif: 'Cormorant Garamond', serif;
     }
 
-```
-body {
-  font-family: var(--font-sans);
-  background-color: #121212;
-  color: #121212;
-  overflow-x: hidden;
-}
+    body {
+      font-family: var(--font-sans);
+      background: var(--color-bg);
+      color: var(--color-text);
+      min-height: 100vh;
+      overflow-x: hidden;
+      cursor: none; /* We'll implement custom cursor */
+      user-select: none;
+    }
 
-#particle-canvas {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100vw;
-  height: 100vh;
-  pointer-events: none;
-  z-index: 50;
-}
+    /* Scrollbar styling */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--color-accent);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
 
-#start-btn {
-  font-family: var(--font-sans);
-  font-weight: 300;
-  font-size: 6rem;
-  cursor: pointer;
-  user-select: none;
-  color: #F5F5F5;
-  transition: color 0.3s ease;
-}
-#start-btn:hover {
-  color: #007AFF;
-}
+    /* Container */
+    #app {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem 1rem 4rem;
+      position: relative;
+      z-index: 10;
+    }
 
-#main-title {
-  font-family: var(--font-serif);
-  font-weight: 700;
-  font-size: 3.5rem;
-  color: #121212;
-  letter-spacing: 0.1em;
-  cursor: pointer;
-  user-select: none;
-  position: relative;
-  overflow: visible;
-  margin-bottom: 3rem;
-}
+    /* Header and nav */
+    header {
+      text-align: center;
+      margin-bottom: 1rem;
+      user-select: text;
+    }
+    #main-title {
+      font-size: 3rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      color: var(--color-accent);
+      text-transform: uppercase;
+      overflow: hidden;
+    }
 
-.glitch {
-  position: relative;
-  color: #121212;
-  user-select: none;
-}
-.glitch::before,
-.glitch::after {
-  content: attr(data-text);
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 100%;
-  overflow: hidden;
-  color: #007AFF;
-  clip-path: polygon(0 2%, 100% 2%, 100% 5%, 0 5%);
-  animation: glitch-anim 2s infinite;
-}
-.glitch::after {
-  color: #F50057;
-  clip-path: polygon(0 50%, 100% 50%, 100% 53%, 0 53%);
-  animation-delay: 1s;
-}
-@keyframes glitch-anim {
-  0% {
-    transform: translate(0);
-  }
-  20% {
-    transform: translate(-3px, 2px);
-  }
-  40% {
-    transform: translate(3px, -2px);
-  }
-  60% {
-    transform: translate(-3px, 2px);
-  }
-  80% {
-    transform: translate(3px, -2px);
-  }
-  100% {
-    transform: translate(0);
-  }
-}
+    nav {
+      margin-top: 0.75rem;
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      user-select: none;
+    }
 
-/* Maximalist Buttons */
-.max-button {
-  font-family: var(--font-serif);
-  font-weight: 700;
-  font-size: 2.5rem;
-  color: #121212;
-  background: #F5F5F5;
-  border-radius: 1rem;
-  padding: 2rem 5rem;
-  box-shadow: 0 8px 15px rgb(0 0 0 / 0.15);
-  cursor: pointer;
-  user-select: none;
-  transition: 
-    box-shadow 0.3s ease, 
-    color 0.3s ease, 
-    transform 0.3s ease;
-  position: relative;
-  overflow: hidden;
-  margin: 0 auto;
-  width: 300px;
-  text-align: center;
-  letter-spacing: 0.15em;
-  margin-bottom: 3rem;
-}
+    nav button {
+      font-weight: 600;
+      color: var(--color-text);
+      background: transparent;
+      padding: 0.5rem 1.5rem;
+      border: 2px solid var(--color-accent);
+      border-radius: 9999px;
+      text-transform: uppercase;
+      font-size: 1rem;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: color 0.3s ease, background 0.3s ease;
+      outline-offset: 3px;
+    }
 
-.max-button:hover, .max-button:focus {
-  color: #007AFF;
-  box-shadow: 0 0 25px #007AFF;
-  transform: translateY(-8px) skew(-2deg, 1deg);
-  outline: none;
-}
+    nav button.active,
+    nav button:hover,
+    nav button:focus {
+      background: var(--color-accent);
+      color: var(--color-bg);
+      outline: none;
+    }
 
-/* Glitch text animation on click */
-.glitching {
-  animation: glitch-click 0.4s ease;
-}
-@keyframes glitch-click {
-  0%, 100% { filter: none; }
-  20% { filter: url(#glitch-filter); }
-  40% { filter: none; }
-  60% { filter: url(#glitch-filter); }
-  80% { filter: none; }
-}
+    nav button:focus-visible {
+      outline: 2px solid var(--color-accent);
+      outline-offset: 3px;
+    }
 
-/* Footer styling */
-footer {
-  background: #121212;
-  color: #F5F5F5;
-  padding: 1rem 0;
-  font-family: var(--font-sans);
-  text-align: center;
-  position: relative;
-  z-index: 10;
-}
-.social-icon {
-  display: inline-block;
-  margin: 0 0.75rem;
-  cursor: pointer;
-  position: relative;
-  color: #F5F5F5;
-  transition: color 0.3s ease;
-  font-size: 1.5rem;
-}
-.social-icon:hover {
-  color: #007AFF;
-}
-.social-icon:hover svg {
-  animation: bounce 0.6s ease forwards;
-}
-@keyframes bounce {
-  0% { transform: translateY(0);}
-  50% { transform: translateY(-8px);}
-  100% { transform: translateY(0);}
-}
+    /* Search bar */
+    #search-container {
+      margin: 2rem auto 3rem;
+      max-width: 500px;
+      position: relative;
+    }
+    #search-input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border-radius: 9999px;
+      border: 2px solid var(--color-accent);
+      background: transparent;
+      color: var(--color-text);
+      font-size: 1.1rem;
+      outline: none;
+      transition: box-shadow 0.3s ease;
+    }
+    #search-input::placeholder {
+      color: #6e7a9a;
+      opacity: 0.8;
+    }
+    #search-input:focus {
+      box-shadow:
+        0 0 10px 2px var(--color-accent),
+        inset 0 0 8px var(--color-accent);
+    }
 
-#grain {
-  pointer-events: none;
-  position: fixed;
-  inset: 0;
-  background: url('https://www.transparenttextures.com/patterns/asfalt-light.png');
-  opacity: 0.05;
-  z-index: 5;
-}
+    /* Section headers */
+    section h2 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--color-accent);
+      margin-bottom: 1.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      overflow: hidden;
+      user-select: text;
+    }
 
-#parallax-bg {
-  position: fixed;
-  top: 0;
-  left: 50%;
-  width: 120vw;
-  height: 120vh;
-  background: radial-gradient(circle at center, #007AFF44 0%, transparent 70%);
-  transform: translateX(-50%);
-  z-index: 1;
-  pointer-events: none;
-  filter: blur(40px);
-  mix-blend-mode: screen;
-}
-```
+    /* Section containers */
+    section {
+      display: none;
+    }
+    section.active {
+      display: block;
+    }
+
+    /* Games grid */
+    #games-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit,minmax(120px,1fr));
+      gap: 1.5rem;
+    }
+
+    .game-button {
+      background: linear-gradient(145deg, #071d39, #092644);
+      border-radius: 1rem;
+      padding: 1rem 0.75rem;
+      text-align: center;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--color-accent);
+      cursor: pointer;
+      perspective: 1000px;
+      box-shadow: 0 4px 15px rgba(0,255,255,0.15);
+      user-select: none;
+      transition:
+        box-shadow 0.3s ease,
+        transform 0.4s ease;
+      border: 2px solid transparent;
+      position: relative;
+      overflow: hidden;
+    }
+    .game-button::before {
+      content: "";
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle at center, rgba(0,255,255,0.3), transparent 70%);
+      transform: translateX(-100%) translateY(-100%);
+      transition: transform 0.7s ease;
+      z-index: 0;
+      pointer-events: none;
+      border-radius: 1rem;
+    }
+    .game-button:hover::before,
+    .game-button:focus::before {
+      transform: translateX(0) translateY(0);
+    }
+    .game-button:hover,
+    .game-button:focus {
+      box-shadow:
+        0 0 20px 4px var(--color-accent),
+        0 0 30px 8px rgba(0,255,255,0.7);
+      transform: rotateY(15deg) scale(1.1);
+      border-color: var(--color-accent);
+      outline: none;
+      z-index: 1;
+    }
+
+    /* Tools and Apps Lists */
+    .list-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+    .list-item {
+      padding: 0.75rem 1.5rem;
+      border-radius: 9999px;
+      border: 2px solid var(--color-accent);
+      text-align: center;
+      font-weight: 600;
+      font-size: 1.2rem;
+      color: var(--color-accent);
+      background: linear-gradient(145deg, #071d39, #092644);
+      cursor: pointer;
+      user-select: none;
+      position: relative;
+      transition:
+        box-shadow 0.3s ease,
+        transform 0.3s ease,
+        background 0.3s ease;
+      outline-offset: 3px;
+    }
+    .list-item:hover,
+    .list-item:focus {
+      background: var(--color-accent);
+      color: var(--color-bg);
+      box-shadow: 0 0 15px var(--color-accent);
+      transform: scale(1.05);
+      outline: none;
+    }
+    .list-item:focus-visible {
+      outline: 2px solid var(--color-accent);
+      outline-offset: 3px;
+    }
+
+    /* Mouse follower */
+    #mouse-follower {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      pointer-events: none;
+      background: rgba(0, 255, 255, 0.3);
+      mix-blend-mode: screen;
+      transform: translate(-50%, -50%);
+      transition: width 0.3s ease, height 0.3s ease, background 0.3s ease;
+      z-index: 9999;
+      will-change: transform;
+      filter: drop-shadow(0 0 4px rgba(0,255,255,0.7));
+    }
+    #mouse-follower.active {
+      width: 36px;
+      height: 36px;
+      background: rgba(0, 255, 255, 0.7);
+      filter: drop-shadow(0 0 12px var(--color-accent));
+    }
+
+    /* Particle background */
+    #particle-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background: transparent;
+      mix-blend-mode: screen;
+    }
 
   </style>
 </head>
-<body class="relative min-h-screen">
+<body>
 
-  <!-- Grain texture -->
+  <canvas id="particle-canvas"></canvas>
 
-  <div id="grain"></div>
+  <div id="app">
+    <header>
+      <h1 id="main-title" aria-label="Unblocked Games">UNBLOCKED GAMES</h1>
+      <nav aria-label="Primary Navigation">
+        <button class="active" data-target="games-section" aria-current="page">Games</button>
+        <button data-target="tools-section">Tools</button>
+        <button data-target="apps-section">Apps</button>
+      </nav>
+      <div id="search-container">
+        <input id="search-input" type="search" placeholder="Search games, tools, apps..." aria-label="Search" autocomplete="off" />
+      </div>
+    </header>
 
-  <!-- Parallax background -->
+    <main>
+      <!-- Games Section -->
+      <section id="games-section" class="active" aria-live="polite" tabindex="0">
+        <h2>Games</h2>
+        <div id="games-grid" role="list">
+          <button class="game-button" role="listitem" tabindex="0">Among Us</button>
+          <button class="game-button" role="listitem" tabindex="0">Slope</button>
+          <button class="game-button" role="listitem" tabindex="0">Vex 5</button>
+          <button class="game-button" role="listitem" tabindex="0">Run 3</button>
+          <button class="game-button" role="listitem" tabindex="0">Retro Bowl</button>
+        </div>
+      </section>
 
-  <div id="parallax-bg"></div>
+      <!-- Tools Section -->
+      <section id="tools-section" aria-live="polite" tabindex="0">
+        <h2>Tools</h2>
+        <div class="list-container">
+          <a href="#" class="list-item" tabindex="0" role="link">Calculator</a>
+          <a href="#" class="list-item" tabindex="0" role="link">Notepad</a>
+          <a href="#" class="list-item" tabindex="0" role="link">Unit Converter</a>
+        </div>
+      </section>
 
-  <!-- Particle canvas for dissolve -->
-
-<canvas id="particle-canvas"></canvas>
-
-  <!-- Minimalist Landing -->
-
-  <main id="minimalist-landing" class="flex items-center justify-center h-screen bg-[#121212]">
-    <div id="start-btn" role="button" tabindex="0" aria-label="Start" title="Click to start">
-      START
-    </div>
-  </main>
-
-  <!-- Maximalist Main Content - initially hidden -->
-
-  <div id="maximalist-content" class="opacity-0 pointer-events-none bg-[#F5F5F5] min-h-screen flex flex-col items-center" style="transition: background-color 1.5s ease;">
-
-```
-<!-- Header -->
-<header class="py-12 flex justify-center">
-  <h1 id="main-title" class="glitch" data-text="UNBLOCKED GAMES" tabindex="0" aria-label="Unblocked Games title">
-    UNBLOCKED GAMES
-  </h1>
-</header>
-
-<!-- Buttons Section -->
-<section id="buttons-section" class="flex flex-col items-center justify-center flex-grow w-full max-w-xl px-6 md:px-20">
-  <button class="max-button" id="games-btn" tabindex="0" aria-label="Open Games">
-    GAMES
-  </button>
-  <button class="max-button" id="apps-btn" tabindex="0" aria-label="Open Apps">
-    APPS
-  </button>
-</section>
-
-<!-- Footer -->
-<footer>
-  <div class="flex justify-center space-x-8">
-    <div class="social-icon" tabindex="0" role="link" aria-label="Twitter" data-tooltip="Twitter">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" width="28" height="28"><path d="M23 3a10.9 10.9 0 01-3.14.86 4.48 4.48 0 001.98-2.48c-.89.53-1.88.91-2.94 1.12A4.52 4.52 0 0016.5 2c-2.52 0-4.56 2.25-4.56 5 0 .39.05.77.14 1.13C7.69 7.87 4.07 5.96 1.64 3.15a5.15 5.15 0 00-.62 2.52c0 1.74.85 3.28 2.15 4.17a4.48 4.48 0 01-2.06-.57v.06c0 2.42 1.66 4.42 3.85 4.88a4.52 4.52 0 01-2.05.08 4.55 4.55 0 004.25 3.12A9 9 0 010 18.58a12.65 12.65 0 006.88 2c8.26 0 12.78-7.02 12.78-13.1 0-.2 0-.41-.02-.6A9.22 9.22 0 0023 3z"/></svg>
-    </div>
-    <div class="social-icon" tabindex="0" role="link" aria-label="GitHub" data-tooltip="GitHub">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" width="28" height="28"><path d="M12 2C6.5 2 2 6.5 2 12a10 10 0 006.84 9.5c.5.09.68-.22.68-.5v-1.8c-2.78.6-3.37-1.34-3.37-1.34a2.66 2.66 0 00-1.12-1.47c-.92-.63.07-.6.07-.6a2.1 2.1 0 011.53 1 2.16 2.16 0 002.94.83 2.2 2.2 0 01.64-1.38c-2.22-.25-4.55-1.12-4.55-5A3.9 3.9 0 017.3 9.5a3.6 3.6 0 01.1-2.65s.87-.28 2.86 1a9.83 9.83 0 015.22 0c2-1.28 2.85-1 2.85-1a3.57 3.57 0 01.1 2.65 3.89 3.89 0 011.05 2.7c0 3.92-2.34 4.68-4.57 4.93a2.45 2.45 0 01.7 1.9v2.8c0 .28.18.6.7.5A10 10 0 0022 12c0-5.5-4.5-10-10-10z"/></svg>
-    </div>
-    <div class="social-icon" tabindex="0" role="link" aria-label="LinkedIn" data-tooltip="LinkedIn">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" width="28" height="28"><path d="M19 0h-14c-2.75 0-5 2.25-5 5v14c0 2.75 2.25 5 5 5h14c2.75 0 5-2.25 5-5v-14c0-2.75-2.25-5-5-5zm-11.75 20.5h-3v-10h3v10zm-1.5-11.5c-1 0-1.75-.82-1.75-1.75s.75-1.75 1.75-1.75c1 0 1.75.82 1.75 1.75s-.75 1.75-1.75 1.75zm14.25 11.5h-3v-5.25c0-1.25-.5-2.25-1.75-2.25s-2 1-2 2.25v5.25h-3v-10h3v1.5a3.49 3.49 0 013-1.5c2 0 3.5 1.5 3.5 4.75v5.25z"/></svg>
-    </div>
+      <!-- Apps Section -->
+      <section id="apps-section" aria-live="polite" tabindex="0">
+        <h2>Apps</h2>
+        <div class="list-container">
+          <a href="#" class="list-item" tabindex="0" role="link">Youtube</a>
+          <a href="#" class="list-item" tabindex="0" role="link">Spotify</a>
+          <a href="#" class="list-item" tabindex="0" role="link">Discord</a>
+        </div>
+      </section>
+    </main>
   </div>
-</footer>
-```
 
-  </div>
+  <div id="mouse-follower" aria-hidden="true"></div>
 
   <script>
-    const startBtn = document.getElementById('start-btn');
-    const minimalistLanding = document.getElementById('minimalist-landing');
-    const maximalistContent = document.getElementById('maximalist-content');
+    // GSAP variables
     const mainTitle = document.getElementById('main-title');
-    const particleCanvas = document.getElementById('particle-canvas');
-    const ctx = particleCanvas.getContext('2d');
+    const navButtons = document.querySelectorAll('nav button');
+    const sections = document.querySelectorAll('main section');
+    const searchInput = document.getElementById('search-input');
+    const gamesGrid = document.getElementById('games-grid');
+    const mouseFollower = document.getElementById('mouse-follower');
 
+    // Particle canvas setup
+    const canvas = document.getElementById('particle-canvas');
+    const ctx = canvas.getContext('2d');
+    let w, h;
     let particles = [];
+    const PARTICLE_COUNT = 80;
 
-    function resizeCanvas() {
-      particleCanvas.width = window.innerWidth;
-      particleCanvas.height = window.innerHeight;
+    function setupCanvas() {
+      w = window.innerWidth;
+      h = window.innerHeight;
+      canvas.width = w;
+      canvas.height = h;
     }
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
+    setupCanvas();
+    window.addEventListener('resize', setupCanvas);
 
     class Particle {
-      constructor(x, y, color) {
-        this.x = x;
-        this.y = y;
-        this.originX = x;
-        this.originY = y;
-        this.color = color;
-        this.size = 3;
-        this.vx = (Math.random() - 0.5) * 8;
-        this.vy = (Math.random() - 0.5) * 8;
-        this.alpha = 1;
+      constructor() {
+        this.reset();
+      }
+      reset() {
+        this.x = Math.random() * w;
+        this.y = Math.random() * h;
+        this.size = 1 + Math.random() * 2;
+        this.speedX = (Math.random() - 0.5) * 0.3;
+        this.speedY = (Math.random() - 0.5) * 0.3;
+        this.opacity = 0.15 + Math.random() * 0.15;
       }
       update() {
-        this.x += this.vx;
-        this.y += this.vy;
-        this.alpha -= 0.02;
-        this.alpha = Math.max(this.alpha, 0);
+        this.x += this.speedX;
+        this.y += this.speedY;
+        if (this.x > w || this.x < 0 || this.y > h || this.y < 0) {
+          this.reset();
+        }
       }
-      draw(ctx) {
-        ctx.fillStyle = `rgba(${this.color.r},${this.color.g},${this.color.b},${this.alpha})`;
+      draw() {
         ctx.beginPath();
+        ctx.fillStyle = `rgba(0,255,255,${this.opacity})`;
+        ctx.shadowColor = 'rgba(0,255,255,0.7)';
+        ctx.shadowBlur = 4;
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
         ctx.fill();
       }
     }
 
-    function textToParticles(text, fontSize, fontFamily) {
-      const offscreenCanvas = document.createElement('canvas');
-      const offCtx = offscreenCanvas.getContext('2d');
-      const width = window.innerWidth;
-      const height = window.innerHeight;
-      offscreenCanvas.width = width;
-      offscreenCanvas.height = height;
-      offCtx.font = `${fontSize}px ${fontFamily}`;
-      offCtx.textAlign = "center";
-      offCtx.textBaseline = "middle";
-      offCtx.fillStyle = "#F5F5F5";
-      offCtx.fillText(text, width / 2, height / 2);
-
-      const imageData = offCtx.getImageData(0, 0, width, height);
-      const data = imageData.data;
-      let particlesArray = [];
-
-      for (let y = 0; y < height; y += 7) {
-        for (let x = 0; x < width; x += 7) {
-          const index = (y * width + x) * 4;
-          const r = data[index];
-          const g = data[index + 1];
-          const b = data[index + 2];
-          const a = data[index + 3];
-          if (a > 128) {
-            particlesArray.push(new Particle(x, y, { r, g, b }));
-          }
-        }
-      }
-      return particlesArray;
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+      particles.push(new Particle());
     }
 
     function animateParticles() {
-      ctx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
-      let activeParticles = false;
+      ctx.clearRect(0, 0, w, h);
       particles.forEach(p => {
-        if (p.alpha > 0) {
-          p.update();
-          p.draw(ctx);
-          activeParticles = true;
-        }
+        p.update();
+        p.draw();
       });
-      if (activeParticles) {
-        requestAnimationFrame(animateParticles);
-      } else {
-        particleCanvas.style.display = 'none';
-      }
+      requestAnimationFrame(animateParticles);
     }
+    animateParticles();
 
-    function animateMainTitle() {
+    // Animate main title letters wave effect on load
+    function animateTitle() {
       const text = mainTitle.textContent;
       mainTitle.textContent = "";
-      for(let char of text) {
+      [...text].forEach((char, i) => {
         const span = document.createElement('span');
         span.textContent = char;
         span.style.display = 'inline-block';
         span.style.opacity = 0;
+        span.style.transform = 'translateY(20px)';
         mainTitle.appendChild(span);
-      }
+      });
       gsap.to(mainTitle.children, {
-        duration: 1.5,
         opacity: 1,
         y: 0,
-        stagger: 0.1,
+        stagger: 0.08,
         ease: "power3.out",
-        from: "random",
-        onStart: () => {
-          for (const span of mainTitle.children) {
-            span.style.transform = "translateY(40px)";
-          }
-        }
+        duration: 1.2
       });
     }
+    animateTitle();
 
-    // Glitch text effect
-    function glitchText(el) {
-      if (el.classList.contains('glitching')) return;
-      el.classList.add('glitching');
-      const originalText = el.textContent;
-      let glitchCount = 0;
-      const glitchInterval = setInterval(() => {
-        if (glitchCount > 15) {
-          clearInterval(glitchInterval);
-          el.textContent = originalText;
-          el.classList.remove('glitching');
-          return;
-        }
-        const chars = originalText.split('');
-        for(let i=0; i<chars.length; i++) {
-          if(Math.random() < 0.3) {
-            chars[i] = String.fromCharCode(33 + Math.floor(Math.random() * 94));
-          }
-        }
-        el.textContent = chars.join('');
-        glitchCount++;
-      }, 50);
-    }
+    // Navigation: Show only one section, with fade + slide animation
+    navButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (btn.classList.contains('active')) return;
 
-    // Parallax background effect on scroll
-    window.addEventListener('scroll', () => {
-      const scrollY = window.scrollY;
-      const parallax = document.getElementById('parallax-bg');
-      parallax.style.transform = `translateX(calc(-50% + ${scrollY * 0.3}px)) scale(1.1)`;
-    });
+        // Update active nav button
+        navButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
 
-    // START button click handler
-    startBtn.addEventListener('click', () => {
-      startBtn.style.pointerEvents = 'none';
+        const targetId = btn.dataset.target;
+        const currentSection = document.querySelector('section.active');
+        const nextSection = document.getElementById(targetId);
 
-      particles = textToParticles("START", 150, "Montserrat");
-
-      particleCanvas.style.display = "block";
-
-      gsap.to(startBtn, {
-        duration: 0.5,
-        opacity: 0,
-        onComplete: () => {
-          particles.forEach(p => p.alpha = 1);
-          animateParticles();
-
-          gsap.to(minimalistLanding, {
-            duration: 2,
-            backgroundColor: "#F5F5F5",
-            onUpdate: () => {
-              document.body.style.backgroundColor = minimalistLanding.style.backgroundColor;
-            }
-          });
-
-          setTimeout(() => {
-            minimalistLanding.style.display = "none";
-            maximalistContent.style.pointerEvents = "auto";
-            gsap.to(maximalistContent, {
-              duration: 1,
+        // Animate fade out + slide left current section
+        gsap.to(currentSection, {
+          duration: 0.5,
+          opacity: 0,
+          x: -100,
+          ease: "power2.in",
+          onComplete: () => {
+            currentSection.classList.remove('active');
+            currentSection.style.opacity = '';
+            currentSection.style.transform = '';
+            // Animate next section in: fade + slide from right
+            nextSection.classList.add('active');
+            nextSection.style.opacity = 0;
+            nextSection.style.transform = 'translateX(100px)';
+            gsap.to(nextSection, {
+              duration: 0.7,
               opacity: 1,
+              x: 0,
               ease: "power2.out",
               onComplete: () => {
-                animateMainTitle();
+                nextSection.focus();
               }
             });
-          }, 1500);
-        }
+          }
+        });
       });
     });
 
-    startBtn.addEventListener('keydown', e => {
-      if(e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        startBtn.click();
-      }
-    });
-
-    mainTitle.addEventListener('click', () => glitchText(mainTitle));
-    mainTitle.addEventListener('keydown', e => {
-      if(e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        glitchText(mainTitle);
-      }
-    });
-
-    // Games and Apps buttons open links
-    document.getElementById('games-btn').addEventListener('click', () => {
-      window.open('https://example.com/games', '_blank');
-    });
-    document.getElementById('apps-btn').addEventListener('click', () => {
-      window.open('https://example.com/apps', '_blank');
-    });
-
-    // Accessibility: Enter/Space triggers buttons
-    ['games-btn', 'apps-btn'].forEach(id => {
-      const btn = document.getElementById(id);
-      btn.addEventListener('keydown', e => {
-        if(e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          btn.click();
-        }
-      });
-      btn.addEventListener('click', () => {
-        glitchText(btn);
+    // Button hover animations (games and list items)
+    const interactiveSelectors = ['.game-button', '.list-item', 'nav button'];
+    interactiveSelectors.forEach(selector => {
+      document.querySelectorAll(selector).forEach(el => {
+        el.addEventListener('mouseenter', () => {
+          gsap.to(el, {
+            duration: 0.3,
+            scale: 1.1,
+            boxShadow: '0 0 15px var(--color-accent)',
+            ease: "power2.out"
+          });
+          mouseFollower.classList.add('active');
+        });
+        el.addEventListener('mouseleave', () => {
+          gsap.to(el, {
+            duration: 0.3,
+            scale: 1,
+            boxShadow: 'none',
+            ease: "power2.out"
+          });
+          mouseFollower.classList.remove('active');
+        });
       });
     });
+
+    // Search filter functionality
+    searchInput.addEventListener('input', () => {
+      const query = searchInput.value.toLowerCase();
+
+      // Filter games
+      const gameButtons = gamesGrid.querySelectorAll('.game-button');
+      gameButtons.forEach(btn => {
+        const visible = btn.textContent.toLowerCase().includes(query);
+        btn.style.display = visible ? 'block' : 'none';
+      });
+
+      // Filter tools
+      const toolsItems = document.querySelectorAll('#tools-section .list-item');
+      toolsItems.forEach(item => {
+        const visible = item.textContent.toLowerCase().includes(query);
+        item.style.display = visible ? 'block' : 'none';
+      });
+
+      // Filter apps
+      const appsItems = document.querySelectorAll('#apps-section .list-item');
+      appsItems.forEach(item => {
+        const visible = item.textContent.toLowerCase().includes(query);
+        item.style.display = visible ? 'block' : 'none';
+      });
+    });
+
+    // Mouse follower effect
+    window.addEventListener('mousemove', e => {
+      mouseFollower.style.transform = `translate(${e.clientX}px, ${e.clientY}px) translate(-50%, -50%)`;
+    });
+
   </script>
 
 </body>
