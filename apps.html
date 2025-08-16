@@ -26,17 +26,43 @@
             z-index: 10000;
         }
 
+        .home-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #e6f0ff;
+            padding: 10px 15px;
+            border-radius: 10px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 1000;
+            cursor: none;
+            transition: background 0.3s ease;
+        }
+
+        .home-btn:hover {
+            background: rgba(125, 211, 252, 0.1);
+        }
+
+        .home-btn span {
+            font-weight: 600;
+        }
+
         .button-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
             gap: 18px;
             max-width: 600px;
-            margin: 0 auto;
+            margin: 40px auto; /* Added margin for better centering */
         }
 
         .link-btn {
             background: rgba(255, 255, 255, 0.03);
-            border: none;
+            border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle border */
             padding: 16px;
             border-radius: 12px;
             text-align: center;
@@ -51,10 +77,11 @@
         }
 
         .link-btn img {
-            width: 36px;
-            height: 36px;
+            width: 42px; /* Slightly larger icons */
+            height: 42px;
             margin-bottom: 8px;
-            object-fit: contain;
+            object-fit: contain; /* Ensures logos aren't stretched */
+            filter: grayscale(30%) brightness(150%); /* Makes icons fit the theme */
         }
 
         .link-btn span {
@@ -81,8 +108,8 @@
         }
 
         .overlay iframe {
-            width: 80%;
-            height: 80%;
+            width: 90%; /* Larger iframe */
+            height: 90%;
             border: none;
             border-radius: 12px;
             background: #111;
@@ -92,21 +119,27 @@
             position: absolute;
             top: 20px;
             right: 30px;
-            font-size: 24px;
+            font-size: 28px;
             color: #e6f0ff;
             background: none;
             border: none;
             cursor: none;
-            transition: transform 0.2s ease;
+            transition: transform 0.2s ease, color 0.2s ease;
         }
 
         .overlay .close:hover {
             transform: scale(1.2);
+            color: #ff4d4d; /* Red hover for close button */
         }
     </style>
 </head>
 <body>
     <div class="cursor" id="cursor"></div>
+
+    <a href="https://ethandupe.github.io/astra" class="home-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+        <span>Home</span>
+    </a>
 
     <div class="button-grid">
         <button class="link-btn" data-url="https://edgedcircles.com/uv/service/hvtrs8%2F-wuw%2Ctkkvoi.aoo%2Fgxrlmrg">
@@ -121,7 +154,7 @@
 
         <button class="link-btn" data-url="https://edgedcircles.com/uv/service/hvtrs8%2F-wuw%2Cntific.aoo%2Ffe%2Fdg%2Feedopcg-lou%2F">
             <img src="https://upload.wikimedia.org/wikipedia/commons/2/21/NVIDIA_GeForce_NOW_logo.svg" alt="NVIDIA GeForce Now" />
-            <span>NVIDIA GeForce Now</span>
+            <span>GeForce Now</span>
         </button>
 
         <button class="link-btn" data-url="https://ixl.com.de/frog/ixl/hvtrs8%252F-wuw%252Cngwermuldq.aoo%252F">
@@ -130,19 +163,19 @@
         </button>
 
         <button class="link-btn" data-url="https://edgedcircles.com/uv/service/hvtrs8%2F-wuw%2Cecs%7Bfwn%2Cge%2F">
-            <img src="https://www.easyfun.com/img/logo.png" alt="Easy Fun" />
+            <img src="https://www.vhv.rs/dpng/d/43-439337_game-controller-icon-white-png-transparent-png.png" alt="Easy Fun" />
             <span>Easy Fun</span>
         </button>
 
         <button class="link-btn" data-url="https://edgedcircles.com/uv/service/hvtrs8%2F-wuw%2Cymuvu%60e%2Ccmm-">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/YouTube_full-color_icon_%282017%29.svg/1024px-YouTube_full-color_icon_%282017%29.svg.png" alt="YouTube" />
+            <img src="https://www.iconpacks.net/icons/2/free-youtube-logo-icon-2431-thumb.png" alt="YouTube" />
             <span>YouTube</span>
         </button>
     </div>
 
     <div class="overlay" id="iframeOverlay">
         <button class="close" id="closeBtn">&times;</button>
-        <iframe src=""></iframe>
+        <iframe src="" allow="fullscreen"></iframe>
     </div>
 
     <script>
@@ -152,13 +185,13 @@
             cursor.style.top = e.clientY + 'px';
         });
 
-        document.querySelectorAll('.link-btn, .close').forEach(el => {
+        document.querySelectorAll('.link-btn, .close, .home-btn').forEach(el => {
             el.addEventListener('mouseenter', () => {
-                cursor.style.transform = 'scale(2)';
-                cursor.style.backgroundColor = 'rgba(125,211,252,0.5)';
+                cursor.style.transform = 'translate(-50%, -50%) scale(2)';
+                cursor.style.backgroundColor = 'rgba(125, 211, 252, 0.5)';
             });
             el.addEventListener('mouseleave', () => {
-                cursor.style.transform = 'scale(1)';
+                cursor.style.transform = 'translate(-50%, -50%) scale(1)';
                 cursor.style.backgroundColor = 'transparent';
             });
         });
@@ -174,7 +207,17 @@
 
         document.getElementById('closeBtn').addEventListener('click', () => {
             overlay.classList.remove('active');
-            setTimeout(() => iframe.src = '', 300);
+            // Clear the iframe src to stop video/audio from playing in the background
+            setTimeout(() => {
+                iframe.src = '';
+            }, 300); // Wait for the transition to finish
+        });
+
+        // Optional: Close overlay with the Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && overlay.classList.contains('active')) {
+                document.getElementById('closeBtn').click();
+            }
         });
     </script>
 
