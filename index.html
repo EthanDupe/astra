@@ -1,117 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Astra</title>
-<style>
-    /* Basic Reset & Fonts */
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        cursor: none; /* Hide default cursor */
-    }
-    body {
-        background-color: #0f0f0f;
-        color: #fff;
-        font-family: 'Segoe UI', sans-serif;
-        overflow-x: hidden;
-    }
-
-    /* Loading Screen */
-    #loading-screen {
-        position: fixed;
-        top: 0; left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: #0f0f0f;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 9999;
-        font-size: 2rem;
-        letter-spacing: 2px;
-        animation: fadeOut 1s ease 1s forwards;
-    }
-    @keyframes fadeOut {
-        to { opacity: 0; visibility: hidden; }
-    }
-
-    /* Title */
-    header {
-        text-align: center;
-        padding: 20px 0;
-        font-size: 2.5rem;
-        font-weight: bold;
-        letter-spacing: 1px;
-        animation: slideDown 0.8s ease;
-    }
-    @keyframes slideDown {
-        from { transform: translateY(-50px); opacity: 0; }
-        to { transform: translateY(0); opacity: 1; }
-    }
-
-    /* Navigation */
-    nav {
-        display: flex;
-        justify-content: center;
-        gap: 40px;
-        margin-top: 10px;
-        animation: fadeIn 1.2s ease;
-    }
-    nav a {
-        position: relative;
-        font-size: 1.2rem;
-        color: #fff;
-        text-decoration: none;
-        padding: 8px 16px;
-        transition: color 0.3s ease;
-    }
-    nav a::after {
-        content: '';
-        position: absolute;
-        left: 0;
-        bottom: -4px;
-        width: 100%;
-        height: 2px;
-        background: #fff;
-        transform: scaleX(0);
-        transform-origin: right;
-        transition: transform 0.3s ease;
-    }
-    nav a:hover {
-        color: #00c3ff;
-    }
-    nav a:hover::after {
-        transform: scaleX(1);
-        transform-origin: left;
-    }
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* Custom Cursor */
-    .cursor {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 15px;
-        height: 15px;
-        background-color: rgba(255,255,255,0.8);
-        border-radius: 50%;
-        pointer-events: none;
-        transform: translate(-50%, -50%);
-        transition: width 0.2s ease, height 0.2s ease, background-color 0.3s ease;
-        z-index: 10000;
-    }
-    .cursor.hover {
-        width: 35px;
-        height: 35px;
-        background-color: rgba(0,195,255,0.5);
-    }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Astra</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -123,45 +16,45 @@
 
 <!-- Navigation -->
 <nav>
-    <a href="https://ethandupe.github.io/games-main/">Games</a>
-    <a href="/astra/tools.html">Tools</a>
-    <a href="/astra/apps.html">Apps</a>
+  <a href="https://ethandupe.github.io/games-main/">Games</a>
+  <a href="/astra/tools.html">Tools</a>
+  <a href="/astra/apps.html">Apps</a>
 </nav>
 
 <!-- Custom Cursor -->
 <div class="cursor" id="cursor"></div>
 
 <script>
-    // Smooth Loading Screen Removal
-    window.addEventListener('load', () => {
-        setTimeout(() => {
-            document.getElementById('loading-screen').style.display = 'none';
-        }, 2000);
-    });
+  // Smooth Loading Screen Removal
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      document.getElementById('loading-screen').style.display = 'none';
+    }, 2000);
+  });
 
-    // Custom Cursor Logic
-    const cursor = document.getElementById('cursor');
-    let mouseX = 0, mouseY = 0;
-    let cursorX = 0, cursorY = 0;
+  // Custom Cursor Logic
+  const cursor = document.getElementById('cursor');
+  let mouseX = 0, mouseY = 0;
+  let cursorX = 0, cursorY = 0;
 
-    document.addEventListener('mousemove', e => {
-        mouseX = e.clientX;
-        mouseY = e.clientY;
-    });
+  document.addEventListener('mousemove', e => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+  });
 
-    function animateCursor() {
-        cursorX += (mouseX - cursorX) * 0.15;
-        cursorY += (mouseY - cursorY) * 0.15;
-        cursor.style.transform = `translate(${cursorX}px, ${cursorY}px)`;
-        requestAnimationFrame(animateCursor);
-    }
-    animateCursor();
+  function animateCursor() {
+    cursorX += (mouseX - cursorX) * 0.15;
+    cursorY += (mouseY - cursorY) * 0.15;
+    cursor.style.transform = `translate(${cursorX}px, ${cursorY}px)`;
+    requestAnimationFrame(animateCursor);
+  }
+  animateCursor();
 
-    // Hover effect for interactive elements
-    document.querySelectorAll('a, button').forEach(el => {
-        el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
-        el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
-    });
+  // Hover effect for interactive elements
+  document.querySelectorAll('a, button').forEach(el => {
+    el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+    el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+  });
 </script>
 
 </body>
