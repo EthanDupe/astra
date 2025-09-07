@@ -1,348 +1,334 @@
-<nav class="tools-nav" role="tablist" aria-label="Tools Navigation" style="display:flex; justify-content:center; gap:1rem; margin-bottom:1.5rem;">
-  <button role="tab" aria-selected="true" aria-controls="calculator" id="btn-calculator" class="active" style="background:#00ffff; color:#0a192f; border:none; border-radius:6px; padding:0.5rem 1rem; cursor:pointer;">Calculator</button>
-  <button role="tab" aria-selected="false" aria-controls="notepad" id="btn-notepad" style="background:transparent; border:2px solid #00ffff; color:#00ffff; border-radius:6px; padding:0.5rem 1rem; cursor:pointer;">Notepad</button>
-  <button role="tab" aria-selected="false" aria-controls="unitconverter" id="btn-unitconverter" style="background:transparent; border:2px solid #00ffff; color:#00ffff; border-radius:6px; padding:0.5rem 1rem; cursor:pointer;">Unit Converter</button>
-</nav>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Utility Tools</title>
+  <style>
+    body {
+      background: #0a192f;
+      color: #eee;
+      font-family: Arial, sans-serif;
+      padding: 2rem;
+    }
 
-<section id="tool-frame" class="tool-frame" role="tabpanel" aria-live="polite" tabindex="0" style="
-  background:#112a67;
-  border-radius:12px;
-  max-width:100%;
-  max-height:70vh;
-  min-height:320px;
-  margin:0 auto;
-  padding:1rem;
-  box-shadow:
-    0 0 10px rgba(0,255,255,0.6),
-    inset 0 0 20px rgba(0,255,255,0.3);
-  overflow-y:auto;
-  opacity:1;
-  transform: scale(1);
-  transition: opacity 0.3s ease, transform 0.3s ease;
-">
-  <!-- Tool content injected here -->
-</section>
+    nav.tools-nav {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    nav.tools-nav button {
+      background: transparent;
+      border: 2px solid #00ffff;
+      color: #00ffff;
+      border-radius: 6px;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    nav.tools-nav button.active {
+      background: #00ffff;
+      color: #0a192f;
+      font-weight: 600;
+    }
 
-<script>
-(() => {
-  const toolFrame = document.getElementById('tool-frame');
-  const buttons = document.querySelectorAll('.tools-nav button');
+    .tool-frame {
+      background: #112a67;
+      border-radius: 12px;
+      max-width: 100%;
+      max-height: 70vh;
+      min-height: 320px;
+      margin: 0 auto;
+      padding: 1rem;
+      box-shadow: 0 0 10px rgba(0,255,255,0.6),
+                  inset 0 0 20px rgba(0,255,255,0.3);
+      overflow-y: auto;
+      opacity: 1;
+      transform: scale(1);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
 
-  const templates = {
-    calculator: `
-      <div class="calculator" tabindex="0" aria-label="Calculator tool" style="
-        max-width:360px; margin:0 auto; background:#1a2c6b; border-radius:10px; padding:1rem; color:#eee; user-select:none;">
-        <div class="calc-display" aria-live="polite" aria-atomic="true" role="textbox" id="calcDisplay" aria-readonly="true" style="
-          width:100%; height:50px; background:#0e1a3a; border-radius:8px; font-size:1.8rem; padding:0.5rem 1rem; text-align:right; color:#aaccff; margin-bottom:1rem; box-shadow: inset 0 0 8px #183875; overflow-wrap: break-word;">0</div>
-        <div class="calc-buttons" role="group" aria-label="Calculator buttons" style="display:grid; grid-template-columns:repeat(4,1fr); gap:12px;">
-          <button type="button" data-val="7" style="background:#25418b; border:none; border-radius:8px; color:#cddcff; font-size:1.4rem; padding:1rem; cursor:pointer;">7</button>
-          <button type="button" data-val="8" style="background:#25418b; border:none; border-radius:8px; color:#cddcff; font-size:1.4rem; padding:1rem; cursor:pointer;">8</button>
-          <button type="button" data-val="9" style="background:#25418b; border:none; border-radius:8px; color:#cddcff; font-size:1.4rem; padding:1rem; cursor:pointer;">9</button>
-          <button type="button" data-val="/" class="operator" aria-label="Divide" style="background:#5971f0; color:#e1e9ff; border:none; border-radius:8px; font-size:1.4rem; padding:1rem; cursor:pointer;">÷</button>
+    /* Shared component styles */
+    .btn {
+      border: none;
+      border-radius: 8px;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      font-weight: 600;
+      transition: 0.3s;
+    }
+    .btn-primary {
+      background: #00ffff;
+      color: #0a192f;
+    }
+    .btn-secondary {
+      background: #25418b;
+      color: #cddcff;
+    }
+    .btn-accent {
+      background: #4969ff;
+      color: #fff;
+    }
 
-          <button type="button" data-val="4" style="background:#25418b; border:none; border-radius:8px; color:#cddcff; font-size:1.4rem; padding:1rem; cursor:pointer;">4</button>
-          <button type="button" data-val="5" style="background:#25418b; border:none; border-radius:8px; color:#cddcff; font-size:1.4rem; padding:1rem; cursor:pointer;">5</button>
-          <button type="button" data-val="6" style="background:#25418b; border:none; border-radius:8px; color:#cddcff; font-size:1.4rem; padding:1rem; cursor:pointer;">6</button>
-          <button type="button" data-val="*" class="operator" aria-label="Multiply" style="background:#5971f0; color:#e1e9ff; border:none; border-radius:8px; font-size:1.4rem; padding:1rem; cursor:pointer;">×</button>
+    textarea, input, select {
+      width: 100%;
+      padding: 0.5rem 0.75rem;
+      border-radius: 6px;
+      border: none;
+      font-size: 1rem;
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <nav class="tools-nav" role="tablist" aria-label="Tools Navigation">
+    <button role="tab" aria-selected="true" id="btn-calculator" class="active">Calculator</button>
+    <button role="tab" aria-selected="false" id="btn-notepad">Notepad</button>
+    <button role="tab" aria-selected="false" id="btn-unitconverter">Unit Converter</button>
+    <button role="tab" aria-selected="false" id="btn-tabcloaker">Tab Cloaker</button>
+    <button role="tab" aria-selected="false" id="btn-aboutblank">About:Blank Opener</button>
+  </nav>
 
-          <button type="button" data-val="1" style="background:#25418b; border:none; border-radius:8px; color:#cddcff; font-size:1.4rem; padding:1rem; cursor:pointer;">1</button>
-          <button type="button" data-val="2" style="background:#25418b; border:none; border-radius:8px; color:#cddcff; font-size:1.4rem; padding:1rem; cursor:pointer;">2</button>
-          <button type="button" data-val="3" style="background:#25418b; border:none; border-radius:8px; color:#cddcff; font-size:1.4rem; padding:1rem; cursor:pointer;">3</button>
-          <button type="button" data-val="-" class="operator" aria-label="Subtract" style="background:#5971f0; color:#e1e9ff; border:none; border-radius:8px; font-size:1.4rem; padding:1rem; cursor:pointer;">−</button>
+  <section id="tool-frame" class="tool-frame" role="tabpanel" aria-live="polite" tabindex="0">
+    <!-- Tool content injected here -->
+  </section>
 
-          <button type="button" data-val="0" style="background:#25418b; border:none; border-radius:8px; color:#cddcff; font-size:1.4rem; padding:1rem; cursor:pointer;">0</button>
-          <button type="button" data-val="." style="background:#25418b; border:none; border-radius:8px; color:#cddcff; font-size:1.4rem; padding:1rem; cursor:pointer;">.</button>
-          <button type="button" data-val="C" aria-label="Clear" style="background:#25418b; border:none; border-radius:8px; color:#cddcff; font-size:1.4rem; padding:1rem; cursor:pointer;">C</button>
-          <button type="button" data-val="+" class="operator" aria-label="Add" style="background:#5971f0; color:#e1e9ff; border:none; border-radius:8px; font-size:1.4rem; padding:1rem; cursor:pointer;">+</button>
+  <script>
+  (() => {
+    const toolFrame = document.getElementById('tool-frame');
+    const buttons = document.querySelectorAll('.tools-nav button');
 
-          <button type="button" data-val="=" style="grid-column: span 4; background:#4969ff; font-weight:700; border:none; border-radius:8px; color:#fff; font-size:1.5rem; padding:1rem; cursor:pointer;">=</button>
+    /* ========================
+       TOOL TEMPLATES
+    =========================*/
+    const templates = {
+      calculator: `
+        <div class="calculator">
+          <div id="calcDisplay" class="display">0</div>
+          <div class="buttons"></div>
         </div>
-      </div>
-    `,
-    notepad: `
-      <div class="notepad" tabindex="0" aria-label="Notepad tool" style="max-width:600px; margin:0 auto; display:flex; flex-direction:column; height:100%;">
-        <textarea aria-label="Notepad text area" id="notepadTextarea" placeholder="Type your notes here..." style="flex:1; background:#f0f4ff; border-radius:10px; border:none; padding:1rem; font-family: monospace, monospace; font-size:1.1rem; color:#222; resize:none; box-shadow: inset 0 0 8px #a6bbe9;"></textarea>
-        <div class="notepad-controls" style="margin-top:0.75rem; display:flex; justify-content:flex-end;">
-          <button class="save-btn" type="button" aria-label="Save notes" style="background:#00ffff; color:#0a192f; border:none; padding:0.5rem 1rem; border-radius:8px; cursor:pointer; font-weight:600; transition: background-color 0.3s ease;">Save</button>
-          <span class="save-msg" aria-live="polite" role="status" aria-atomic="true" style="margin-left:1rem; align-self:center; font-size:0.9rem; color:#a0d468; opacity:0; transition:opacity 0.3s ease;">Saved!</span>
+      `,
+      notepad: `
+        <div class="notepad">
+          <textarea id="notepadTextarea" placeholder="Type your notes here..."></textarea>
+          <button class="btn btn-primary" id="saveNote">Save</button>
+          <span id="saveMsg" style="margin-left:1rem; color:#00ff99; opacity:0;">Saved!</span>
         </div>
-      </div>
-    `,
-    unitconverter: `
-      <div class="unit-converter" tabindex="0" aria-label="Unit converter tool" style="max-width:600px; margin:0 auto; color:#eee;">
-        <label for="unitType" style="display:block; margin-bottom:0.25rem; font-weight:600;">Select Unit Type:</label>
-        <select id="unitType" aria-controls="unitInput unitFrom unitTo conversionResult" style="width:100%; padding:0.5rem 0.75rem; margin-bottom:1rem; border-radius:6px; border:none; background:#0e2a54; color:#cdeeff; font-size:1rem; box-shadow: inset 0 0 6px #15407e;">
-          <option value="length">Length</option>
-          <option value="weight">Weight</option>
-          <option value="temperature">Temperature</option>
-        </select>
-
-        <label for="unitInput" style="display:block; margin-bottom:0.25rem; font-weight:600;">Enter Value:</label>
-        <input type="number" id="unitInput" aria-describedby="unitFrom unitTo conversionResult" placeholder="Enter a number" style="width:100%; padding:0.5rem 0.75rem; border-radius:6px; border:none; margin-bottom:1rem; font-size:1rem; background:#0e2a54; color:#cdeeff; box-shadow: inset 0 0 6px #15407e;" />
-
-        <label for="unitFrom" style="display:block; margin-bottom:0.25rem; font-weight:600;">From:</label>
-        <select id="unitFrom" style="width:100%; padding:0.5rem 0.75rem; margin-bottom:1rem; border-radius:6px; border:none; background:#0e2a54; color:#cdeeff; font-size:1rem; box-shadow: inset 0 0 6px #15407e;"></select>
-
-        <label for="unitTo" style="display:block; margin-bottom:0.25rem; font-weight:600;">To:</label>
-        <select id="unitTo" style="width:100%; padding:0.5rem 0.75rem; margin-bottom:1rem; border-radius:6px; border:none; background:#0e2a54; color:#cdeeff; font-size:1rem; box-shadow: inset 0 0 6px #15407e;"></select>
-
-        <div id="conversionResult" aria-live="polite" role="alert" style="font-weight:700; font-size:1.25rem; margin-top:1rem; color:#00ffff; min-height:1.5rem;"></div>
-      </div>
-    `
-  };
-
-  let activeTool = 'calculator';
-
-  const btnCalc = document.getElementById('btn-calculator');
-  const btnNote = document.getElementById('btn-notepad');
-  const btnUnit = document.getElementById('btn-unitconverter');
-
-  function updateNav() {
-    buttons.forEach(btn => {
-      btn.classList.remove('active');
-      btn.setAttribute('aria-selected', 'false');
-    });
-    if(activeTool === 'calculator') {
-      btnCalc.classList.add('active');
-      btnCalc.setAttribute('aria-selected', 'true');
-    } else if(activeTool === 'notepad') {
-      btnNote.classList.add('active');
-      btnNote.setAttribute('aria-selected', 'true');
-    } else if(activeTool === 'unitconverter') {
-      btnUnit.classList.add('active');
-      btnUnit.setAttribute('aria-selected', 'true');
-    }
-  }
-
-  function animateFrameIn() {
-    toolFrame.style.opacity = '0';
-    toolFrame.style.transform = 'scale(0.85)';
-    setTimeout(() => {
-      toolFrame.style.opacity = '1';
-      toolFrame.style.transform = 'scale(1)';
-    }, 50);
-  }
-
-  function loadTool(tool) {
-    if (!templates[tool]) return;
-    toolFrame.innerHTML = templates[tool];
-    activeTool = tool;
-    updateNav();
-    animateFrameIn();
-    initToolLogic(tool);
-  }
-
-  function initCalculator() {
-    const display = toolFrame.querySelector('#calcDisplay');
-    const buttons = toolFrame.querySelectorAll('.calc-buttons button');
-
-    let current = '';
-
-    function updateDisplay(val) {
-      display.textContent = val || '0';
-    }
-
-    function calculate(expr) {
-      try {
-        if (/[^0-9+\-*/.]/.test(expr)) return 'Error';
-        let result = eval(expr);
-        if (result === undefined) return '0';
-        return result;
-      } catch {
-        return 'Error';
-      }
-    }
-
-    buttons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const val = btn.getAttribute('data-val');
-
-        if(val === 'C') {
-          current = '';
-          updateDisplay(current);
-          return;
-        }
-        if(val === '=') {
-          let res = calculate(current);
-          current = String(res);
-          updateDisplay(current);
-          return;
-        }
-
-        current += val;
-        updateDisplay(current);
-      });
-    });
-  }
-
-  function initNotepad() {
-    const textarea = toolFrame.querySelector('#notepadTextarea');
-    const saveBtn = toolFrame.querySelector('.save-btn');
-    const saveMsg = toolFrame.querySelector('.save-msg');
-
-    const savedNotes = localStorage.getItem('unblocked_notepad');
-    if(savedNotes) textarea.value = savedNotes;
-
-    saveBtn.addEventListener('click', () => {
-      localStorage.setItem('unblocked_notepad', textarea.value);
-      saveMsg.style.opacity = '1';
-      setTimeout(() => {
-        saveMsg.style.opacity = '0';
-      }, 1500);
-    });
-  }
-
-  function initUnitConverter() {
-    const unitType = toolFrame.querySelector('#unitType');
-    const unitFrom = toolFrame.querySelector('#unitFrom');
-    const unitTo = toolFrame.querySelector('#unitTo');
-    const inputValue = toolFrame.querySelector('#unitInput');
-    const resultDisplay = toolFrame.querySelector('#conversionResult');
-
-    const units = {
-      length: {
-        meter: 1,
-        kilometer: 1000,
-        centimeter: 0.01,
-        millimeter: 0.001,
-        mile: 1609.34,
-        yard: 0.9144,
-        foot: 0.3048,
-        inch: 0.0254,
-      },
-      weight: {
-        kilogram: 1,
-        gram: 0.001,
-        milligram: 0.000001,
-        pound: 0.453592,
-        ounce: 0.0283495,
-      },
-      temperature: {
-        Celsius: null,
-        Fahrenheit: null,
-        Kelvin: null,
-      }
+      `,
+      unitconverter: `
+        <div class="unit-converter">
+          <label>Select Unit Type:</label>
+          <select id="unitType">
+            <option value="length">Length</option>
+            <option value="weight">Weight</option>
+            <option value="temperature">Temperature</option>
+          </select>
+          <input type="number" id="unitInput" placeholder="Enter value">
+          <label>From:</label>
+          <select id="unitFrom"></select>
+          <label>To:</label>
+          <select id="unitTo"></select>
+          <div id="conversionResult" style="margin-top:1rem; font-weight:bold;"></div>
+        </div>
+      `,
+      tabcloaker: `
+        <div class="tab-cloaker">
+          <input type="text" id="cloakTitle" placeholder="Enter fake tab title">
+          <input type="text" id="cloakFavicon" placeholder="Enter favicon URL (optional)">
+          <button class="btn btn-primary" id="applyCloak">Apply Cloak</button>
+          <button class="btn btn-secondary" id="resetCloak">Reset</button>
+        </div>
+      `,
+      aboutblank: `
+        <div class="about-blank">
+          <input type="url" id="blankUrl" placeholder="Enter website URL">
+          <button class="btn btn-accent" id="openBlank">Open in About:Blank</button>
+        </div>
+      `
     };
 
-    function populateUnits(type) {
-      unitFrom.innerHTML = '';
-      unitTo.innerHTML = '';
-      if(type === 'temperature') {
-        ['Celsius', 'Fahrenheit', 'Kelvin'].forEach(u => {
-          const option1 = document.createElement('option');
-          option1.value = u;
-          option1.textContent = u;
-          unitFrom.appendChild(option1);
-          const option2 = document.createElement('option');
-          option2.value = u;
-          option2.textContent = u;
-          unitTo.appendChild(option2);
+    let activeTool = 'calculator';
+
+    /* ========================
+       TOOL LOAD & NAV
+    =========================*/
+    function updateNav() {
+      buttons.forEach(btn => {
+        btn.classList.remove('active');
+        btn.setAttribute('aria-selected', 'false');
+      });
+      document.getElementById(`btn-${activeTool}`).classList.add('active');
+      document.getElementById(`btn-${activeTool}`).setAttribute('aria-selected', 'true');
+    }
+
+    function animateFrameIn() {
+      toolFrame.style.opacity = '0';
+      toolFrame.style.transform = 'scale(0.85)';
+      setTimeout(() => {
+        toolFrame.style.opacity = '1';
+        toolFrame.style.transform = 'scale(1)';
+      }, 50);
+    }
+
+    function loadTool(tool) {
+      if (!templates[tool]) return;
+      toolFrame.innerHTML = templates[tool];
+      activeTool = tool;
+      updateNav();
+      animateFrameIn();
+      initToolLogic(tool);
+    }
+
+    /* ========================
+       TOOLS LOGIC
+    =========================*/
+    function initCalculator() {
+      const display = document.getElementById('calcDisplay');
+      const buttonsDiv = document.querySelector('.buttons');
+      const keys = ["7","8","9","/","4","5","6","*","1","2","3","-","0",".","C","+","="];
+      let current = "";
+
+      keys.forEach(k => {
+        const btn = document.createElement('button');
+        btn.textContent = k === "/" ? "÷" : k === "*" ? "×" : k;
+        btn.className = "btn btn-secondary";
+        btn.style.fontSize = "1.2rem";
+        btn.addEventListener('click', () => {
+          if(k === "C") { current = ""; display.textContent = "0"; return; }
+          if(k === "=") {
+            try { current = eval(current).toString(); }
+            catch { current = "Error"; }
+            display.textContent = current; return;
+          }
+          current += k;
+          display.textContent = current;
         });
-      } else {
+        buttonsDiv.appendChild(btn);
+      });
+    }
+
+    function initNotepad() {
+      const textarea = document.getElementById('notepadTextarea');
+      const saveBtn = document.getElementById('saveNote');
+      const saveMsg = document.getElementById('saveMsg');
+      textarea.value = localStorage.getItem('modern_notepad') || "";
+
+      saveBtn.addEventListener('click', () => {
+        localStorage.setItem('modern_notepad', textarea.value);
+        saveMsg.style.opacity = 1;
+        setTimeout(() => saveMsg.style.opacity = 0, 1500);
+      });
+    }
+
+    function initUnitConverter() {
+      const unitType = document.getElementById('unitType');
+      const unitFrom = document.getElementById('unitFrom');
+      const unitTo = document.getElementById('unitTo');
+      const inputValue = document.getElementById('unitInput');
+      const resultDisplay = document.getElementById('conversionResult');
+
+      const units = {
+        length: { meter: 1, kilometer: 1000, centimeter: 0.01, inch: 0.0254, foot: 0.3048, mile: 1609.34 },
+        weight: { kilogram: 1, gram: 0.001, pound: 0.453592, ounce: 0.0283495 },
+        temperature: { Celsius: null, Fahrenheit: null, Kelvin: null }
+      };
+
+      function populateUnits(type) {
+        unitFrom.innerHTML = "";
+        unitTo.innerHTML = "";
         Object.keys(units[type]).forEach(u => {
-          const option1 = document.createElement('option');
-          option1.value = u;
-          option1.textContent = capitalize(u);
-          unitFrom.appendChild(option1);
-          const option2 = document.createElement('option');
-          option2.value = u;
-          option2.textContent = capitalize(u);
-          unitTo.appendChild(option2);
+          unitFrom.add(new Option(u,u));
+          unitTo.add(new Option(u,u));
         });
+        unitTo.selectedIndex = 1;
       }
-      unitFrom.selectedIndex = 0;
-      unitTo.selectedIndex = 1;
-      updateResult();
-    }
 
-    function capitalize(str) {
-      return str.charAt(0).toUpperCase() + str.slice(1);
-    }
-
-    function convert(value, fromUnit, toUnit, type) {
-      if(type === 'temperature') return convertTemperature(value, fromUnit, toUnit);
-      const baseValue = value * units[type][fromUnit];
-      return baseValue / units[type][toUnit];
-    }
-
-    function convertTemperature(value, from, to) {
-      let val = parseFloat(value);
-      if(isNaN(val)) return '';
-      if(from === to) return val.toFixed(4);
-
-      switch(from) {
-        case 'Celsius':
-          if(to === 'Fahrenheit') return (val * 9/5 + 32).toFixed(4);
-          if(to === 'Kelvin') return (val + 273.15).toFixed(4);
-          break;
-        case 'Fahrenheit':
-          if(to === 'Celsius') return ((val - 32) * 5/9).toFixed(4);
-          if(to === 'Kelvin') return ((val - 32) * 5/9 + 273.15).toFixed(4);
-          break;
-        case 'Kelvin':
-          if(to === 'Celsius') return (val - 273.15).toFixed(4);
-          if(to === 'Fahrenheit') return ((val - 273.15) * 9/5 + 32).toFixed(4);
-          break;
+      function convert(val, from, to, type) {
+        if(type === "temperature") {
+          let v = parseFloat(val);
+          if(from==="Celsius"&&to==="Fahrenheit") return v*9/5+32;
+          if(from==="Celsius"&&to==="Kelvin") return v+273.15;
+          if(from==="Fahrenheit"&&to==="Celsius") return (v-32)*5/9;
+          if(from==="Fahrenheit"&&to==="Kelvin") return (v-32)*5/9+273.15;
+          if(from==="Kelvin"&&to==="Celsius") return v-273.15;
+          if(from==="Kelvin"&&to==="Fahrenheit") return (v-273.15)*9/5+32;
+          return v;
+        }
+        const base = val * units[type][from];
+        return base / units[type][to];
       }
-      return '';
-    }
 
-    function updateResult() {
-      const val = parseFloat(inputValue.value);
-      if(isNaN(val)) {
-        resultDisplay.textContent = '';
-        return;
+      function updateResult() {
+        let v = parseFloat(inputValue.value);
+        if(isNaN(v)) { resultDisplay.textContent = ""; return; }
+        resultDisplay.textContent = convert(v, unitFrom.value, unitTo.value, unitType.value).toFixed(4) + " " + unitTo.value;
       }
-      const from = unitFrom.value;
-      const to = unitTo.value;
-      const type = unitType.value;
-      if(from === to) {
-        resultDisplay.textContent = `${val} ${to}`;
-        return;
-      }
-      const converted = convert(val, from, to, type);
-      if(converted === '') {
-        resultDisplay.textContent = 'Invalid conversion';
-      } else {
-        resultDisplay.textContent = `${converted} ${to}`;
-      }
-    }
 
-    unitType.addEventListener('change', () => {
+      unitType.addEventListener('change', () => { populateUnits(unitType.value); updateResult(); });
+      [unitFrom, unitTo, inputValue].forEach(el => el.addEventListener('input', updateResult));
+
       populateUnits(unitType.value);
-    });
-    unitFrom.addEventListener('change', updateResult);
-    unitTo.addEventListener('change', updateResult);
-    inputValue.addEventListener('input', updateResult);
-
-    populateUnits(unitType.value);
-  }
-
-  function initToolLogic(tool) {
-    if(tool === 'calculator') initCalculator();
-    else if(tool === 'notepad') initNotepad();
-    else if(tool === 'unitconverter') initUnitConverter();
-  }
-
-  loadTool(activeTool);
-
-  buttons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      if(btn.classList.contains('active')) return;
-      activeTool = btn.id.replace('btn-', '');
-      loadTool(activeTool);
-    });
-  });
-
-  document.body.addEventListener('mouseover', e => {
-    if(e.target.closest('button, input, select, textarea')) {
-      document.querySelector('.mouse-follower').classList.add('active-hover');
     }
-  });
-  document.body.addEventListener('mouseout', e => {
-    if(e.target.closest('button, input, select, textarea')) {
-      document.querySelector('.mouse-follower').classList.remove('active-hover');
+
+    function initTabCloaker() {
+      const titleInput = document.getElementById('cloakTitle');
+      const faviconInput = document.getElementById('cloakFavicon');
+      const applyBtn = document.getElementById('applyCloak');
+      const resetBtn = document.getElementById('resetCloak');
+
+      const originalTitle = document.title;
+      const originalFavicon = document.querySelector("link[rel*='icon']")?.href;
+
+      applyBtn.addEventListener('click', () => {
+        if(titleInput.value) document.title = titleInput.value;
+        if(faviconInput.value) {
+          let link = document.querySelector("link[rel*='icon']") || document.createElement("link");
+          link.rel = "icon";
+          link.href = faviconInput.value;
+          document.head.appendChild(link);
+        }
+      });
+
+      resetBtn.addEventListener('click', () => {
+        document.title = originalTitle;
+        if(originalFavicon) {
+          let link = document.querySelector("link[rel*='icon']");
+          if(link) link.href = originalFavicon;
+        }
+      });
     }
-  });
-})();
-</script>
+
+    function initAboutBlank() {
+      const input = document.getElementById('blankUrl');
+      const btn = document.getElementById('openBlank');
+      btn.addEventListener('click', () => {
+        if(!input.value) return;
+        const win = window.open("about:blank");
+        win.document.write(\`<iframe src="\${input.value}" style="border:none;width:100%;height:100%"></iframe>\`);
+        win.document.title = "Loading...";
+      });
+    }
+
+    function initToolLogic(tool) {
+      if(tool==="calculator") initCalculator();
+      if(tool==="notepad") initNotepad();
+      if(tool==="unitconverter") initUnitConverter();
+      if(tool==="tabcloaker") initTabCloaker();
+      if(tool==="aboutblank") initAboutBlank();
+    }
+
+    /* ========================
+       INIT
+    =========================*/
+    loadTool(activeTool);
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tool = btn.id.replace("btn-","");
+        if(tool!==activeTool) loadTool(tool);
+      });
+    });
+  })();
+  </script>
+</body>
+</html>
