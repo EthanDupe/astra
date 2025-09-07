@@ -3,332 +3,292 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Utility Tools</title>
-  <style>
-    body {
-      background: #0a192f;
-      color: #eee;
-      font-family: Arial, sans-serif;
-      padding: 2rem;
-    }
-
-    nav.tools-nav {
-      display: flex;
-      justify-content: center;
-      gap: 1rem;
-      margin-bottom: 1.5rem;
-    }
-    nav.tools-nav button {
-      background: transparent;
-      border: 2px solid #00ffff;
-      color: #00ffff;
-      border-radius: 6px;
-      padding: 0.5rem 1rem;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-    nav.tools-nav button.active {
-      background: #00ffff;
-      color: #0a192f;
-      font-weight: 600;
-    }
-
-    .tool-frame {
-      background: #112a67;
-      border-radius: 12px;
-      max-width: 100%;
-      max-height: 70vh;
-      min-height: 320px;
-      margin: 0 auto;
-      padding: 1rem;
-      box-shadow: 0 0 10px rgba(0,255,255,0.6),
-                  inset 0 0 20px rgba(0,255,255,0.3);
-      overflow-y: auto;
-      opacity: 1;
-      transform: scale(1);
-      transition: opacity 0.3s ease, transform 0.3s ease;
-    }
-
-    /* Shared component styles */
-    .btn {
-      border: none;
-      border-radius: 8px;
-      padding: 0.5rem 1rem;
-      cursor: pointer;
-      font-weight: 600;
-      transition: 0.3s;
-    }
-    .btn-primary {
-      background: #00ffff;
-      color: #0a192f;
-    }
-    .btn-secondary {
-      background: #25418b;
-      color: #cddcff;
-    }
-    .btn-accent {
-      background: #4969ff;
-      color: #fff;
-    }
-
-    textarea, input, select {
-      width: 100%;
-      padding: 0.5rem 0.75rem;
-      border-radius: 6px;
-      border: none;
-      font-size: 1rem;
-      margin-bottom: 1rem;
-    }
-  </style>
+  <title>Astra | Utility Tools</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <nav class="tools-nav" role="tablist" aria-label="Tools Navigation">
-    <button role="tab" aria-selected="true" id="btn-calculator" class="active">Calculator</button>
-    <button role="tab" aria-selected="false" id="btn-notepad">Notepad</button>
-    <button role="tab" aria-selected="false" id="btn-unitconverter">Unit Converter</button>
-    <button role="tab" aria-selected="false" id="btn-tabcloaker">Tab Cloaker</button>
-    <button role="tab" aria-selected="false" id="btn-aboutblank">About:Blank Opener</button>
-  </nav>
 
-  <section id="tool-frame" class="tool-frame" role="tabpanel" aria-live="polite" tabindex="0">
-    <!-- Tool content injected here -->
-  </section>
+<!-- Title -->
+<header>Utility Tools</header>
 
-  <script>
-  (() => {
-    const toolFrame = document.getElementById('tool-frame');
-    const buttons = document.querySelectorAll('.tools-nav button');
+<!-- Tools Navigation -->
+<nav class="tools-nav" role="tablist" aria-label="Tools Navigation">
+  <button role="tab" aria-selected="true" id="btn-calculator" class="active">Calculator</button>
+  <button role="tab" aria-selected="false" id="btn-notepad">Notepad</button>
+  <button role="tab" aria-selected="false" id="btn-unitconverter">Unit Converter</button>
+  <button role="tab" aria-selected="false" id="btn-tabcloaker">Tab Cloaker</button>
+  <button role="tab" aria-selected="false" id="btn-aboutblank">About:Blank Opener</button>
+</nav>
 
-    /* ========================
-       TOOL TEMPLATES
-    =========================*/
-    const templates = {
-      calculator: `
-        <div class="calculator">
-          <div id="calcDisplay" class="display">0</div>
-          <div class="buttons"></div>
-        </div>
-      `,
-      notepad: `
-        <div class="notepad">
-          <textarea id="notepadTextarea" placeholder="Type your notes here..."></textarea>
-          <button class="btn btn-primary" id="saveNote">Save</button>
-          <span id="saveMsg" style="margin-left:1rem; color:#00ff99; opacity:0;">Saved!</span>
-        </div>
-      `,
-      unitconverter: `
-        <div class="unit-converter">
-          <label>Select Unit Type:</label>
-          <select id="unitType">
-            <option value="length">Length</option>
-            <option value="weight">Weight</option>
-            <option value="temperature">Temperature</option>
-          </select>
-          <input type="number" id="unitInput" placeholder="Enter value">
-          <label>From:</label>
-          <select id="unitFrom"></select>
-          <label>To:</label>
-          <select id="unitTo"></select>
-          <div id="conversionResult" style="margin-top:1rem; font-weight:bold;"></div>
-        </div>
-      `,
-      tabcloaker: `
-        <div class="tab-cloaker">
-          <input type="text" id="cloakTitle" placeholder="Enter fake tab title">
-          <input type="text" id="cloakFavicon" placeholder="Enter favicon URL (optional)">
-          <button class="btn btn-primary" id="applyCloak">Apply Cloak</button>
-          <button class="btn btn-secondary" id="resetCloak">Reset</button>
-        </div>
-      `,
-      aboutblank: `
-        <div class="about-blank">
-          <input type="url" id="blankUrl" placeholder="Enter website URL">
-          <button class="btn btn-accent" id="openBlank">Open in About:Blank</button>
-        </div>
-      `
+<!-- Tool Frame -->
+<section id="tool-frame" class="tool-frame" role="tabpanel" aria-live="polite" tabindex="0">
+  <!-- Tool content injected here -->
+</section>
+
+<!-- Custom Cursor -->
+<div class="cursor" id="cursor"></div>
+
+<script>
+(() => {
+  const toolFrame = document.getElementById('tool-frame');
+  const buttons = document.querySelectorAll('.tools-nav button');
+
+  /* ========================
+     TOOL TEMPLATES
+  =========================*/
+  const templates = {
+    calculator: `
+      <div class="calculator">
+        <div id="calcDisplay" class="display">0</div>
+        <div class="buttons"></div>
+      </div>
+    `,
+    notepad: `
+      <div class="notepad">
+        <textarea id="notepadTextarea" placeholder="Type your notes here..."></textarea>
+        <button class="btn btn-primary" id="saveNote">Save</button>
+        <span id="saveMsg" style="margin-left:1rem; color:#00ff99; opacity:0;">Saved!</span>
+      </div>
+    `,
+    unitconverter: `
+      <div class="unit-converter">
+        <label>Select Unit Type:</label>
+        <select id="unitType">
+          <option value="length">Length</option>
+          <option value="weight">Weight</option>
+          <option value="temperature">Temperature</option>
+        </select>
+        <input type="number" id="unitInput" placeholder="Enter value">
+        <label>From:</label>
+        <select id="unitFrom"></select>
+        <label>To:</label>
+        <select id="unitTo"></select>
+        <div id="conversionResult" style="margin-top:1rem; font-weight:bold;"></div>
+      </div>
+    `,
+    tabcloaker: `
+      <div class="tab-cloaker">
+        <input type="text" id="cloakTitle" placeholder="Enter fake tab title">
+        <input type="text" id="cloakFavicon" placeholder="Enter favicon URL (optional)">
+        <button class="btn btn-primary" id="applyCloak">Apply Cloak</button>
+        <button class="btn btn-secondary" id="resetCloak">Reset</button>
+      </div>
+    `,
+    aboutblank: `
+      <div class="about-blank">
+        <input type="url" id="blankUrl" placeholder="Enter website URL">
+        <button class="btn btn-accent" id="openBlank">Open in About:Blank</button>
+      </div>
+    `
+  };
+
+  let activeTool = 'calculator';
+
+  /* ========================
+     TOOL LOAD & NAV
+  =========================*/
+  function updateNav() {
+    buttons.forEach(btn => {
+      btn.classList.remove('active');
+      btn.setAttribute('aria-selected', 'false');
+    });
+    document.getElementById(`btn-${activeTool}`).classList.add('active');
+    document.getElementById(`btn-${activeTool}`).setAttribute('aria-selected', 'true');
+  }
+
+  function animateFrameIn() {
+    toolFrame.style.opacity = '0';
+    toolFrame.style.transform = 'scale(0.85)';
+    setTimeout(() => {
+      toolFrame.style.opacity = '1';
+      toolFrame.style.transform = 'scale(1)';
+    }, 50);
+  }
+
+  function loadTool(tool) {
+    if (!templates[tool]) return;
+    toolFrame.innerHTML = templates[tool];
+    activeTool = tool;
+    updateNav();
+    animateFrameIn();
+    initToolLogic(tool);
+  }
+
+  /* ========================
+     TOOLS LOGIC
+  =========================*/
+  function initCalculator() {
+    const display = document.getElementById('calcDisplay');
+    const buttonsDiv = document.querySelector('.buttons');
+    const keys = ["7","8","9","/","4","5","6","*","1","2","3","-","0",".","C","+","="];
+    let current = "";
+
+    keys.forEach(k => {
+      const btn = document.createElement('button');
+      btn.textContent = k === "/" ? "÷" : k === "*" ? "×" : k;
+      btn.className = "btn btn-secondary";
+      btn.style.fontSize = "1.2rem";
+      btn.addEventListener('click', () => {
+        if(k === "C") { current = ""; display.textContent = "0"; return; }
+        if(k === "=") {
+          try { current = eval(current).toString(); }
+          catch { current = "Error"; }
+          display.textContent = current; return;
+        }
+        current += k;
+        display.textContent = current;
+      });
+      buttonsDiv.appendChild(btn);
+    });
+  }
+
+  function initNotepad() {
+    const textarea = document.getElementById('notepadTextarea');
+    const saveBtn = document.getElementById('saveNote');
+    const saveMsg = document.getElementById('saveMsg');
+    textarea.value = localStorage.getItem('modern_notepad') || "";
+
+    saveBtn.addEventListener('click', () => {
+      localStorage.setItem('modern_notepad', textarea.value);
+      saveMsg.style.opacity = 1;
+      setTimeout(() => saveMsg.style.opacity = 0, 1500);
+    });
+  }
+
+  function initUnitConverter() {
+    const unitType = document.getElementById('unitType');
+    const unitFrom = document.getElementById('unitFrom');
+    const unitTo = document.getElementById('unitTo');
+    const inputValue = document.getElementById('unitInput');
+    const resultDisplay = document.getElementById('conversionResult');
+
+    const units = {
+      length: { meter: 1, kilometer: 1000, centimeter: 0.01, inch: 0.0254, foot: 0.3048, mile: 1609.34 },
+      weight: { kilogram: 1, gram: 0.001, pound: 0.453592, ounce: 0.0283495 },
+      temperature: { Celsius: null, Fahrenheit: null, Kelvin: null }
     };
 
-    let activeTool = 'calculator';
-
-    /* ========================
-       TOOL LOAD & NAV
-    =========================*/
-    function updateNav() {
-      buttons.forEach(btn => {
-        btn.classList.remove('active');
-        btn.setAttribute('aria-selected', 'false');
+    function populateUnits(type) {
+      unitFrom.innerHTML = "";
+      unitTo.innerHTML = "";
+      Object.keys(units[type]).forEach(u => {
+        unitFrom.add(new Option(u,u));
+        unitTo.add(new Option(u,u));
       });
-      document.getElementById(`btn-${activeTool}`).classList.add('active');
-      document.getElementById(`btn-${activeTool}`).setAttribute('aria-selected', 'true');
+      unitTo.selectedIndex = 1;
     }
 
-    function animateFrameIn() {
-      toolFrame.style.opacity = '0';
-      toolFrame.style.transform = 'scale(0.85)';
-      setTimeout(() => {
-        toolFrame.style.opacity = '1';
-        toolFrame.style.transform = 'scale(1)';
-      }, 50);
-    }
-
-    function loadTool(tool) {
-      if (!templates[tool]) return;
-      toolFrame.innerHTML = templates[tool];
-      activeTool = tool;
-      updateNav();
-      animateFrameIn();
-      initToolLogic(tool);
-    }
-
-    /* ========================
-       TOOLS LOGIC
-    =========================*/
-    function initCalculator() {
-      const display = document.getElementById('calcDisplay');
-      const buttonsDiv = document.querySelector('.buttons');
-      const keys = ["7","8","9","/","4","5","6","*","1","2","3","-","0",".","C","+","="];
-      let current = "";
-
-      keys.forEach(k => {
-        const btn = document.createElement('button');
-        btn.textContent = k === "/" ? "÷" : k === "*" ? "×" : k;
-        btn.className = "btn btn-secondary";
-        btn.style.fontSize = "1.2rem";
-        btn.addEventListener('click', () => {
-          if(k === "C") { current = ""; display.textContent = "0"; return; }
-          if(k === "=") {
-            try { current = eval(current).toString(); }
-            catch { current = "Error"; }
-            display.textContent = current; return;
-          }
-          current += k;
-          display.textContent = current;
-        });
-        buttonsDiv.appendChild(btn);
-      });
-    }
-
-    function initNotepad() {
-      const textarea = document.getElementById('notepadTextarea');
-      const saveBtn = document.getElementById('saveNote');
-      const saveMsg = document.getElementById('saveMsg');
-      textarea.value = localStorage.getItem('modern_notepad') || "";
-
-      saveBtn.addEventListener('click', () => {
-        localStorage.setItem('modern_notepad', textarea.value);
-        saveMsg.style.opacity = 1;
-        setTimeout(() => saveMsg.style.opacity = 0, 1500);
-      });
-    }
-
-    function initUnitConverter() {
-      const unitType = document.getElementById('unitType');
-      const unitFrom = document.getElementById('unitFrom');
-      const unitTo = document.getElementById('unitTo');
-      const inputValue = document.getElementById('unitInput');
-      const resultDisplay = document.getElementById('conversionResult');
-
-      const units = {
-        length: { meter: 1, kilometer: 1000, centimeter: 0.01, inch: 0.0254, foot: 0.3048, mile: 1609.34 },
-        weight: { kilogram: 1, gram: 0.001, pound: 0.453592, ounce: 0.0283495 },
-        temperature: { Celsius: null, Fahrenheit: null, Kelvin: null }
-      };
-
-      function populateUnits(type) {
-        unitFrom.innerHTML = "";
-        unitTo.innerHTML = "";
-        Object.keys(units[type]).forEach(u => {
-          unitFrom.add(new Option(u,u));
-          unitTo.add(new Option(u,u));
-        });
-        unitTo.selectedIndex = 1;
+    function convert(val, from, to, type) {
+      if(type === "temperature") {
+        let v = parseFloat(val);
+        if(from==="Celsius"&&to==="Fahrenheit") return v*9/5+32;
+        if(from==="Celsius"&&to==="Kelvin") return v+273.15;
+        if(from==="Fahrenheit"&&to==="Celsius") return (v-32)*5/9;
+        if(from==="Fahrenheit"&&to==="Kelvin") return (v-32)*5/9+273.15;
+        if(from==="Kelvin"&&to==="Celsius") return v-273.15;
+        if(from==="Kelvin"&&to==="Fahrenheit") return (v-273.15)*9/5+32;
+        return v;
       }
+      const base = val * units[type][from];
+      return base / units[type][to];
+    }
 
-      function convert(val, from, to, type) {
-        if(type === "temperature") {
-          let v = parseFloat(val);
-          if(from==="Celsius"&&to==="Fahrenheit") return v*9/5+32;
-          if(from==="Celsius"&&to==="Kelvin") return v+273.15;
-          if(from==="Fahrenheit"&&to==="Celsius") return (v-32)*5/9;
-          if(from==="Fahrenheit"&&to==="Kelvin") return (v-32)*5/9+273.15;
-          if(from==="Kelvin"&&to==="Celsius") return v-273.15;
-          if(from==="Kelvin"&&to==="Fahrenheit") return (v-273.15)*9/5+32;
-          return v;
-        }
-        const base = val * units[type][from];
-        return base / units[type][to];
+    function updateResult() {
+      let v = parseFloat(inputValue.value);
+      if(isNaN(v)) { resultDisplay.textContent = ""; return; }
+      resultDisplay.textContent = convert(v, unitFrom.value, unitTo.value, unitType.value).toFixed(4) + " " + unitTo.value;
+    }
+
+    unitType.addEventListener('change', () => { populateUnits(unitType.value); updateResult(); });
+    [unitFrom, unitTo, inputValue].forEach(el => el.addEventListener('input', updateResult));
+
+    populateUnits(unitType.value);
+  }
+
+  function initTabCloaker() {
+    const titleInput = document.getElementById('cloakTitle');
+    const faviconInput = document.getElementById('cloakFavicon');
+    const applyBtn = document.getElementById('applyCloak');
+    const resetBtn = document.getElementById('resetCloak');
+
+    const originalTitle = document.title;
+    const originalFavicon = document.querySelector("link[rel*='icon']")?.href;
+
+    applyBtn.addEventListener('click', () => {
+      if(titleInput.value) document.title = titleInput.value;
+      if(faviconInput.value) {
+        let link = document.querySelector("link[rel*='icon']") || document.createElement("link");
+        link.rel = "icon";
+        link.href = faviconInput.value;
+        document.head.appendChild(link);
       }
-
-      function updateResult() {
-        let v = parseFloat(inputValue.value);
-        if(isNaN(v)) { resultDisplay.textContent = ""; return; }
-        resultDisplay.textContent = convert(v, unitFrom.value, unitTo.value, unitType.value).toFixed(4) + " " + unitTo.value;
-      }
-
-      unitType.addEventListener('change', () => { populateUnits(unitType.value); updateResult(); });
-      [unitFrom, unitTo, inputValue].forEach(el => el.addEventListener('input', updateResult));
-
-      populateUnits(unitType.value);
-    }
-
-    function initTabCloaker() {
-      const titleInput = document.getElementById('cloakTitle');
-      const faviconInput = document.getElementById('cloakFavicon');
-      const applyBtn = document.getElementById('applyCloak');
-      const resetBtn = document.getElementById('resetCloak');
-
-      const originalTitle = document.title;
-      const originalFavicon = document.querySelector("link[rel*='icon']")?.href;
-
-      applyBtn.addEventListener('click', () => {
-        if(titleInput.value) document.title = titleInput.value;
-        if(faviconInput.value) {
-          let link = document.querySelector("link[rel*='icon']") || document.createElement("link");
-          link.rel = "icon";
-          link.href = faviconInput.value;
-          document.head.appendChild(link);
-        }
-      });
-
-      resetBtn.addEventListener('click', () => {
-        document.title = originalTitle;
-        if(originalFavicon) {
-          let link = document.querySelector("link[rel*='icon']");
-          if(link) link.href = originalFavicon;
-        }
-      });
-    }
-
-    function initAboutBlank() {
-      const input = document.getElementById('blankUrl');
-      const btn = document.getElementById('openBlank');
-      btn.addEventListener('click', () => {
-        if(!input.value) return;
-        const win = window.open("about:blank");
-        win.document.write(\`<iframe src="\${input.value}" style="border:none;width:100%;height:100%"></iframe>\`);
-        win.document.title = "Loading...";
-      });
-    }
-
-    function initToolLogic(tool) {
-      if(tool==="calculator") initCalculator();
-      if(tool==="notepad") initNotepad();
-      if(tool==="unitconverter") initUnitConverter();
-      if(tool==="tabcloaker") initTabCloaker();
-      if(tool==="aboutblank") initAboutBlank();
-    }
-
-    /* ========================
-       INIT
-    =========================*/
-    loadTool(activeTool);
-    buttons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const tool = btn.id.replace("btn-","");
-        if(tool!==activeTool) loadTool(tool);
-      });
     });
-  })();
-  </script>
+
+    resetBtn.addEventListener('click', () => {
+      document.title = originalTitle;
+      if(originalFavicon) {
+        let link = document.querySelector("link[rel*='icon']");
+        if(link) link.href = originalFavicon;
+      }
+    });
+  }
+
+  function initAboutBlank() {
+    const input = document.getElementById('blankUrl');
+    const btn = document.getElementById('openBlank');
+    btn.addEventListener('click', () => {
+      if(!input.value) return;
+      const win = window.open("about:blank");
+      win.document.write(\`<iframe src="\${input.value}" style="border:none;width:100%;height:100%"></iframe>\`);
+      win.document.title = "Loading...";
+    });
+  }
+
+  function initToolLogic(tool) {
+    if(tool==="calculator") initCalculator();
+    if(tool==="notepad") initNotepad();
+    if(tool==="unitconverter") initUnitConverter();
+    if(tool==="tabcloaker") initTabCloaker();
+    if(tool==="aboutblank") initAboutBlank();
+  }
+
+  /* ========================
+     INIT
+  =========================*/
+  loadTool(activeTool);
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tool = btn.id.replace("btn-","");
+      if(tool!==activeTool) loadTool(tool);
+    });
+  });
+
+  /* ========================
+     CUSTOM CURSOR
+  =========================*/
+  const cursor = document.getElementById('cursor');
+  let mouseX = 0, mouseY = 0;
+  let cursorX = 0, cursorY = 0;
+
+  document.addEventListener('mousemove', e => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+  });
+
+  function animateCursor() {
+    cursorX += (mouseX - cursorX) * 0.15;
+    cursorY += (mouseY - cursorY) * 0.15;
+    cursor.style.transform = \`translate(\${cursorX}px, \${cursorY}px)\`;
+    requestAnimationFrame(animateCursor);
+  }
+  animateCursor();
+
+  document.querySelectorAll('a, button').forEach(el => {
+    el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+    el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+  });
+})();
+</script>
+
 </body>
 </html>
