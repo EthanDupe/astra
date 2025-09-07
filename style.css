@@ -1,0 +1,86 @@
+/* Base styles */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  background: #0a0a0a; /* Dark background */
+  color: #fff;
+  overflow-x: hidden;
+  cursor: none; /* Hide default cursor */
+}
+
+/* Header */
+header {
+  text-align: center;
+  padding: 2rem 0 1rem 0;
+}
+header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+/* Navigation */
+nav.main-nav {
+  display: flex;
+  justify-content: center;
+  gap: 3rem;
+  margin-bottom: 2rem;
+}
+nav.main-nav a {
+  font-size: 1.25rem;
+  font-weight: 500;
+  text-decoration: none;
+  color: #ddd;
+  position: relative;
+  transition: color 0.3s ease;
+}
+nav.main-nav a:hover {
+  color: #00aaff;
+}
+nav.main-nav a.active {
+  color: #00aaff;
+}
+nav.main-nav a.active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -6px;
+  width: 100%;
+  height: 2px;
+  background: #00aaff;
+}
+
+/* Tool frame styling */
+.tool-frame {
+  background: #111;
+  border-radius: 12px;
+  max-width: 90%;
+  min-height: 320px;
+  margin: 0 auto;
+  padding: 1rem;
+  box-shadow: 0 0 10px rgba(0,255,255,0.3),
+              inset 0 0 20px rgba(0,255,255,0.15);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  color: #eee;
+}
+
+/* Custom mouse follower */
+.mouse-follower {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.8);
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  transition: background 0.2s ease, transform 0.15s ease;
+  z-index: 9999;
+}
+.mouse-follower.active-hover {
+  background: rgba(0,170,255,0.9);
+  box-shadow: 0 0 12px rgba(0,170,255,0.8);
+  transform: translate(-50%, -50%) scale(1.5);
+}
