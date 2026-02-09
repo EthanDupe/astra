@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Astra</title>
   <style>
+    /* 1. FORCE HIDE DEFAULT CURSOR GLOBALLY */
+    *, *::before, *::after {
+      cursor: none !important;
+    }
+
     /* Reset & Base Styles */
     body {
       margin: 0;
@@ -13,7 +18,7 @@
       color: white;
       font-family: 'Inter', -apple-system, sans-serif;
       overflow-x: hidden;
-      cursor: none; /* Hide default cursor to show custom one */
+      height: 100vh;
     }
 
     /* Loading Screen */
@@ -25,11 +30,12 @@
       justify-content: center;
       align-items: center;
       z-index: 9999;
-      transition: opacity 1s ease-in-out, visibility 1s;
+      /* Speeding up the fade transition to 0.5s */
+      transition: opacity 0.5s ease-in-out, visibility 0.5s; 
       font-size: 3rem;
       letter-spacing: 0.5rem;
       font-weight: bold;
-      text-transform: uppercase;
+      /* Lowercase handled here or in HTML */
     }
 
     /* Main Content */
@@ -54,12 +60,13 @@
       font-size: 1.2rem;
       transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       display: inline-block;
+      padding: 10px; /* Added padding to make hover target easier to hit */
     }
 
     /* Hover effect: Text gets bigger */
     nav a:hover {
       color: #fff;
-      transform: scale(1.2);
+      transform: scale(1.3); /* Slightly larger scale */
     }
 
     /* Custom Cursor */
@@ -69,20 +76,30 @@
       background: white;
       border-radius: 50%;
       position: fixed;
+      top: 0;
+      left: 0;
       pointer-events: none;
       z-index: 10000;
-      mix-blend-mode: difference; /* Makes cursor visible on both dark/light */
-      transition: transform 0.1s ease-out;
+      mix-blend-mode: difference;
+      /* Will-change helps browser optimize rendering for movement */
+      will-change: transform; 
+      transition: width 0.3s, height 0.3s; /* Smooth expansion animation */
     }
 
+    /* Cursor gets bigger on hover */
     .cursor.hover {
-      transform: scale(3);
+      width: 50px;
+      height: 50px;
+      /* Re-center the larger cursor so it doesn't drift */
+      margin-left: -15px; 
+      margin-top: -15px;
+      opacity: 0.5;
     }
   </style>
 </head>
 <body>
 
-<div id="loading-screen">ASTRA</div>
+<div id="loading-screen">astra</div>
 
 <header>Astra</header>
 
@@ -98,17 +115,19 @@
   const loadingScreen = document.getElementById('loading-screen');
   const cursor = document.getElementById('cursor');
 
-  // Smooth Loading Screen Removal
+  // 2. SPEED UP LOADING
   window.addEventListener('load', () => {
     setTimeout(() => {
       loadingScreen.style.opacity = '0';
       loadingScreen.style.visibility = 'hidden';
-    }, 1500); // 1.5s delay for that "premium" feel
+    }, 800); // Reduced wait time to 0.8 seconds
   });
 
-  // Custom Cursor Logic with Smoothing (Lerp)
-  let mouseX = 0, mouseY = 0;
-  let cursorX = 0, cursorY = 0;
+  // 3. SMOOTH CURSOR LOGIC
+  let mouseX = window.innerWidth / 2; // Start in center
+  let mouseY = window.innerHeight / 2;
+  let cursorX = window.innerWidth / 2;
+  let cursorY = window.innerHeight / 2;
 
   document.addEventListener('mousemove', e => {
     mouseX = e.clientX;
@@ -116,19 +135,22 @@
   });
 
   function animateCursor() {
-    // 0.1 is the 'fluidity'—lower is slower/smoother
-    cursorX += (mouseX - cursorX) * 0.12;
-    cursorY += (mouseY - cursorY) * 0.12;
+    // Math for smooth trailing (Lerp)
+    // 0.1 is the "weight". Lower = smoother/slower. Higher = faster/responsive.
+    const smoothness = 0.1; 
     
-    // Offset by -10 to center the 20px div on the pointer
-    cursor.style.left = `${cursorX - 10}px`;
-    cursor.style.top = `${cursorY - 10}px`;
+    cursorX += (mouseX - cursorX) * smoothness;
+    cursorY += (mouseY - cursorY) * smoothness;
+    
+    // Using translate3d enables GPU acceleration for buttery smooth movement
+    // The -10 centers the 20px cursor div
+    cursor.style.transform = `translate3d(${cursorX - 10}px, ${cursorY - 10}px, 0)`;
     
     requestAnimationFrame(animateCursor);
   }
   animateCursor();
 
-  // Hover effect for navigation
+  // Hover Interaction
   document.querySelectorAll('nav a').forEach(el => {
     el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
     el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
@@ -137,5 +159,6 @@
 
 <div id="sfcrjbejqnhn8bx29s5acyl9qx3fkk7aerg" style="text-align:center; margin-top:50px;"></div>
 <script type="text/javascript" src="https://counter5.optistats.ovh/private/counter.js?c=rjbejqnhn8bx29s5acyl9qx3fkk7aerg&down=async" async></script>
+
 </body>
 </html>
