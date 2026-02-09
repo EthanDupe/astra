@@ -4,36 +4,109 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Astra</title>
-  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Reset & Base Styles */
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #0b0b0b;
+      color: white;
+      font-family: 'Inter', -apple-system, sans-serif;
+      overflow-x: hidden;
+      cursor: none; /* Hide default cursor to show custom one */
+    }
+
+    /* Loading Screen */
+    #loading-screen {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      transition: opacity 1s ease-in-out, visibility 1s;
+      font-size: 3rem;
+      letter-spacing: 0.5rem;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    /* Main Content */
+    header {
+      font-size: 4rem;
+      text-align: center;
+      margin-top: 10vh;
+      font-weight: 800;
+      letter-spacing: -2px;
+    }
+
+    nav {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      margin-top: 20px;
+    }
+
+    nav a {
+      color: #888;
+      text-decoration: none;
+      font-size: 1.2rem;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      display: inline-block;
+    }
+
+    /* Hover effect: Text gets bigger */
+    nav a:hover {
+      color: #fff;
+      transform: scale(1.2);
+    }
+
+    /* Custom Cursor */
+    .cursor {
+      width: 20px;
+      height: 20px;
+      background: white;
+      border-radius: 50%;
+      position: fixed;
+      pointer-events: none;
+      z-index: 10000;
+      mix-blend-mode: difference; /* Makes cursor visible on both dark/light */
+      transition: transform 0.1s ease-out;
+    }
+
+    .cursor.hover {
+      transform: scale(3);
+    }
+  </style>
 </head>
 <body>
 
-<!-- Loading Screen -->
-<div id="loading-screen">Welcome</div>
+<div id="loading-screen">ASTRA</div>
 
-<!-- Title -->
 <header>Astra</header>
 
-<!-- Navigation -->
 <nav>
   <a href="https://ethandupe.github.io/games-main/">Games</a>
   <a href="/astra/tools.html">Tools</a>
   <a href="/astra/apps.html">Apps</a>
 </nav>
 
-<!-- Custom Cursor -->
 <div class="cursor" id="cursor"></div>
 
 <script>
+  const loadingScreen = document.getElementById('loading-screen');
+  const cursor = document.getElementById('cursor');
+
   // Smooth Loading Screen Removal
   window.addEventListener('load', () => {
     setTimeout(() => {
-      document.getElementById('loading-screen').style.display = 'none';
-    }, 2000);
+      loadingScreen.style.opacity = '0';
+      loadingScreen.style.visibility = 'hidden';
+    }, 1500); // 1.5s delay for that "premium" feel
   });
 
-  // Custom Cursor Logic
-  const cursor = document.getElementById('cursor');
+  // Custom Cursor Logic with Smoothing (Lerp)
   let mouseX = 0, mouseY = 0;
   let cursorX = 0, cursorY = 0;
 
@@ -43,21 +116,26 @@
   });
 
   function animateCursor() {
-    cursorX += (mouseX - cursorX) * 0.15;
-    cursorY += (mouseY - cursorY) * 0.15;
-    cursor.style.transform = `translate(${cursorX}px, ${cursorY}px)`;
+    // 0.1 is the 'fluidity'—lower is slower/smoother
+    cursorX += (mouseX - cursorX) * 0.12;
+    cursorY += (mouseY - cursorY) * 0.12;
+    
+    // Offset by -10 to center the 20px div on the pointer
+    cursor.style.left = `${cursorX - 10}px`;
+    cursor.style.top = `${cursorY - 10}px`;
+    
     requestAnimationFrame(animateCursor);
   }
   animateCursor();
 
-  // Hover effect for interactive elements
-  document.querySelectorAll('a, button').forEach(el => {
+  // Hover effect for navigation
+  document.querySelectorAll('nav a').forEach(el => {
     el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
     el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
   });
 </script>
 
+<div id="sfcrjbejqnhn8bx29s5acyl9qx3fkk7aerg" style="text-align:center; margin-top:50px;"></div>
+<script type="text/javascript" src="https://counter5.optistats.ovh/private/counter.js?c=rjbejqnhn8bx29s5acyl9qx3fkk7aerg&down=async" async></script>
 </body>
- <!-- WEBSITE COUNTER --> 
-<div id="sfcrjbejqnhn8bx29s5acyl9qx3fkk7aerg"></div><script type="text/javascript" src="https://counter5.optistats.ovh/private/counter.js?c=rjbejqnhn8bx29s5acyl9qx3fkk7aerg&down=async" async></script><br><a href="https://www.freecounterstat.com">web hit counter</a><noscript><a href="https://www.freecounterstat.com" title="web hit counter"><img src="https://counter5.optistats.ovh/private/freecounterstat.php?c=rjbejqnhn8bx29s5acyl9qx3fkk7aerg" border="0" title="web hit counter" alt="web hit counter"></a></noscript>
 </html>
