@@ -17,14 +17,19 @@
       --cursor-hover-size: 60px;
       --text-main: #ffffff;
       --text-muted: #94a3b8;
-      --accent: #818cf8; /* Indigo Accent */
+      --accent: #818cf8;
       --glass-bg: rgba(255, 255, 255, 0.03);
       --glass-border: rgba(255, 255, 255, 0.08);
     }
 
     *, *::before, *::after {
-      cursor: none !important;
+      cursor: none !important; /* Force hide default cursor normally */
       box-sizing: border-box;
+    }
+
+    /* CRITICAL FIX: Restores default cursor when app is open */
+    body.app-active, body.app-active * {
+      cursor: auto !important;
     }
 
     body {
@@ -66,10 +71,6 @@
     }
 
     /* 4. HEADER & UTILITIES */
-    header {
-      margin-bottom: 50px;
-    }
-
     h1 {
       font-family: 'Space Grotesk', sans-serif;
       font-size: 4rem;
@@ -80,7 +81,6 @@
       filter: drop-shadow(0 0 30px rgba(129, 140, 248, 0.3));
     }
 
-    /* Utility Bar (Cloaking) */
     .utility-bar {
       display: inline-flex;
       gap: 15px;
@@ -112,13 +112,7 @@
       border-color: rgba(255,255,255,0.3);
     }
 
-    .utility-btn.active {
-      background: var(--accent);
-      color: black;
-      border-color: var(--accent);
-    }
-
-    /* 5. NAVIGATION (Top Left) */
+    /* 5. NAVIGATION */
     .nav-bar {
       position: absolute;
       top: 30px;
@@ -160,7 +154,6 @@
       margin: 0 auto;
     }
 
-    /* 7. APP CARDS */
     .app-card {
       background: var(--glass-bg);
       border: 1px solid var(--glass-border);
@@ -216,7 +209,7 @@
     .app-card:hover img { transform: scale(1.15) rotate(-5deg); }
     .app-card:hover span { color: #fff; }
 
-    /* 8. IFRAME OVERLAY */
+    /* 7. IFRAME OVERLAY */
     .overlay {
       position: fixed;
       inset: 0;
@@ -235,7 +228,7 @@
     }
 
     .overlay-bar {
-      height: 50px;
+      height: 40px;
       background: #0a0a0a;
       border-bottom: 1px solid #333;
       display: flex;
@@ -246,34 +239,25 @@
 
     .overlay-title {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 1.2rem;
-      color: white;
+      font-size: 1rem;
+      color: #888;
     }
 
     .close-btn {
       background: transparent;
-      border: 1px solid #333;
+      border: none;
       color: #888;
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-      transition: all 0.2s ease;
+      font-size: 24px;
+      cursor: pointer !important; /* Force pointer for close btn */
     }
 
-    .close-btn:hover {
-      background: #c0392b;
-      color: white;
-      border-color: #c0392b;
-    }
+    .close-btn:hover { color: #fff; }
 
     .iframe-wrapper {
       flex: 1;
       width: 100%;
       background: #000;
+      position: relative;
     }
 
     iframe {
@@ -282,7 +266,7 @@
       border: none;
     }
 
-    /* 9. CUSTOM CURSOR */
+    /* 8. CUSTOM CURSOR (Main Page Style) */
     .cursor {
       width: var(--cursor-size);
       height: var(--cursor-size);
@@ -302,7 +286,12 @@
     .cursor.hover {
       width: var(--cursor-hover-size);
       height: var(--cursor-hover-size);
-      opacity: 0.5;
+      opacity: 1;
+    }
+
+    /* HIDE custom cursor when app is open */
+    body.app-active .cursor {
+      display: none;
     }
 
     /* Toast Notification */
@@ -322,7 +311,6 @@
       font-size: 0.9rem;
     }
     .toast.show { transform: translateY(0); }
-
   </style>
 </head>
 <body>
@@ -337,9 +325,7 @@
     <h1>Apps</h1>
 
     <div class="utility-bar">
-      <button class="utility-btn" onclick="cloakTab('default')">
-        <span>Reset</span>
-      </button>
+      <button class="utility-btn" onclick="cloakTab('default')"><span>Reset</span></button>
       <button class="utility-btn" onclick="cloakTab('drive')">
         <img src="https://upload.wikimedia.org/wikipedia/commons/1/12/Google_Drive_icon_%282020%29.svg" width="16" alt="">
         <span>Drive</span>
@@ -356,49 +342,34 @@
 
     <div class="app-grid">
       
-      <div class="app-card" data-url="https://www.google.com/webhp?igu=1">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google">
-        <span>Google</span>
+      <div class="app-card" data-url="https://scramjet.mercurywork.shop/scramjet/https%3A%2F%2Fwww.google.com%2F%3Fzx%3D1770699498684%26no_sw_cr%3D1">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Browser">
+        <span>Browser</span>
       </div>
 
-      <div class="app-card" data-url="https://discord.com/app">
-        <img src="https://assets-global.website-files.com/6257adef93867e56f84d3092/636e0a6a49cf127bf92de1e2_icon_clyde_blurple_RGB.png" alt="Discord">
-        <span>Discord</span>
-      </div>
-
-      <div class="app-card" data-url="https://www.tiktok.com/embed">
-        <img src="https://sf16-scmcdn-va.ibytedtos.com/goofy/tiktok/web/node/_next/static/images/logo-dark-e95da587b61837f722a774360d50a699.svg" style="filter: invert(1);" alt="TikTok">
-        <span>TikTok</span>
-      </div>
-
-      <div class="app-card" data-url="https://www.youtube.com/embed/">
+      <div class="app-card" data-url="https://scramjet.mercurywork.shop/scramjet/https%3A%2F%2Fwww.youtube.com%2F">
         <img src="https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon_%282017%29.svg" alt="YouTube">
         <span>YouTube</span>
       </div>
 
-      <div class="app-card" data-url="https://chat.openai.com">
+      <div class="app-card" data-url="https://scramjet.mercurywork.shop/scramjet/https%3A%2F%2Fdiscord.com%2F">
+        <img src="https://assets-global.website-files.com/6257adef93867e56f84d3092/636e0a6a49cf127bf92de1e2_icon_clyde_blurple_RGB.png" alt="Discord">
+        <span>Discord</span>
+      </div>
+
+      <div class="app-card" data-url="https://scramjet.mercurywork.shop/scramjet/https%3A%2F%2Fwww.tiktok.com%2Fexplore">
+        <img src="https://sf16-scmcdn-va.ibytedtos.com/goofy/tiktok/web/node/_next/static/images/logo-dark-e95da587b61837f722a774360d50a699.svg" style="filter: invert(1);" alt="TikTok">
+        <span>TikTok</span>
+      </div>
+
+      <div class="app-card" data-url="https://scramjet.mercurywork.shop/scramjet/https%3A%2F%2Fchatgpt.com%2F">
         <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg" alt="ChatGPT">
         <span>ChatGPT</span>
       </div>
 
-      <div class="app-card" data-url="https://play.geforcenow.com">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/2/21/NVIDIA_GeForce_NOW_logo.svg" alt="GeForce">
-        <span>GeForce</span>
-      </div>
-
-      <div class="app-card" data-url="https://player.twitch.tv/?channel=monstercat&parent=localhost">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/d/d3/Twitch_Glitch_Logo_Purple.svg" alt="Twitch">
-        <span>Twitch</span>
-      </div>
-
-      <div class="app-card" data-url="https://open.spotify.com/embed">
+      <div class="app-card" data-url="https://open.spotify.com">
         <img src="https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg" alt="Spotify">
         <span>Spotify</span>
-      </div>
-      
-      <div class="app-card" data-url="https://www.bing.com">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/9/9c/Bing_Fluent_Logo.svg" alt="Browser">
-        <span>Browser</span>
       </div>
 
     </div>
@@ -407,7 +378,7 @@
   <div class="overlay" id="appOverlay">
     <div class="overlay-bar">
       <div class="overlay-title" id="overlayTitle">App</div>
-      <button class="close-btn" id="closeOverlayBtn">&times;</button>
+      <button class="close-btn" id="closeOverlayBtn">×</button>
     </div>
     <div class="iframe-wrapper">
       <iframe src="" id="appFrame" allow="fullscreen; clipboard-read; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
@@ -415,8 +386,7 @@
   </div>
 
   <div class="cursor" id="cursor"></div>
-  
-  <div class="toast" id="toast">Tab Cloaked Successfully</div>
+  <div class="toast" id="toast">Tab Cloaked</div>
 
   <script>
     // --- 1. SMOOTH CURSOR ---
@@ -490,7 +460,7 @@
     resize();
     drawStars();
 
-    // --- 3. TAB CLOAKING ---
+    // --- 3. UTILITIES (Cloak / Panic) ---
     const favicon = document.getElementById('dynamic-favicon');
     
     function cloakTab(type) {
@@ -504,7 +474,7 @@
         showToast("Cloaked as Google Classroom");
       } else {
         document.title = 'Astra – Apps';
-        favicon.href = '/favicon.ico'; // Reset to default
+        favicon.href = '/favicon.ico';
         showToast("Cloak Reset");
       }
     }
@@ -516,15 +486,11 @@
       setTimeout(() => toast.classList.remove('show'), 2000);
     }
 
-    // --- 4. PANIC BUTTON ---
     document.addEventListener('keydown', (e) => {
-      // Check for ']' key (Right Bracket)
-      if (e.key === ']') {
-        window.location.href = 'https://www.google.com';
-      }
+      if (e.key === ']') window.location.href = 'https://www.google.com';
     });
 
-    // --- 5. APP OPENING LOGIC ---
+    // --- 4. APP OPENING LOGIC ---
     const overlay = document.getElementById('appOverlay');
     const iframe = document.getElementById('appFrame');
     const overlayTitle = document.getElementById('overlayTitle');
@@ -538,6 +504,8 @@
         if (url) {
           overlayTitle.innerText = name;
           iframe.src = url;
+          // Add class to body to revert cursor to system default
+          document.body.classList.add('app-active'); 
           overlay.classList.add('active');
         }
       });
@@ -545,12 +513,13 @@
 
     function closeApp() {
       overlay.classList.remove('active');
-      setTimeout(() => { iframe.src = ''; }, 300); // Clear src to stop audio/video
+      // Remove class from body to bring back custom cursor
+      document.body.classList.remove('app-active');
+      setTimeout(() => { iframe.src = ''; }, 300);
     }
 
     closeOverlayBtn.addEventListener('click', closeApp);
     
-    // Close on Escape (if overlay is active)
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && overlay.classList.contains('active')) {
         closeApp();
