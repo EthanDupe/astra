@@ -1,1 +1,104 @@
+:root {
+  --cursor-size: 20px;
+  --cursor-hover-size: 60px;
+  --text-main: #ffffff;
+  --text-muted: #94a3b8;
+  --accent: #818cf8;
+  --glass-bg: rgba(255, 255, 255, 0.03);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --bg-color: #050505;
+}
 
+*, *::before, *::after {
+  cursor: none !important;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  font-family: 'Outfit', sans-serif;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* Background & Cursor */
+#bg-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  opacity: 0.6;
+}
+
+.cursor {
+  width: var(--cursor-size);
+  height: var(--cursor-size);
+  background: white;
+  border-radius: 50%;
+  position: fixed;
+  top: 0; left: 0;
+  pointer-events: none;
+  z-index: 10000;
+  mix-blend-mode: difference;
+  transform: translate3d(-50%, -50%, 0);
+  transition: width 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), 
+              height 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.cursor.hover {
+  width: var(--cursor-hover-size);
+  height: var(--cursor-hover-size);
+}
+
+/* Global Navigation */
+.global-nav {
+  position: fixed;
+  top: 0; width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 40px;
+  background: linear-gradient(to bottom, rgba(5,5,5,0.9), transparent);
+  z-index: 100;
+}
+.nav-brand {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+.nav-links a {
+  color: var(--text-muted);
+  text-decoration: none;
+  margin-left: 20px;
+  transition: color 0.3s;
+}
+.nav-links a:hover { color: white; }
+
+/* Fluid Section Transitions */
+.view-section {
+  position: absolute;
+  top: 80px;
+  left: 0;
+  width: 100%;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(20px) scale(0.98);
+  transition: opacity 0.5s ease, transform 0.5s ease, visibility 0.5s;
+  padding: 0 40px;
+}
+
+.view-section.active {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+  position: relative; 
+}
+
+/* Overlay and App Styles (Copied from your apps.html) */
+.overlay {
+  position: fixed; inset: 0; background: #000; z-index: 999;
+  opacity: 0; pointer-events: none; display: flex; flex-direction: column;
+  transition: opacity 0.4s ease;
+}
+.overlay.active { opacity: 1; pointer-events: all; }
