@@ -3,293 +3,78 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Astra</title>
-  
+  <title>Astra | Fluid</title>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" id="dynamic-favicon">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
-
-  <style>
-    /* 1. CORE RESET & VARIABLES */
-    :root {
-      --cursor-size: 20px;
-      --cursor-hover-size: 60px;
-      --text-main: #ffffff;
-      --text-muted: #888888;
-      --accent: #a5b4fc;
-    }
-
-    *, *::before, *::after {
-      cursor: none !important;
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      padding: 0;
-      background-color: #050505;
-      color: var(--text-main);
-      font-family: 'Outfit', sans-serif; /* Clean body font */
-      overflow: hidden; /* Hide scrollbars for full immersion */
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-    }
-
-    /* 2. BACKGROUND CANVAS (STARS) */
-    #bg-canvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: -1;
-      opacity: 0.6;
-    }
-
-    /* 3. LOADING SCREEN */
-    #loading-screen {
-      position: fixed;
-      inset: 0;
-      background: #000;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 9999;
-      transition: opacity 0.8s cubic-bezier(0.7, 0, 0.3, 1), visibility 0.8s; 
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 4rem;
-      letter-spacing: 0.5rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      color: white;
-    }
-
-    /* 4. MAIN CONTENT CONTAINER */
-    .content-wrapper {
-      text-align: center;
-      z-index: 10;
-      opacity: 0; /* Hidden initially for animation */
-      transform: translateY(30px);
-      transition: opacity 1s ease-out, transform 1s cubic-bezier(0.2, 0.8, 0.2, 1);
-    }
-    
-    .content-wrapper.loaded {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    header {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 8rem; /* Massive text */
-      line-height: 1;
-      font-weight: 700;
-      letter-spacing: -4px;
-      margin-bottom: 2rem;
-      background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      filter: drop-shadow(0 0 30px rgba(165, 180, 252, 0.2));
-      animation: breathe 6s ease-in-out infinite;
-    }
-
-    @keyframes breathe {
-      0%, 100% { transform: scale(1); filter: drop-shadow(0 0 30px rgba(165, 180, 252, 0.2)); }
-      50% { transform: scale(1.02); filter: drop-shadow(0 0 50px rgba(165, 180, 252, 0.4)); }
-    }
-
-    /* 5. GLASS NAV */
-    nav {
-      display: inline-flex;
-      gap: 10px;
-      padding: 15px 30px;
-      background: rgba(255, 255, 255, 0.03);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 50px;
-      box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
-    }
-
-    nav a {
-      color: var(--text-muted);
-      text-decoration: none;
-      font-size: 1.1rem;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      padding: 10px 20px;
-      border-radius: 30px;
-      transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
-      position: relative;
-      overflow: hidden;
-    }
-
-    /* Hover effect for links */
-    nav a:hover {
-      color: #000;
-      background-color: #fff;
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(255,255,255,0.3);
-    }
-
-    /* 6. CUSTOM CURSOR */
-    .cursor {
-      width: var(--cursor-size);
-      height: var(--cursor-size);
-      background: white;
-      border-radius: 50%;
-      position: fixed;
-      top: 0;
-      left: 0;
-      pointer-events: none;
-      z-index: 10000;
-      mix-blend-mode: difference;
-      will-change: transform, width, height; 
-      /* Center the cursor div on coordinates */
-      transform: translate3d(-50%, -50%, 0); 
-      transition: width 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), 
-                  height 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); 
-    }
-
-    .cursor.hover {
-      width: var(--cursor-hover-size);
-      height: var(--cursor-hover-size);
-      opacity: 1;
-    }
-    
-    /* Responsive Adjustments */
-    @media (max-width: 768px) {
-        header { font-size: 5rem; }
-        nav { padding: 10px 20px; }
-        nav a { padding: 8px 12px; font-size: 0.9rem; }
-    }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
   <canvas id="bg-canvas"></canvas>
 
-  <div id="loading-screen">astra</div>
+  <nav class="global-nav">
+    <div class="nav-brand">Astra</div>
+    <div class="nav-links">
+      <a href="#" onclick="switchTab('home')">Home</a>
+      <a href="#" onclick="switchTab('apps')">Apps</a>
+      <a href="#" onclick="switchTab('games')">Games</a>
+      <a href="#" onclick="switchTab('tools')">Tools</a>
+    </div>
+  </nav>
 
-  <div class="content-wrapper" id="content">
-    <header>Astra</header>
-    <nav>
-      <a href="https://ethandupe.github.io/games-main/">Games</a>
-      <a href="/astra/tools.html">Tools</a>
-      <a href="/astra/apps.html">Apps</a>
-    </nav>
+  <main id="main-content">
+    
+    <section id="home" class="view-section active">
+      <div class="hero-container">
+        <h1 class="glitch-title">Astra</h1>
+        <p>Where unblocked games meet reality.</p>
+      </div>
+    </section>
+
+    <section id="apps" class="view-section">
+      <div class="container">
+        <h2>Apps</h2>
+        <div class="app-grid">
+          <div class="app-card" onclick="openApp('https://chatgpt.com/')">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg" alt="ChatGPT">
+            <span>ChatGPT</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="games" class="view-section">
+      <div class="container">
+        <h2>Games</h2>
+        <div class="app-grid">
+           <button class="game-btn">Among Us</button>
+           <button class="game-btn">Slope</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="tools" class="view-section">
+      <div class="container">
+        <h2>Utility Tools</h2>
+        </div>
+    </section>
+
+  </main>
+
+  <div class="overlay" id="appOverlay">
+    <div class="overlay-bar">
+      <div class="overlay-title" id="overlayTitle">App</div>
+      <button class="close-btn" onclick="closeApp()">×</button>
+    </div>
+    <div class="iframe-wrapper">
+      <iframe src="" id="appFrame"></iframe>
+    </div>
   </div>
 
   <div class="cursor" id="cursor"></div>
 
-  <div style="position:fixed; bottom:10px; left:50%; transform:translateX(-50%); opacity:0.3; font-size:10px;">
-    <div id="sfcrjbejqnhn8bx29s5acyl9qx3fkk7aerg"></div>
-  </div>
-  <script type="text/javascript" src="https://counter5.optistats.ovh/private/counter.js?c=rjbejqnhn8bx29s5acyl9qx3fkk7aerg&down=async" async></script>
-
-  <script>
-    // --- 1. SETUP & LOADING ---
-    const loadingScreen = document.getElementById('loading-screen');
-    const content = document.getElementById('content');
-    const cursor = document.getElementById('cursor');
-
-    window.addEventListener('load', () => {
-      setTimeout(() => {
-        // Fade out loader
-        loadingScreen.style.opacity = '0';
-        loadingScreen.style.visibility = 'hidden';
-        // Trigger entrance animation for content
-        content.classList.add('loaded');
-      }, 800);
-    });
-
-    // --- 2. SMOOTH CURSOR ---
-    // Using a Spring-like lerp for very fluid feeling
-    let mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-    let curPos = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-
-    document.addEventListener('mousemove', e => {
-      mouse.x = e.clientX;
-      mouse.y = e.clientY;
-    });
-
-    function animateCursor() {
-      // Lerp factor (0.15 is snappy but smooth)
-      const ease = 0.15;
-      
-      curPos.x += (mouse.x - curPos.x) * ease;
-      curPos.y += (mouse.y - curPos.y) * ease;
-      
-      // Apply transform. Note: CSS translates -50% to center it.
-      cursor.style.left = `${curPos.x}px`;
-      cursor.style.top = `${curPos.y}px`;
-      
-      requestAnimationFrame(animateCursor);
-    }
-    animateCursor();
-
-    // Hover Listeners
-    document.querySelectorAll('a, button').forEach(el => {
-      el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
-      el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
-    });
-
-    // --- 3. BACKGROUND PARTICLES (STARS) ---
-    const canvas = document.getElementById('bg-canvas');
-    const ctx = canvas.getContext('2d');
-    
-    let width, height;
-    let stars = [];
-    
-    function resize() {
-      width = canvas.width = window.innerWidth;
-      height = canvas.height = window.innerHeight;
-      initStars();
-    }
-    
-    function initStars() {
-      stars = [];
-      const starCount = Math.floor((width * height) / 6000); // Density
-      for (let i = 0; i < starCount; i++) {
-        stars.push({
-          x: Math.random() * width,
-          y: Math.random() * height,
-          size: Math.random() * 1.5,
-          speed: Math.random() * 0.5 + 0.1
-        });
-      }
-    }
-    
-    function drawStars() {
-      ctx.clearRect(0, 0, width, height);
-      ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
-      
-      stars.forEach(star => {
-        // Subtle movement based on mouse
-        const parallaxX = (mouse.x - width/2) * 0.02;
-        const parallaxY = (mouse.y - height/2) * 0.02;
-
-        ctx.beginPath();
-        ctx.arc(star.x + parallaxX, star.y + parallaxY, star.size, 0, Math.PI * 2);
-        ctx.fill();
-        
-        // Move stars slowly upward
-        star.y -= star.speed;
-        
-        // Reset if off screen
-        if (star.y < -5) star.y = height + 5;
-      });
-      
-      requestAnimationFrame(drawStars);
-    }
-
-    window.addEventListener('resize', resize);
-    resize();
-    drawStars();
-
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
-
