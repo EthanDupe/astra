@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Fluid Camera</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Base styles to prevent unwanted touch behaviors on mobile */
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: black;
+            color: white;
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            touch-action: none; /* Prevent scroll/zoom on canvas */
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        /* Custom scrollbar for the gallery */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Hidden video element for camera feed stream -->
+    <video id="camera-video" playsinline autoplay muted class="hidden"></video>
+
+    <!-- Main Canvas Context -->
+    <canvas id="camera-canvas" class="block w-full h-full touch-none"></canvas>
+
+    <!-- Permissions Error Overlay -->
+    <div id="permission-overlay" class="hidden absolute inset-0 flex items-center justify-center bg-black/80 z-50 p-6 text-center">
+        <div>
+            <h2 class="text-2xl font-bold mb-2">Camera Access Required</h2>
+            <p class="text-gray-400">Please allow camera permissions in your browser to use the fluid camera.</p>
+        </div>
+    </div>
+
+    <!-- Gallery DOM Overlay -->
+    <div id="gallery-overlay" class="hidden absolute inset-0 bg-black/90 z-40 flex-col backdrop-blur-md animate-in fade-in duration-300 transition-opacity opacity-100">
+        <div class="flex items-center justify-between p-6 pb-2">
+            <h2 class="text-3xl font-bold tracking-tight">Gallery</h2>
+            <button onclick="closeGallery()" class="p-3 bg-white/10 hover:bg-white/20 rounded-full transition-colors focus:outline-none cursor-pointer">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        
+        <div class="flex-1 overflow-y-auto p-6 pt-4 custom-scrollbar">
+            <div id="gallery-empty" class="h-full flex items-center justify-center text-gray-500">
+                <p>No photos yet. Start snapping!</p>
+            </div>
+            <div id="gallery-grid" class="hidden grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pb-10">
+                <!-- Photos will be injected here via JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ✨ Ask AI Modal Overlay -->
+    <div id="ai-modal" class="hidden absolute inset-0 z-50 bg-black/90 flex-col items-center justify-center p-6 backdrop-blur-2xl transition-all duration-300">
+        <img id="ai-photo-preview" src="" alt="For AI" class="max-h-[40vh] object-contain rounded-xl mb-8 shadow-2xl shadow-purple-500/20 border border-white/10" />
+        <h3 class="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-6">Ask Gemini</h3>
+        
+        <input 
+            type="text" 
+            placeholder="What do you want to know about this photo?" 
+            class="w-full max-w-md bg-white/10 border border-white/20 rounded-full px-6 py-4 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 mb-6 shadow-inner" 
+        />
+        
+        <div class="flex gap-4 w-full max-w-md">
+            <button onclick="closeAiModal()" class="flex-1 py-3 rounded-full bg-white/10 hover:bg-white/20 transition-colors font-medium cursor-pointer">
+                Cancel
+            </button>
+            <button class="flex-1 py-3 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 hover:opacity-90 transition-opacity font-bold shadow-lg shadow-purple-500/30 cursor-pointer">
+                Analyze
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Constants & State
+        const FILTERS = [
+            { name: 'Normal', filter: 'none' },
+            { name: 'Grayscale', filter: 'grayscale(100%)' },
+            { name: 'Sepia', filter: 'sepia(100%)' },
+            { name: 'Invert', filter: 'invert(100%)' },
+            { name: 'Psychedelic', filter: 'hue-rotate(90deg) saturate(300%)' },
+            { name: 'Vintage', filter: 'sepia(50%) contrast(150%) saturate(80%)' },
+            { name: 'High Contrast', filter: 'contrast(200%)' },
+            { name: 'Blur', filter: 'blur(4px)' }
+        ];
+
+        let photos = [];
+        let isGalleryOpen = false;
+        let isAiModalOpen = false;
+
+        // Animation State
+        const state = {
+            currentFilter: 0,
+            time: 0,
+            flashOpacity: 0,
+            particles: [],
+            interaction: { x: -1000, y: -1000, isDown: false },
+            buttons: {}
+        };
+
+        // DOM Elements
+        const video = document.getElementById('camera-video');
+        const canvas = document.getElementById('camera-canvas');
+        const ctx = canvas.getContext('2d');
+        const permissionOverlay = document.getElementById('permission-overlay');
+        
+        // Gallery Elements
+        const galleryOverlay = document.getElementById('gallery-overlay');
+        const galleryEmpty = document.getElementById('gallery-empty');
+        const galleryGrid = document.getElementById('gallery-grid');
+        
+        // AI Modal Elements
+        const aiModal = document.getElementById('ai-modal');
+        const aiPhotoPreview = document.getElementById('ai-photo-preview');
+
+        // Create an offscreen buffer canvas to fix iOS hardware-accelerated video filtering bugs
+        const offscreenCanvas = document.createElement('canvas');
+        const offCtx = offscreenCanvas.getContext('2d');
+
+        // Initialize Application
+        window.onload = function() {
+            initCamera();
+            window.addEventListener('resize', resizeCanvas);
+            resizeCanvas();
+            
+            // Pointer events for Canvas UI
+            canvas.addEventListener('pointerdown', handlePointerDown);
+            canvas.addEventListener('pointermove', handlePointerMove);
+            canvas.addEventListener('pointerup', handlePointerUp);
+            canvas.addEventListener('pointercancel', handlePointerUp);
+            canvas.addEventListener('pointerleave', handlePointerUp);
+
+            // Start Animation Loop
+            requestAnimationFrame(renderLoop);
+        };
+
+        function initCamera() {
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 1920 }, height: { ideal: 1080 } } })
+                .then((stream) => {
+                    video.srcObject = stream;
+                    video.play().catch(e => console.error("Playback failed:", e));
+                })
+                .catch((err) => {
+                    console.error("Camera access denied or unavailable", err);
+                    permissionOverlay.classList.remove('hidden');
+                });
+        }
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            const w = canvas.width;
+            const h = canvas.height;
+            
+            state.buttons = {
+                shutter: { x: w / 2, y: h - 100, r: 45, isHovered: false, label: '' },
+                prev: { x: 70, y: h - 100, r: 25, isHovered: false, label: '<' },
+                next: { x: w - 70, y: h - 100, r: 25, isHovered: false, label: '>' },
+                gallery: { x: 60, y: 60, r: 25, isHovered: false, label: 'img' },
+                filterLabel: { x: w / 2, y: h - 173, r: 40, isHovered: false, label: '' } // Hidden logical button for hit testing
+            };
+        }
+
+        function handlePointerDown(e) {
+            state.interaction.isDown = true;
+            state.interaction.x = e.clientX;
+            state.interaction.y = e.clientY;
+            checkCanvasClicks();
+        }
+
+        function handlePointerMove(e) {
+            state.interaction.x = e.clientX;
+            state.interaction.y = e.clientY;
+        }
+
+        function handlePointerUp() {
+            state.interaction.isDown = false;
+        }
+
+        function spawnParticles(x, y, count = 15) {
+            for (let i = 0; i < count; i++) {
+                state.particles.push({
+                    x: x, 
+                    y: y,
+                    vx: (Math.random() - 0.5) * 15,
+                    vy: (Math.random() - 0.5) * 15,
+                    life: 1.0,
+                    size: Math.random() * 5 + 3,
+                    color: `hsl(${Math.random() * 60 + 200}, 100%, 75%)` // Blueish particles
+                });
+            }
+        }
+
+        function takePhoto() {
+            if (!video || video.videoWidth === 0 || video.videoHeight === 0) return;
+            
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = canvas.width;
+            tempCanvas.height = canvas.height;
+            const tCtx = tempCanvas.getContext('2d');
+            
+            const vW = video.videoWidth;
+            const vH = video.videoHeight;
+            const vRatio = tempCanvas.width / vW;
+            const hRatio = tempCanvas.height / vH;
+            const ratio = Math.max(vRatio, hRatio);
+            const w = vW * ratio;
+            const h = vH * ratio;
+
+            tCtx.filter = FILTERS[state.currentFilter].filter;
+            tCtx.translate(tempCanvas.width / 2, tempCanvas.height / 2);
+            tCtx.scale(-1, 1);
+            tCtx.drawImage(offscreenCanvas, -w / 2, -h / 2, w, h);
+            
+            const dataUrl = tempCanvas.toDataURL('image/jpeg', 0.9);
+            photos.unshift(dataUrl); // Add to beginning of array
+            
+            state.flashOpacity = 1.0;
+            spawnParticles(state.buttons.shutter.x, state.buttons.shutter.y, 40);
+        }
+
+        function checkCanvasClicks() {
+            if (isGalleryOpen || isAiModalOpen) return;
+
+            const { x, y } = state.interaction;
+            const { shutter, prev, next, gallery, filterLabel } = state.buttons;
+
+            const hitTest = (btn) => {
+                if (!btn) return false;
+                return Math.hypot(x - btn.x, y - btn.y) < btn.r * 2.5; 
+            };
+
+            if (hitTest(shutter)) {
+                takePhoto();
+            } else if (hitTest(prev)) {
+                state.currentFilter = (state.currentFilter - 1 + FILTERS.length) % FILTERS.length;
+                spawnParticles(prev.x, prev.y);
+            } else if (hitTest(next) || hitTest(filterLabel)) {
+                state.currentFilter = (state.currentFilter + 1) % FILTERS.length;
+                const px = hitTest(filterLabel) ? filterLabel.x : next.x;
+                const py = hitTest(filterLabel) ? filterLabel.y : next.y;
+                spawnParticles(px, py);
+            } else if (hitTest(gallery)) {
+                openGallery();
+                spawnParticles(gallery.x, gallery.y);
+            }
+        }
+
+        function drawFluidBlob(x, y, baseRadius, time, isActive, color, icon, isRainbow = false) {
+            ctx.beginPath();
+            const points = 100; // Higher resolution for smoother fluid curves
+            
+            // Fluid Breathing Effect (pulsates slightly when idle)
+            const breathe = Math.sin(time * 0.05) * (isActive ? 0 : 2);
+            const targetRadius = isActive ? baseRadius * 0.85 : baseRadius + breathe;
+            
+            const fluctuation = isActive ? 0.2 : 0.08;
+            const speed = isActive ? 0.12 : 0.04;
+
+            for (let i = 0; i <= points; i++) {
+                const angle = (i / points) * Math.PI * 2;
+                
+                // Multi-frequency wave calculation for an organic, non-repeating jello edge
+                const noise1 = Math.sin(angle * 3 + time * speed);
+                const noise2 = Math.cos(angle * 5 - time * speed * 0.8);
+                const noise3 = Math.sin(angle * 7 + time * speed * 1.2);
+                
+                const noise = (noise1 + noise2 + noise3) * 0.33 * targetRadius * fluctuation;
+                const r = targetRadius + noise;
+                
+                const px = x + Math.cos(angle) * r;
+                const py = y + Math.sin(angle) * r;
+
+                if (i === 0) ctx.moveTo(px, py);
+                else ctx.lineTo(px, py);
+            }
+            ctx.closePath();
+
+            const standardFill = isActive ? 'rgba(255, 255, 255, 0.9)' : (color || 'rgba(255, 255, 255, 0.3)');
+            ctx.fillStyle = standardFill;
+            
+            if (isRainbow) {
+                // Ghostly Blue/Purple Gemini stroke effect
+                const gradient = ctx.createRadialGradient(x, y, targetRadius * 0.8, x, y, targetRadius * (1 + fluctuation));
+                if (isActive) {
+                    gradient.addColorStop(0, 'rgba(66, 133, 244, 0.7)'); // Intense Blue
+                    gradient.addColorStop(0.5, 'rgba(156, 39, 176, 0.7)'); // Intense Purple
+                    gradient.addColorStop(1, 'rgba(63, 81, 181, 0.7)'); // Intense Indigo
+                    ctx.lineWidth = 6;
+                } else {
+                    gradient.addColorStop(0, 'rgba(66, 133, 244, 0.4)'); // Ghostly Blue
+                    gradient.addColorStop(0.5, 'rgba(156, 39, 176, 0.4)'); // Ghostly Purple
+                    gradient.addColorStop(1, 'rgba(63, 81, 181, 0.4)'); // Ghostly Indigo
+                    ctx.lineWidth = 4;
+                }
+                ctx.strokeStyle = gradient;
+            } 
+
+            ctx.shadowColor = isRainbow && isActive ? 'rgba(156, 39, 176, 0.6)' : 'rgba(0, 0, 0, 0.3)';
+            ctx.shadowBlur = isRainbow && isActive ? 25 : 10;
+            
+            ctx.fill(); // Fill interior
+            
+            if (isRainbow) {
+                ctx.shadowBlur = isActive ? 10 : 5; 
+                ctx.stroke(); // Stroke edge
+            }
+
+            ctx.shadowBlur = 0;
+
+            if (icon) {
+                ctx.fillStyle = isActive ? '#000' : '#fff';
+                ctx.font = 'bold 20px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                if (icon === 'img') {
+                    // Mini gallery icon drawing
+                    ctx.fillRect(x - 8, y - 8, 16, 16);
+                    ctx.fillStyle = isActive ? '#fff' : 'rgba(0,0,0,0.5)';
+                    ctx.beginPath();
+                    ctx.arc(x, y, 3, 0, Math.PI * 2);
+                    ctx.fill();
+                } else {
+                    ctx.fillText(icon, x, y + 2);
+                }
+            }
+        }
+
+        function renderLoop() {
+            state.time += 1;
+            const time = state.time;
+            const w = canvas.width;
+            const h = canvas.height;
+
+            // 1. Draw Camera Feed
+            if (video.readyState >= video.HAVE_CURRENT_DATA && video.videoWidth > 0 && video.videoHeight > 0) {
+                const vW = video.videoWidth;
+                const vH = video.videoHeight;
+
+                if (offscreenCanvas.width !== vW) {
+                    offscreenCanvas.width = vW;
+                    offscreenCanvas.height = vH;
+                }
+                offCtx.clearRect(0, 0, vW, vH);
+                offCtx.drawImage(video, 0, 0, vW, vH);
+
+                const vRatio = w / vW;
+                const hRatio = h / vH;
+                const ratio = Math.max(vRatio, hRatio);
+                const drawW = vW * ratio;
+                const drawH = vH * ratio;
+
+                ctx.save();
+                ctx.filter = FILTERS[state.currentFilter].filter;
+                ctx.translate(w / 2, h / 2);
+                ctx.scale(-1, 1); // Mirror
+                ctx.drawImage(offscreenCanvas, -drawW / 2, -drawH / 2, drawW, drawH);
+                ctx.restore();
+                
+                ctx.filter = 'none'; // Force reset context
+            } else {
+                ctx.fillStyle = '#111';
+                ctx.fillRect(0, 0, w, h);
+                ctx.fillStyle = '#fff';
+                ctx.font = '20px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('Initializing Camera Fluid...', w / 2, h / 2);
+            }
+
+            // 2. Flash Effect
+            if (state.flashOpacity > 0) {
+                ctx.fillStyle = `rgba(255, 255, 255, ${state.flashOpacity})`;
+                ctx.fillRect(0, 0, w, h);
+                state.flashOpacity -= 0.05;
+            }
+
+            // 3. Draw UI layer (only if gallery is closed)
+            if (!isGalleryOpen && !isAiModalOpen) {
+                const { x, y, isDown } = state.interaction;
+                
+                // Update hover states
+                Object.values(state.buttons).forEach(btn => {
+                    btn.isHovered = Math.hypot(x - btn.x, y - btn.y) < btn.r * 2.5; 
+                });
+
+                const btns = state.buttons;
+
+                if (btns.prev && btns.next && btns.shutter && btns.gallery) {
+                    drawFluidBlob(btns.prev.x, btns.prev.y, btns.prev.r, time, btns.prev.isHovered && isDown, 'rgba(0, 0, 0, 0.5)', btns.prev.label);
+                    drawFluidBlob(btns.next.x, btns.next.y, btns.next.r, time, btns.next.isHovered && isDown, 'rgba(0, 0, 0, 0.5)', btns.next.label);
+                    
+                    // Shutter outer ring (Ghostly rainbow edge, highly transparent fill)
+                    drawFluidBlob(btns.shutter.x, btns.shutter.y, btns.shutter.r + 8, time * 0.9, false, 'rgba(255,255,255,0.05)', '', true);
+                    // Shutter inner blob
+                    drawFluidBlob(btns.shutter.x, btns.shutter.y, btns.shutter.r, time, btns.shutter.isHovered && isDown, 'rgba(255,255,255,0.6)', '', true);
+                    
+                    const photoCount = photos.length;
+                    drawFluidBlob(btns.gallery.x, btns.gallery.y, btns.gallery.r, time, btns.gallery.isHovered && isDown, 'rgba(0, 0, 0, 0.5)', photoCount > 0 ? photoCount.toString() : 'img');
+                }
+
+                // Filter Label Backdrop
+                ctx.fillStyle = btns.filterLabel?.isHovered && isDown ? 'rgba(0, 0, 0, 0.8)' : 'rgba(0, 0, 0, 0.6)';
+                const labelW = 140;
+                ctx.beginPath();
+                ctx.roundRect(w / 2 - labelW / 2, h - 190, labelW, 34, 17);
+                ctx.fill();
+                
+                // Filter Label Text
+                ctx.fillStyle = '#fff';
+                ctx.font = '16px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(FILTERS[state.currentFilter].name, w / 2, h - 173);
+
+                // 4. Fluid Particle Engine (Viscosity / Drag)
+                for (let i = state.particles.length - 1; i >= 0; i--) {
+                    const p = state.particles[i];
+                    
+                    // Friction slows them down quickly (Viscous effect)
+                    p.vx *= 0.92;
+                    p.vy *= 0.92;
+                    
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += 0.35; // Soft Gravity
+                    p.life -= 0.02; // Fade speed
+                    
+                    if (p.life <= 0) {
+                        state.particles.splice(i, 1);
+                        continue;
+                    }
+
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
+                    ctx.fillStyle = p.color;
+                    ctx.globalAlpha = p.life;
+                    ctx.fill();
+                    ctx.globalAlpha = 1.0;
+                }
+            }
+
+            requestAnimationFrame(renderLoop);
+        }
+
+        // UI Navigation Functions
+        function openGallery() {
+            isGalleryOpen = true;
+            galleryOverlay.classList.remove('hidden');
+            galleryOverlay.classList.add('flex');
+            renderGallery();
+        }
+
+        function closeGallery() {
+            isGalleryOpen = false;
+            galleryOverlay.classList.add('hidden');
+            galleryOverlay.classList.remove('flex');
+        }
+
+        function openAiModal(photoSrc) {
+            isAiModalOpen = true;
+            aiPhotoPreview.src = photoSrc;
+            aiModal.classList.remove('hidden');
+            aiModal.classList.add('flex');
+        }
+
+        function closeAiModal() {
+            isAiModalOpen = false;
+            aiModal.classList.add('hidden');
+            aiModal.classList.remove('flex');
+        }
+
+        function renderGallery() {
+            if (photos.length === 0) {
+                galleryEmpty.classList.remove('hidden');
+                galleryGrid.classList.add('hidden');
+                return;
+            }
+
+            galleryEmpty.classList.add('hidden');
+            galleryGrid.classList.remove('hidden');
+            galleryGrid.classList.add('grid');
+            
+            // Clear existing
+            galleryGrid.innerHTML = '';
+
+            // Map photos to HTML elements
+            photos.forEach((src, idx) => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = "relative group aspect-[3/4] rounded-2xl overflow-hidden shadow-lg border border-white/10";
+                
+                itemDiv.innerHTML = `
+                    <img src="${src}" alt="Captured ${idx}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-3 gap-2">
+                        <button onclick="openAiModal('${src}')" class="w-full py-2 bg-gradient-to-r from-blue-500/80 to-purple-500/80 hover:from-blue-400 hover:to-purple-400 backdrop-blur-sm rounded-lg text-center text-sm font-bold text-white transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer">
+                            <span>✨</span> Ask AI
+                        </button>
+                        <a href="${src}" download="fluid-cam-${Date.now()}.jpg" class="w-full block py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-lg text-center text-sm font-medium transition-colors cursor-pointer">
+                            Save
+                        </a>
+                    </div>
+                `;
+                
+                galleryGrid.appendChild(itemDiv);
+            });
+        }
+    </script>
+</body>
+</html>
