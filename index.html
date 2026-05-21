@@ -3,78 +3,131 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Astra | Fluid</title>
-  <link rel="icon" type="image/x-icon" href="/favicon.ico" id="dynamic-favicon">
+  <title>Astra</title>
+  
+  <!-- Roboto Flex Font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,100..1000&display=swap" rel="stylesheet">
+  
+  <!-- External CSS -->
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
+  <!-- The JS will still draw stars here, but over a fluid gradient now! -->
   <canvas id="bg-canvas"></canvas>
 
-  <nav class="global-nav">
-    <div class="nav-brand">Astra</div>
-    <div class="nav-links">
-      <a href="#" onclick="switchTab('home')">Home</a>
-      <a href="#" onclick="switchTab('apps')">Apps</a>
-      <a href="#" onclick="switchTab('games')">Games</a>
-      <a href="#" onclick="switchTab('tools')">Tools</a>
-    </div>
-  </nav>
+  <div id="loading-screen">astra</div>
 
-  <main id="main-content">
-    
-    <section id="home" class="view-section active">
-      <div class="hero-container">
-        <h1 class="glitch-title">Astra</h1>
-        <p>Where unblocked games meet reality.</p>
-      </div>
-    </section>
-
-    <section id="apps" class="view-section">
-      <div class="container">
-        <h2>Apps</h2>
-        <div class="app-grid">
-          <div class="app-card" onclick="openApp('https://chatgpt.com/')">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg" alt="ChatGPT">
-            <span>ChatGPT</span>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="games" class="view-section">
-      <div class="container">
-        <h2>Games</h2>
-        <div class="app-grid">
-           <button class="game-btn">Among Us</button>
-           <button class="game-btn">Slope</button>
-        </div>
-      </div>
-    </section>
-
-    <section id="tools" class="view-section">
-      <div class="container">
-        <h2>Utility Tools</h2>
-        </div>
-    </section>
-
-  </main>
-
-  <div class="overlay" id="appOverlay">
-    <div class="overlay-bar">
-      <div class="overlay-title" id="overlayTitle">App</div>
-      <button class="close-btn" onclick="closeApp()">×</button>
-    </div>
-    <div class="iframe-wrapper">
-      <iframe src="" id="appFrame"></iframe>
-    </div>
+  <div class="content-wrapper" id="content">
+    <header>Astra</header>
+    <nav>
+      <a href="https://ethandupe.github.io/games-main/">Games</a>
+      <a href="/astra/tools.html">Tools</a>
+      <a href="/astra/apps.html">Apps</a>
+      <!-- New FluidCam Link -->
+      <a href="https://ethandupe.github.io/astra/fluidcam">FluidCam</a>
+    </nav>
   </div>
 
   <div class="cursor" id="cursor"></div>
 
-  <script src="script.js"></script>
+  <div class="footer-tracker">
+    <div id="sfcrjbejqnhn8bx29s5acyl9qx3fkk7aerg"></div>
+  </div>
+  <script type="text/javascript" src="https://counter5.optistats.ovh/private/counter.js?c=rjbejqnhn8bx29s5acyl9qx3fkk7aerg&down=async" async></script>
+
+  <script>
+    // --- 1. SETUP & LOADING ---
+    const loadingScreen = document.getElementById('loading-screen');
+    const content = document.getElementById('content');
+    const cursor = document.getElementById('cursor');
+
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        loadingScreen.style.opacity = '0';
+        loadingScreen.style.visibility = 'hidden';
+        content.classList.add('loaded');
+      }, 800);
+    });
+
+    // --- 2. SMOOTH CURSOR ---
+    let mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    let curPos = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+
+    document.addEventListener('mousemove', e => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+    });
+
+    function animateCursor() {
+      const ease = 0.15;
+      curPos.x += (mouse.x - curPos.x) * ease;
+      curPos.y += (mouse.y - curPos.y) * ease;
+      
+      cursor.style.left = `${curPos.x}px`;
+      cursor.style.top = `${curPos.y}px`;
+      
+      requestAnimationFrame(animateCursor);
+    }
+    animateCursor();
+
+    // Hover Listeners
+    document.querySelectorAll('a, button').forEach(el => {
+      el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+      el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+    });
+
+    // --- 3. BACKGROUND PARTICLES (STARS) ---
+    // Note: Kept the particles, but they will now float over the liquid CSS background!
+    const canvas = document.getElementById('bg-canvas');
+    const ctx = canvas.getContext('2d');
+    
+    let width, height;
+    let stars = [];
+    
+    function resize() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+      initStars();
+    }
+    
+    function initStars() {
+      stars = [];
+      const starCount = Math.floor((width * height) / 6000); 
+      for (let i = 0; i < starCount; i++) {
+        stars.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          size: Math.random() * 1.5,
+          speed: Math.random() * 0.5 + 0.1
+        });
+      }
+    }
+    
+    function drawStars() {
+      ctx.clearRect(0, 0, width, height);
+      ctx.fillStyle = "rgba(255, 255, 255, 0.6)"; // Softened the stars slightly
+      
+      stars.forEach(star => {
+        const parallaxX = (mouse.x - width/2) * 0.02;
+        const parallaxY = (mouse.y - height/2) * 0.02;
+
+        ctx.beginPath();
+        ctx.arc(star.x + parallaxX, star.y + parallaxY, star.size, 0, Math.PI * 2);
+        ctx.fill();
+        
+        star.y -= star.speed;
+        if (star.y < -5) star.y = height + 5;
+      });
+      
+      requestAnimationFrame(drawStars);
+    }
+
+    window.addEventListener('resize', resize);
+    resize();
+    drawStars();
+  </script>
 </body>
 </html>
