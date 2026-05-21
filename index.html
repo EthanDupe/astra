@@ -15,7 +15,6 @@
 </head>
 <body>
 
-  <!-- The JS will still draw stars here, but over a fluid gradient now! -->
   <canvas id="bg-canvas"></canvas>
 
   <div id="loading-screen">astra</div>
@@ -26,8 +25,9 @@
       <a href="https://ethandupe.github.io/games-main/">Games</a>
       <a href="/astra/tools.html">Tools</a>
       <a href="/astra/apps.html">Apps</a>
-      <!-- New FluidCam Link -->
       <a href="https://ethandupe.github.io/astra/fluidcam">FluidCam</a>
+      <!-- Theme Toggle Button -->
+      <button id="theme-toggle" aria-label="Toggle Dark Mode">◑</button>
     </nav>
   </div>
 
@@ -39,6 +39,20 @@
   <script type="text/javascript" src="https://counter5.optistats.ovh/private/counter.js?c=rjbejqnhn8bx29s5acyl9qx3fkk7aerg&down=async" async></script>
 
   <script>
+    // --- 0. THEME TOGGLE LOGIC ---
+    const themeToggle = document.getElementById('theme-toggle');
+    const body = document.body;
+    
+    // Check local storage for theme preference, default to light
+    const currentTheme = localStorage.getItem('astra-theme') || 'light';
+    if (currentTheme === 'dark') body.classList.add('dark-theme');
+
+    themeToggle.addEventListener('click', () => {
+      body.classList.toggle('dark-theme');
+      const theme = body.classList.contains('dark-theme') ? 'dark' : 'light';
+      localStorage.setItem('astra-theme', theme);
+    });
+
     // --- 1. SETUP & LOADING ---
     const loadingScreen = document.getElementById('loading-screen');
     const content = document.getElementById('content');
@@ -73,14 +87,13 @@
     }
     animateCursor();
 
-    // Hover Listeners
+    // Hover Listeners for links and our new button
     document.querySelectorAll('a, button').forEach(el => {
       el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
       el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
     });
 
     // --- 3. BACKGROUND PARTICLES (STARS) ---
-    // Note: Kept the particles, but they will now float over the liquid CSS background!
     const canvas = document.getElementById('bg-canvas');
     const ctx = canvas.getContext('2d');
     
@@ -108,7 +121,9 @@
     
     function drawStars() {
       ctx.clearRect(0, 0, width, height);
-      ctx.fillStyle = "rgba(255, 255, 255, 0.6)"; // Softened the stars slightly
+      // Determine if dark mode is active for star brightness
+      const isDark = document.body.classList.contains('dark-theme');
+      ctx.fillStyle = isDark ? "rgba(255, 255, 255, 0.8)" : "rgba(255, 255, 255, 0.6)"; 
       
       stars.forEach(star => {
         const parallaxX = (mouse.x - width/2) * 0.02;
