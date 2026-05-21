@@ -1,94 +1,103 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Astra – Apps</title>
   <link rel="icon" type="image/x-icon" href="/favicon.ico" id="dynamic-favicon">
 
+  <!-- Roboto Flex Font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,100..1000&display=swap" rel="stylesheet">
+
+  <!-- Global Liquid Glass Styles -->
+  <link rel="stylesheet" href="style.css">
 
   <style>
-    /* 1. CORE RESET & VARIABLES */
-    :root {
-      --cursor-size: 20px;
-      --cursor-hover-size: 60px;
-      --text-main: #ffffff;
-      --text-muted: #94a3b8;
-      --accent: #818cf8;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-    }
-
-    *, *::before, *::after {
-      cursor: none !important; /* Force hide default cursor normally */
-      box-sizing: border-box;
-    }
-
-    /* CRITICAL FIX: Restores default cursor when app is open */
+    /* === Page-Specific Glass Styles === */
+    
+    /* CRITICAL FIX: Restores default cursor when app iframe is open */
     body.app-active, body.app-active * {
       cursor: auto !important;
     }
-
-    body {
-      margin: 0;
-      padding: 0;
-      background-color: #050505;
-      color: var(--text-main);
-      font-family: 'Outfit', sans-serif;
-      overflow-x: hidden;
-      min-height: 100vh;
+    /* Hide our custom fluid cursor when an app is open */
+    body.app-active #cursor {
+      display: none !important;
     }
 
-    /* 2. BACKGROUND CANVAS (STARS) */
-    #bg-canvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: -1;
-      opacity: 0.6;
-    }
-
-    /* 3. LAYOUT */
     .container {
       max-width: 1200px;
       margin: 0 auto;
-      padding: 40px 20px;
+      padding: 80px 20px 40px 20px; /* Extra top padding for nav */
       text-align: center;
       position: relative;
       z-index: 10;
       opacity: 0;
       transform: translateY(20px);
-      animation: fadeUp 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+      animation: fadeUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 
     @keyframes fadeUp {
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* 4. HEADER & UTILITIES */
-    h1 {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 4rem;
-      margin: 0 0 20px 0;
-      background: linear-gradient(135deg, #fff 0%, var(--accent) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      filter: drop-shadow(0 0 30px rgba(129, 140, 248, 0.3));
+    /* Top Navigation (Matches Tools Page) */
+    .top-nav {
+      position: absolute;
+      top: 30px;
+      left: 30px; /* Aligned to the left for this page */
+      z-index: 100;
     }
 
+    .top-nav a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 1.05rem;
+      font-weight: 600;
+      font-variation-settings: "wdth" 110; 
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      padding: 10px 20px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(25px) saturate(150%);
+      border: 1px solid var(--glass-border);
+      border-radius: 40px;
+      box-shadow: var(--glass-shadow);
+      transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      display: inline-block;
+    }
+
+    .top-nav a:hover {
+      color: var(--nav-hover-text);
+      background: var(--nav-hover-bg);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+    }
+
+    header.page-title {
+      font-size: 5rem;
+      line-height: 1;
+      font-weight: 900;
+      letter-spacing: -2px;
+      margin-bottom: 2rem;
+      background: var(--header-grad);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 4px 15px rgba(99, 102, 241, 0.2));
+      animation: floatFluid 6s ease-in-out infinite;
+    }
+
+    /* Cloaking Utility Bar */
     .utility-bar {
       display: inline-flex;
       gap: 15px;
-      background: rgba(0, 0, 0, 0.4);
-      padding: 10px 20px;
+      background: var(--glass-bg);
+      padding: 12px 25px;
       border-radius: 50px;
       border: 1px solid var(--glass-border);
-      backdrop-filter: blur(10px);
+      backdrop-filter: blur(20px);
+      box-shadow: var(--glass-shadow);
       margin-bottom: 30px;
     }
 
@@ -99,7 +108,10 @@
       padding: 8px 16px;
       border-radius: 20px;
       font-size: 0.85rem;
-      font-family: 'Outfit', sans-serif;
+      font-family: inherit;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
       transition: all 0.3s ease;
       display: flex;
       align-items: center;
@@ -107,82 +119,61 @@
     }
 
     .utility-btn:hover {
-      background: rgba(255,255,255,0.1);
-      color: white;
-      border-color: rgba(255,255,255,0.3);
-    }
-
-    /* 5. NAVIGATION */
-    .nav-bar {
-      position: absolute;
-      top: 30px;
-      left: 30px;
-      z-index: 100;
-    }
-
-    .home-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 20px;
-      background: var(--glass-bg);
-      backdrop-filter: blur(10px);
-      border: 1px solid var(--glass-border);
-      border-radius: 30px;
-      color: var(--text-muted);
-      text-decoration: none;
-      font-weight: 500;
-      text-transform: uppercase;
-      font-size: 0.9rem;
-      letter-spacing: 1px;
-      transition: all 0.3s ease;
-    }
-
-    .home-btn:hover {
-      background: #fff;
-      color: #000;
+      background: rgba(165, 180, 252, 0.15);
+      color: #ffffff;
+      border-color: rgba(165, 180, 252, 0.4);
       transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(255,255,255,0.2);
     }
 
-    /* 6. APP GRID */
+    .panic-text {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      margin-top: -15px;
+      margin-bottom: 40px;
+      letter-spacing: 0.5px;
+    }
+    .panic-text b { color: #ffffff; background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; }
+
+    /* Glass App Grid */
     .app-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-      gap: 20px;
-      max-width: 900px;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 25px;
+      max-width: 1000px;
       margin: 0 auto;
     }
 
     .app-card {
       background: var(--glass-bg);
       border: 1px solid var(--glass-border);
-      border-radius: 24px;
+      border-radius: 28px;
       aspect-ratio: 1 / 1;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       gap: 15px;
-      transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
-      backdrop-filter: blur(5px);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      backdrop-filter: blur(15px);
+      box-shadow: var(--glass-shadow);
       position: relative;
       overflow: hidden;
     }
 
     .app-card img {
-      width: 48px;
-      height: 48px;
+      width: 54px;
+      height: 54px;
       object-fit: contain;
-      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5));
-      transition: transform 0.3s ease;
+      filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5));
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
       z-index: 2;
     }
 
     .app-card span {
-      font-size: 0.95rem;
-      font-weight: 500;
+      font-size: 1rem;
+      font-weight: 700;
       color: var(--text-muted);
+      letter-spacing: 0.5px;
       transition: color 0.3s ease;
       z-index: 2;
     }
@@ -192,7 +183,7 @@
       content: '';
       position: absolute;
       inset: 0;
-      background: radial-gradient(circle at center, rgba(129, 140, 248, 0.15) 0%, transparent 70%);
+      background: radial-gradient(circle at center, rgba(165, 180, 252, 0.2) 0%, transparent 70%);
       opacity: 0;
       transition: opacity 0.4s ease;
       z-index: 1;
@@ -200,26 +191,27 @@
 
     .app-card:hover {
       background: rgba(255, 255, 255, 0.05);
-      border-color: rgba(255, 255, 255, 0.2);
-      transform: translateY(-8px);
-      box-shadow: 0 15px 30px -10px rgba(0,0,0,0.5);
+      border-color: rgba(165, 180, 252, 0.5);
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 20px 40px -10px rgba(0,0,0,0.7);
     }
 
     .app-card:hover::before { opacity: 1; }
-    .app-card:hover img { transform: scale(1.15) rotate(-5deg); }
-    .app-card:hover span { color: #fff; }
+    .app-card:hover img { transform: scale(1.15) translateY(-5px); }
+    .app-card:hover span { color: #ffffff; }
 
-    /* 7. IFRAME OVERLAY */
+    /* Iframe Overlay Modal */
     .overlay {
       position: fixed;
       inset: 0;
-      background: #000;
+      background: rgba(10, 10, 15, 0.85);
+      backdrop-filter: blur(20px);
       z-index: 999;
       opacity: 0;
       pointer-events: none;
       display: flex;
       flex-direction: column;
-      transition: opacity 0.3s ease;
+      transition: opacity 0.4s ease;
     }
 
     .overlay.active {
@@ -228,9 +220,9 @@
     }
 
     .overlay-bar {
-      height: 40px;
-      background: #0a0a0a;
-      border-bottom: 1px solid #333;
+      height: 45px;
+      background: rgba(0, 0, 0, 0.5);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -238,25 +230,30 @@
     }
 
     .overlay-title {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 1rem;
-      color: #888;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 1px;
     }
 
     .close-btn {
       background: transparent;
       border: none;
-      color: #888;
-      font-size: 24px;
+      color: var(--text-muted);
+      font-size: 28px;
       cursor: pointer !important; /* Force pointer for close btn */
+      transition: color 0.2s, transform 0.2s;
+      line-height: 1;
     }
 
-    .close-btn:hover { color: #fff; }
+    .close-btn:hover { 
+      color: #ff4d4d; 
+      transform: scale(1.1);
+    }
 
     .iframe-wrapper {
       flex: 1;
       width: 100%;
-      background: #000;
       position: relative;
     }
 
@@ -264,34 +261,7 @@
       width: 100%;
       height: 100%;
       border: none;
-    }
-
-    /* 8. CUSTOM CURSOR (Main Page Style) */
-    .cursor {
-      width: var(--cursor-size);
-      height: var(--cursor-size);
-      background: white;
-      border-radius: 50%;
-      position: fixed;
-      top: 0; left: 0;
-      pointer-events: none;
-      z-index: 10000;
-      mix-blend-mode: difference;
-      transform: translate3d(-50%, -50%, 0);
-      will-change: transform, width, height;
-      transition: width 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), 
-                  height 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-    }
-
-    .cursor.hover {
-      width: var(--cursor-hover-size);
-      height: var(--cursor-hover-size);
-      opacity: 1;
-    }
-
-    /* HIDE custom cursor when app is open */
-    body.app-active .cursor {
-      display: none;
+      background: #ffffff; /* Keeping iframe background white just in case the proxy needs it */
     }
 
     /* Toast Notification */
@@ -299,30 +269,34 @@
       position: fixed;
       bottom: 20px;
       right: 20px;
-      background: rgba(129, 140, 248, 0.2);
-      border: 1px solid var(--accent);
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
       color: white;
       padding: 12px 24px;
       border-radius: 12px;
-      backdrop-filter: blur(10px);
+      backdrop-filter: blur(20px) saturate(150%);
+      box-shadow: var(--glass-shadow);
       transform: translateY(100px);
       transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       z-index: 2000;
-      font-size: 0.9rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
     }
     .toast.show { transform: translateY(0); }
   </style>
 </head>
 <body>
 
+  <!-- Liquid Background Stars -->
   <canvas id="bg-canvas"></canvas>
 
-  <div class="nav-bar">
-    <a href="/astra/index.html" class="home-btn">← Home</a>
-  </div>
+  <nav class="top-nav">
+    <a href="/astra/index.html">← Home</a>
+  </nav>
 
   <div class="container">
-    <h1>Apps</h1>
+    <header class="page-title">Apps</header>
 
     <div class="utility-bar">
       <button class="utility-btn" onclick="cloakTab('default')"><span>Reset</span></button>
@@ -336,12 +310,11 @@
       </button>
     </div>
     
-    <p style="color: #666; font-size: 0.8rem; margin-top: -20px; margin-bottom: 40px;">
+    <p class="panic-text">
       Panic Button: Press <b>]</b> to exit immediately.
     </p>
 
     <div class="app-grid">
-      
       <div class="app-card" data-url="https://scramjet.mercurywork.shop/scramjet/https%3A%2F%2Fwww.google.com%2F%3Fzx%3D1770699498684%26no_sw_cr%3D1">
         <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Browser">
         <span>Browser</span>
@@ -371,14 +344,14 @@
         <img src="https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg" alt="Spotify">
         <span>Spotify</span>
       </div>
-
     </div>
   </div>
 
+  <!-- Fullscreen App Container -->
   <div class="overlay" id="appOverlay">
     <div class="overlay-bar">
       <div class="overlay-title" id="overlayTitle">App</div>
-      <button class="close-btn" id="closeOverlayBtn">×</button>
+      <button class="close-btn" id="closeOverlayBtn" title="Close App">&times;</button>
     </div>
     <div class="iframe-wrapper">
       <iframe src="" id="appFrame" allow="fullscreen; clipboard-read; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
@@ -423,10 +396,6 @@
     function resize() {
       width = canvas.width = window.innerWidth;
       height = canvas.height = window.innerHeight;
-      initStars();
-    }
-
-    function initStars() {
       stars = [];
       const starCount = Math.floor((width * height) / 5000);
       for (let i = 0; i < starCount; i++) {
@@ -442,12 +411,16 @@
 
     function drawStars() {
       ctx.clearRect(0, 0, width, height);
-      ctx.fillStyle = "white";
+      ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
       
       stars.forEach(star => {
+        // Subtle parallax
+        const parallaxX = (mouse.x - width/2) * 0.01;
+        const parallaxY = (mouse.y - height/2) * 0.01;
+
         ctx.globalAlpha = star.opacity;
         ctx.beginPath();
-        ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+        ctx.arc(star.x + parallaxX, star.y + parallaxY, star.size, 0, Math.PI * 2);
         ctx.fill();
         
         star.y -= star.speed;
@@ -467,15 +440,15 @@
       if (type === 'drive') {
         document.title = 'My Drive - Google Drive';
         favicon.href = 'https://ssl.gstatic.com/images/branding/product/1x/drive_2020q4_32dp.png';
-        showToast("Cloaked as Google Drive");
+        showToast("✨ Cloaked as Google Drive");
       } else if (type === 'classroom') {
         document.title = 'Classes';
         favicon.href = 'https://ssl.gstatic.com/classroom/favicon.png';
-        showToast("Cloaked as Google Classroom");
+        showToast("✨ Cloaked as Google Classroom");
       } else {
         document.title = 'Astra – Apps';
         favicon.href = '/favicon.ico';
-        showToast("Cloak Reset");
+        showToast("🔄 Cloak Reset");
       }
     }
 
@@ -483,7 +456,7 @@
       const toast = document.getElementById('toast');
       toast.innerText = msg;
       toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 2000);
+      setTimeout(() => toast.classList.remove('show'), 2500);
     }
 
     document.addEventListener('keydown', (e) => {
@@ -504,7 +477,7 @@
         if (url) {
           overlayTitle.innerText = name;
           iframe.src = url;
-          // Add class to body to revert cursor to system default
+          // Add class to body to revert cursor to system default so you can click in the app
           document.body.classList.add('app-active'); 
           overlay.classList.add('active');
         }
@@ -513,9 +486,9 @@
 
     function closeApp() {
       overlay.classList.remove('active');
-      // Remove class from body to bring back custom cursor
+      // Remove class from body to bring back Astra's custom cursor
       document.body.classList.remove('app-active');
-      setTimeout(() => { iframe.src = ''; }, 300);
+      setTimeout(() => { iframe.src = ''; }, 400); // Wait for fade out before killing source
     }
 
     closeOverlayBtn.addEventListener('click', closeApp);
@@ -526,6 +499,98 @@
       }
     });
 
+    // --- 5. 🚀 ASTRA AUTO-UPDATE CHECKER ---
+    (() => {
+      let lastVersion = null;
+
+      async function checkForUpdates() {
+        try {
+          const response = await fetch(window.location.href.split('?')[0] + '?t=' + Date.now(), { 
+            method: 'HEAD',
+            cache: 'no-store'
+          });
+
+          const currentVersion = response.headers.get('Last-Modified') || response.headers.get('ETag');
+
+          if (!lastVersion) {
+            lastVersion = currentVersion;
+            return;
+          }
+
+          if (currentVersion && currentVersion !== lastVersion) {
+            showUpdateNotification();
+            lastVersion = currentVersion; 
+          }
+        } catch (error) {
+          console.log("Update check paused.");
+        }
+      }
+
+      function showUpdateNotification() {
+        if (document.getElementById('astra-update-toast')) return;
+
+        const toast = document.createElement('div');
+        toast.id = 'astra-update-toast';
+        
+        toast.style.cssText = `
+          position: fixed;
+          top: 20px;
+          left: 50%;
+          transform: translateX(-50%);
+          background: rgba(20, 20, 30, 0.85);
+          backdrop-filter: blur(20px) saturate(150%);
+          -webkit-backdrop-filter: blur(20px) saturate(150%);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.7);
+          color: #ffffff;
+          padding: 12px 20px;
+          border-radius: 50px;
+          z-index: 100000;
+          display: flex;
+          align-items: center;
+          gap: 15px;
+          font-family: 'Roboto Flex', sans-serif;
+          animation: slideDown 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        `;
+
+        toast.innerHTML = `
+          <span style="font-weight: 600; font-size: 0.95rem; letter-spacing: 0.5px;">✨ Update Available</span>
+          <button id="toast-reload" style="background: rgba(165, 180, 252, 0.85); color: #050505; border: none; padding: 6px 16px; border-radius: 30px; font-weight: 700; font-family: inherit; cursor: none; transition: transform 0.2s;">Reload</button>
+          <button id="toast-close" style="background: transparent; color: #9aa0b8; border: none; font-size: 1.5rem; cursor: none; padding: 0; line-height: 1; transition: color 0.2s;">&times;</button>
+        `;
+
+        document.body.appendChild(toast);
+
+        if (!document.getElementById('toast-keyframes')) {
+          const style = document.createElement('style');
+          style.id = 'toast-keyframes';
+          style.innerHTML = `
+            @keyframes slideDown {
+              from { top: -50px; opacity: 0; transform: translateX(-50%) scale(0.9); }
+              to { top: 20px; opacity: 1; transform: translateX(-50%) scale(1); }
+            }
+          `;
+          document.head.appendChild(style);
+        }
+
+        const reloadBtn = document.getElementById('toast-reload');
+        const closeBtn = document.getElementById('toast-close');
+
+        reloadBtn.addEventListener('click', () => window.location.reload(true));
+        closeBtn.addEventListener('click', () => {
+          toast.style.animation = 'slideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1) reverse forwards';
+          setTimeout(() => toast.remove(), 300);
+        });
+
+        [reloadBtn, closeBtn].forEach(btn => {
+          btn.addEventListener('mouseenter', () => document.getElementById('cursor').classList.add('hover'));
+          btn.addEventListener('mouseleave', () => document.getElementById('cursor').classList.remove('hover'));
+        });
+      }
+
+      checkForUpdates();
+      setInterval(checkForUpdates, 25000);
+    })();
   </script>
 </body>
 </html>
