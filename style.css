@@ -1,12 +1,12 @@
+/* 1. CORE RESET & VARIABLES */
 :root {
   --cursor-size: 20px;
   --cursor-hover-size: 60px;
-  --text-main: #ffffff;
-  --text-muted: #94a3b8;
-  --accent: #818cf8;
-  --glass-bg: rgba(255, 255, 255, 0.03);
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --bg-color: #050505;
+  --text-main: #1a1a2e; /* Darker text for the light glass theme */
+  --text-muted: #555566;
+  --glass-bg: rgba(255, 255, 255, 0.45); /* Milky white stained glass */
+  --glass-border: rgba(255, 255, 255, 0.8);
+  --glass-shadow: 0 16px 40px -10px rgba(100, 110, 140, 0.3);
 }
 
 *, *::before, *::after {
@@ -17,88 +17,174 @@
 body {
   margin: 0;
   padding: 0;
-  background-color: var(--bg-color);
+  /* Fluid liquid animated background */
+  background: linear-gradient(-45deg, #e0e7ff, #f3e8ff, #ffffff, #c7d2fe);
+  background-size: 400% 400%;
+  animation: liquidBg 15s ease infinite;
   color: var(--text-main);
-  font-family: 'Outfit', sans-serif;
-  overflow-x: hidden;
-  min-height: 100vh;
+  font-family: 'Roboto Flex', sans-serif;
+  overflow: hidden; 
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
-/* Background & Cursor */
+/* Fluid Background Animation */
+@keyframes liquidBg {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* 2. BACKGROUND CANVAS (STARS OVER LIQUID) */
 #bg-canvas {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   z-index: -1;
-  opacity: 0.6;
+  opacity: 0.5;
+  pointer-events: none;
 }
 
+/* 3. LOADING SCREEN (FROSTED) */
+#loading-screen {
+  position: fixed;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  transition: opacity 1s cubic-bezier(0.7, 0, 0.3, 1), visibility 1s; 
+  font-size: 4rem;
+  letter-spacing: 0.3rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #a5b4fc;
+}
+
+/* 4. MAIN CONTENT CONTAINER */
+.content-wrapper {
+  text-align: center;
+  z-index: 10;
+  opacity: 0; 
+  transform: translateY(40px) scale(0.95);
+  transition: opacity 1.2s ease-out, transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.content-wrapper.loaded {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+header {
+  font-size: 8rem; 
+  line-height: 1;
+  font-weight: 900;
+  letter-spacing: -3px;
+  margin-bottom: 2rem;
+  background: linear-gradient(135deg, #1a1a2e 0%, #6366f1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 4px 15px rgba(99, 102, 241, 0.2));
+  animation: floatFluid 6s ease-in-out infinite;
+}
+
+/* Fluid floating animation for header */
+@keyframes floatFluid {
+  0%, 100% { transform: translateY(0px) scale(1); }
+  50% { transform: translateY(-10px) scale(1.02); }
+}
+
+/* 5. WHITE STAINED GLASS NAV */
+nav {
+  display: inline-flex;
+  gap: 12px;
+  padding: 15px 25px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(25px) saturate(150%);
+  -webkit-backdrop-filter: blur(25px) saturate(150%);
+  border: 1px solid var(--glass-border);
+  border-radius: 60px;
+  box-shadow: var(--glass-shadow);
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+nav:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 50px -10px rgba(100, 110, 140, 0.4);
+}
+
+nav a {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 1.05rem;
+  font-weight: 600;
+  font-variation-settings: "wdth" 110; /* Roboto Flex custom width axis */
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  padding: 12px 24px;
+  border-radius: 40px;
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+  background: transparent;
+}
+
+/* Fluid Liquid Hover Effect */
+nav a:hover {
+  color: #ffffff;
+  background: rgba(99, 102, 241, 0.8);
+  box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+  transform: scale(1.05);
+}
+
+/* 6. CUSTOM FLUID CURSOR */
 .cursor {
   width: var(--cursor-size);
   height: var(--cursor-size);
-  background: white;
+  background: rgba(99, 102, 241, 0.6); /* Soft indigo cursor */
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255,255,255,0.8);
   border-radius: 50%;
   position: fixed;
-  top: 0; left: 0;
+  top: 0;
+  left: 0;
   pointer-events: none;
   z-index: 10000;
-  mix-blend-mode: difference;
-  transform: translate3d(-50%, -50%, 0);
-  transition: width 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), 
-              height 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  will-change: transform, width, height; 
+  transform: translate3d(-50%, -50%, 0); 
+  transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
+              height 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+              background 0.4s ease; 
 }
+
 .cursor.hover {
   width: var(--cursor-hover-size);
   height: var(--cursor-hover-size);
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(99, 102, 241, 0.8);
 }
 
-/* Global Navigation */
-.global-nav {
-  position: fixed;
-  top: 0; width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px 40px;
-  background: linear-gradient(to bottom, rgba(5,5,5,0.9), transparent);
-  z-index: 100;
-}
-.nav-brand {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 1.5rem;
-  font-weight: 700;
-}
-.nav-links a {
-  color: var(--text-muted);
-  text-decoration: none;
-  margin-left: 20px;
-  transition: color 0.3s;
-}
-.nav-links a:hover { color: white; }
-
-/* Fluid Section Transitions */
-.view-section {
-  position: absolute;
-  top: 80px;
-  left: 0;
-  width: 100%;
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(20px) scale(0.98);
-  transition: opacity 0.5s ease, transform 0.5s ease, visibility 0.5s;
-  padding: 0 40px;
+/* Tracker styling cleanup */
+.footer-tracker {
+  position: fixed; 
+  bottom: 10px; 
+  left: 50%; 
+  transform: translateX(-50%); 
+  opacity: 0.3; 
+  font-size: 10px;
+  mix-blend-mode: multiply;
 }
 
-.view-section.active {
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0) scale(1);
-  position: relative; 
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    header { font-size: 4.5rem; }
+    nav { padding: 12px 20px; flex-wrap: wrap; justify-content: center;}
+    nav a { padding: 10px 16px; font-size: 0.85rem; }
 }
-
-/* Overlay and App Styles (Copied from your apps.html) */
-.overlay {
-  position: fixed; inset: 0; background: #000; z-index: 999;
-  opacity: 0; pointer-events: none; display: flex; flex-direction: column;
-  transition: opacity 0.4s ease;
-}
-.overlay.active { opacity: 1; pointer-events: all; }
