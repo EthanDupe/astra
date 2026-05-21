@@ -4,265 +4,346 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Astra | Utility Tools</title>
+  
+  <!-- 🚀 THEME BOUNCER: Put this at the top of EVERY page to remember Dark Mode! -->
+  <script>
+    if (localStorage.getItem('astra-theme') === 'dark') {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    }
+  </script>
+
+  <!-- Roboto Flex Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,100..1000&display=swap" rel="stylesheet">
+  
+  <!-- Link to our global liquid glass styles -->
   <link rel="stylesheet" href="style.css">
 
   <style>
-    /* === Utility Tools Styles === */
-
-    body {
-      background: #0a192f;
-      color: #cddcff;
-      font-family: 'Segoe UI', sans-serif;
-      margin: 0;
-      padding: 0;
-      text-align: center;
-      overflow-x: hidden;
-      cursor: none; /* hide system cursor */
+    /* === Page-Specific Glass Styles === */
+    .tools-layout {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 900px;
+      margin-top: 2rem;
+      z-index: 10;
     }
 
-    header {
-      font-size: 2rem;
-      font-weight: 700;
-      margin: 2rem 0;
-      color: #00ffff;
-      text-shadow: 0 0 10px rgba(0,255,255,0.6);
+    /* Main Navigation Override (to sit at the top) */
+    .top-nav {
+      position: absolute;
+      top: 30px;
+      z-index: 100;
     }
 
+    header.page-title {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+      margin-top: 80px; /* Make room for top nav */
+      animation: floatFluid 6s ease-in-out infinite;
+    }
+
+    /* Tools Category Nav */
     .tools-nav {
       display: flex;
       justify-content: center;
       flex-wrap: wrap;
-      gap: 1rem;
-      margin: 2rem 0;
+      gap: 10px;
+      margin-bottom: 2rem;
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      padding: 10px 20px;
+      border-radius: 40px;
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--glass-shadow);
     }
+
     .tools-nav button {
       background: transparent;
-      border: 2px solid #00ffff;
-      color: #00ffff;
-      border-radius: 6px;
-      padding: 0.5rem 1rem;
-      cursor: pointer;
-      transition: all 0.3s ease;
+      border: none;
+      color: var(--text-muted);
+      font-family: inherit;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 8px 16px;
+      border-radius: 30px;
+      transition: all 0.4s ease;
+      font-size: 0.9rem;
     }
+
     .tools-nav button:hover {
-      background: rgba(0,255,255,0.2);
+      color: var(--text-main);
+      background: rgba(165, 180, 252, 0.2);
     }
+
     .tools-nav button.active {
-      background: #00ffff;
-      color: #0a192f;
-      font-weight: 600;
+      background: var(--nav-hover-bg);
+      color: var(--nav-hover-text);
+      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
     }
 
+    /* The Main Tool Container */
     .tool-frame {
-      background: #112a67;
-      border-radius: 12px;
-      max-width: 800px;
-      max-height: 70vh;
-      min-height: 320px;
-      margin: 0 auto;
-      padding: 1rem;
-      box-shadow: 0 0 10px rgba(0,255,255,0.6),
-                  inset 0 0 20px rgba(0,255,255,0.3);
-      overflow-y: auto;
-      opacity: 1;
-      transform: scale(1);
-      transition: opacity 0.3s ease, transform 0.3s ease;
-    }
-
-    /* Buttons */
-    .btn {
-      border: none;
-      border-radius: 8px;
-      padding: 0.5rem 1rem;
-      cursor: pointer;
-      font-weight: 600;
-      transition: 0.3s;
-    }
-    .btn-primary {
-      background: #00ffff;
-      color: #0a192f;
-    }
-    .btn-primary:hover {
-      background: #00e6e6;
-    }
-    .btn-secondary {
-      background: #25418b;
-      color: #cddcff;
-    }
-    .btn-secondary:hover {
-      background: #2f53af;
-    }
-    .btn-accent {
-      background: #4969ff;
-      color: #fff;
-    }
-    .btn-accent:hover {
-      background: #3654d6;
-    }
-
-    /* Inputs + Textareas */
-    textarea, input, select {
+      background: var(--glass-bg);
+      backdrop-filter: blur(30px) saturate(150%);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
       width: 100%;
-      padding: 0.5rem 0.75rem;
-      border-radius: 6px;
-      border: none;
+      min-height: 400px;
+      padding: 2rem;
+      box-shadow: var(--glass-shadow);
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .tool-frame.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Reusable Glass Inputs & Buttons inside tools */
+    .glass-input, .glass-select, .glass-textarea {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 12px;
+      border: 1px solid var(--glass-border);
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text-main);
+      font-family: inherit;
       font-size: 1rem;
       margin-bottom: 1rem;
-      background: #0d1b3d;
-      color: #eee;
+      outline: none;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
     }
-    textarea:focus, input:focus, select:focus {
-      outline: 2px solid #00ffff;
+    
+    :root[data-theme="dark"] .glass-input, 
+    :root[data-theme="dark"] .glass-select, 
+    :root[data-theme="dark"] .glass-textarea {
+      background: rgba(0, 0, 0, 0.2);
     }
 
-    /* Custom Cursor */
-    .cursor {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 20px;
-      height: 20px;
-      border: 2px solid #00ffff;
-      border-radius: 50%;
-      pointer-events: none;
-      transform: translate(-50%, -50%);
-      transition: transform 0.15s ease-out, width 0.2s, height 0.2s, background 0.2s;
-      z-index: 9999;
+    .glass-input:focus, .glass-select:focus, .glass-textarea:focus {
+      border-color: var(--nav-hover-bg);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
     }
-    .cursor.hover {
-      width: 35px;
-      height: 35px;
-      background: rgba(0,255,255,0.2);
+
+    .glass-textarea {
+      min-height: 200px;
+      resize: vertical;
+    }
+
+    .glass-btn {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      color: var(--text-main);
+      font-family: inherit;
+      font-weight: 600;
+      padding: 10px 20px;
+      border-radius: 12px;
+      cursor: none; /* Let the custom cursor do the work */
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .glass-btn:hover {
+      background: var(--nav-hover-bg);
+      color: var(--nav-hover-text);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(99, 102, 241, 0.3);
+    }
+
+    /* Tool Specific Layouts */
+    .calculator { width: 100%; max-width: 350px; }
+    .notepad { width: 100%; max-width: 600px; }
+    .unit-converter, .tab-cloaker, .about-blank { width: 100%; max-width: 400px; text-align: left;}
+    
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--text-muted);
     }
   </style>
 </head>
 <body>
-  <!-- Title -->
-  <header>Utility Tools</header>
 
-  <!-- Tools Navigation -->
-  <nav class="tools-nav" role="tablist" aria-label="Tools Navigation">
-    <button role="tab" aria-selected="true" id="btn-calculator" class="active">Calculator</button>
-    <button role="tab" aria-selected="false" id="btn-notepad">Notepad</button>
-    <button role="tab" aria-selected="false" id="btn-unitconverter">Unit Converter</button>
-    <button role="tab" aria-selected="false" id="btn-tabcloaker">Tab Cloaker</button>
-    <button role="tab" aria-selected="false" id="btn-aboutblank">About:Blank Opener</button>
+  <!-- Liquid Background Stars -->
+  <canvas id="bg-canvas"></canvas>
+
+  <!-- Global Navigation (Back to home + Theme Toggle) -->
+  <nav class="top-nav">
+    <a href="/astra/index.html">← Home</a>
+    <button id="theme-toggle" aria-label="Toggle Dark Mode">◑</button>
   </nav>
 
-  <!-- Tool Frame -->
-  <section id="tool-frame" class="tool-frame" role="tabpanel" aria-live="polite" tabindex="0"></section>
+  <div class="tools-layout" id="content">
+    <header class="page-title">Utility Tools</header>
 
-  <!-- Custom Cursor -->
+    <!-- Tools Navigation -->
+    <div class="tools-nav" role="tablist">
+      <button role="tab" id="btn-calculator" class="active">Calculator</button>
+      <button role="tab" id="btn-notepad">Notepad</button>
+      <button role="tab" id="btn-unitconverter">Unit Converter</button>
+      <button role="tab" id="btn-tabcloaker">Tab Cloaker</button>
+      <button role="tab" id="btn-aboutblank">About:Blank</button>
+    </div>
+
+    <!-- Tool Frame -->
+    <section id="tool-frame" class="tool-frame" role="tabpanel"></section>
+  </div>
+
+  <!-- Custom Cursor (Linked from style.css) -->
   <div class="cursor" id="cursor"></div>
 
-  <!-- Script -->
+  <!-- Script Logic -->
   <script>
-  (() => {
+    // --- 0. THEME TOGGLE (Synced with Home Page) ---
+    const themeToggle = document.getElementById('theme-toggle');
+
+    function setTheme(isDark) {
+      if (isDark) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        try { localStorage.setItem('astra-theme', 'dark'); } catch(e) {}
+      } else {
+        document.documentElement.setAttribute('data-theme', 'light');
+        try { localStorage.setItem('astra-theme', 'light'); } catch(e) {}
+      }
+    }
+
+    themeToggle.addEventListener('click', () => {
+      const isDarkTheme = document.documentElement.getAttribute('data-theme') !== 'dark';
+      setTheme(isDarkTheme);
+    });
+
+    // --- 1. TOOLS LOGIC ---
     const toolFrame = document.getElementById('tool-frame');
     const buttons = document.querySelectorAll('.tools-nav button');
 
-    /* ========================
-       TOOL TEMPLATES
-    =========================*/
     const templates = {
       calculator: `
         <div class="calculator">
-          <div id="calcDisplay" class="display" style="background:#0d1b3d;padding:1rem;margin-bottom:1rem;border-radius:6px;text-align:right;font-size:1.5rem;">0</div>
+          <div id="calcDisplay" class="glass-input" style="text-align:right;font-size:2rem;font-weight:700;margin-bottom:1rem;height:60px;display:flex;align-items:center;justify-content:flex-end;">0</div>
           <div class="buttons" style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.5rem;"></div>
         </div>
       `,
       notepad: `
         <div class="notepad">
-          <textarea id="notepadTextarea" placeholder="Type your notes here..."></textarea>
-          <button class="btn btn-primary" id="saveNote">Save</button>
-          <span id="saveMsg" style="margin-left:1rem; color:#00ff99; opacity:0;">Saved!</span>
+          <textarea id="notepadTextarea" class="glass-textarea" placeholder="Type your notes here..."></textarea>
+          <div style="display:flex; align-items:center; gap:15px;">
+            <button class="glass-btn" id="saveNote">Save Notes</button>
+            <span id="saveMsg" style="color:var(--nav-hover-bg); font-weight:700; opacity:0; transition:opacity 0.3s;">Saved!</span>
+          </div>
         </div>
       `,
       unitconverter: `
         <div class="unit-converter">
           <label>Select Unit Type:</label>
-          <select id="unitType">
+          <select id="unitType" class="glass-select">
             <option value="length">Length</option>
             <option value="weight">Weight</option>
             <option value="temperature">Temperature</option>
           </select>
-          <input type="number" id="unitInput" placeholder="Enter value">
+          
+          <label>Value:</label>
+          <input type="number" id="unitInput" class="glass-input" placeholder="Enter value">
+          
           <label>From:</label>
-          <select id="unitFrom"></select>
+          <select id="unitFrom" class="glass-select"></select>
+          
           <label>To:</label>
-          <select id="unitTo"></select>
-          <div id="conversionResult" style="margin-top:1rem; font-weight:bold;"></div>
+          <select id="unitTo" class="glass-select"></select>
+          
+          <div id="conversionResult" style="margin-top:1.5rem; font-size:1.5rem; font-weight:800; text-align:center; color:var(--text-main);"></div>
         </div>
       `,
       tabcloaker: `
         <div class="tab-cloaker">
-          <input type="text" id="cloakTitle" placeholder="Enter fake tab title">
-          <input type="text" id="cloakFavicon" placeholder="Enter favicon URL (optional)">
-          <button class="btn btn-primary" id="applyCloak">Apply Cloak</button>
-          <button class="btn btn-secondary" id="resetCloak">Reset</button>
+          <label>Tab Title:</label>
+          <input type="text" id="cloakTitle" class="glass-input" placeholder="e.g. Google Classroom">
+          
+          <label>Favicon URL (optional):</label>
+          <input type="text" id="cloakFavicon" class="glass-input" placeholder="https://...">
+          
+          <div style="display:flex; gap:10px; margin-top:1rem;">
+            <button class="glass-btn" id="applyCloak" style="flex:1;">Apply</button>
+            <button class="glass-btn" id="resetCloak" style="flex:1;">Reset</button>
+          </div>
         </div>
       `,
       aboutblank: `
         <div class="about-blank">
-          <input type="url" id="blankUrl" placeholder="Enter website URL">
-          <button class="btn btn-accent" id="openBlank">Open in About:Blank</button>
+          <label>Target URL:</label>
+          <input type="url" id="blankUrl" class="glass-input" placeholder="https://example.com">
+          <button class="glass-btn" id="openBlank" style="width:100%;">Open Stealth Window</button>
         </div>
       `
     };
 
     let activeTool = 'calculator';
 
-    /* ========================
-       TOOL LOAD & NAV
-    =========================*/
     function updateNav() {
-      buttons.forEach(btn => {
-        btn.classList.remove('active');
-        btn.setAttribute('aria-selected', 'false');
-      });
+      buttons.forEach(btn => btn.classList.remove('active'));
       document.getElementById(`btn-${activeTool}`).classList.add('active');
-      document.getElementById(`btn-${activeTool}`).setAttribute('aria-selected', 'true');
-    }
-
-    function animateFrameIn() {
-      toolFrame.style.opacity = '0';
-      toolFrame.style.transform = 'scale(0.85)';
-      setTimeout(() => {
-        toolFrame.style.opacity = '1';
-        toolFrame.style.transform = 'scale(1)';
-      }, 50);
     }
 
     function loadTool(tool) {
       if (!templates[tool]) return;
-      toolFrame.innerHTML = templates[tool];
-      activeTool = tool;
-      updateNav();
-      animateFrameIn();
-      initToolLogic(tool);
+      
+      // Animate out
+      toolFrame.classList.remove('show');
+      
+      setTimeout(() => {
+        toolFrame.innerHTML = templates[tool];
+        activeTool = tool;
+        updateNav();
+        initToolLogic(tool);
+        rebindHoverEvents(); // Ensure new buttons get the hover cursor
+        
+        // Animate in
+        requestAnimationFrame(() => {
+          toolFrame.classList.add('show');
+        });
+      }, 300); // Matches the CSS transition time
     }
 
-    /* ========================
-       TOOLS LOGIC
-    =========================*/
+    // Initialize specific tool logic
     function initCalculator() {
       const display = document.getElementById('calcDisplay');
       const buttonsDiv = document.querySelector('.buttons');
-      const keys = ["7","8","9","/","4","5","6","*","1","2","3","-","0",".","C","+","="];
+      const keys = ["7","8","9","/","4","5","6","*","1","2","3","-","0",".","C","="];
       let current = "";
 
       keys.forEach(k => {
         const btn = document.createElement('button');
         btn.textContent = k === "/" ? "÷" : k === "*" ? "×" : k;
-        btn.className = "btn btn-secondary";
-        btn.style.fontSize = "1.2rem";
+        btn.className = "glass-btn";
+        if(k === "C" || k === "=") btn.style.background = "var(--nav-hover-bg)";
+        if(k === "C" || k === "=") btn.style.color = "var(--nav-hover-text)";
+        
         btn.addEventListener('click', () => {
           if(k === "C") { current = ""; display.textContent = "0"; return; }
           if(k === "=") {
-            try { current = eval(current).toString(); }
+            try { 
+                if(current === "") return;
+                // Basic eval sanitization
+                current = eval(current.replace(/[^0-9\+\-\*\/\.]/g, '')).toString(); 
+            }
             catch { current = "Error"; }
-            display.textContent = current; return;
+            display.textContent = current; 
+            return;
           }
+          if(current === "Error" || current === "0") current = "";
           current += k;
           display.textContent = current;
         });
@@ -274,10 +355,10 @@
       const textarea = document.getElementById('notepadTextarea');
       const saveBtn = document.getElementById('saveNote');
       const saveMsg = document.getElementById('saveMsg');
-      textarea.value = localStorage.getItem('modern_notepad') || "";
+      textarea.value = localStorage.getItem('astra_notepad') || "";
 
       saveBtn.addEventListener('click', () => {
-        localStorage.setItem('modern_notepad', textarea.value);
+        localStorage.setItem('astra_notepad', textarea.value);
         saveMsg.style.opacity = 1;
         setTimeout(() => saveMsg.style.opacity = 0, 1500);
       });
@@ -324,7 +405,7 @@
       function updateResult() {
         let v = parseFloat(inputValue.value);
         if(isNaN(v)) { resultDisplay.textContent = ""; return; }
-        resultDisplay.textContent = convert(v, unitFrom.value, unitTo.value, unitType.value).toFixed(4) + " " + unitTo.value;
+        resultDisplay.textContent = convert(v, unitFrom.value, unitTo.value, unitType.value).toFixed(2) + " " + unitTo.value;
       }
 
       unitType.addEventListener('change', () => { populateUnits(unitType.value); updateResult(); });
@@ -336,13 +417,13 @@
     function initTabCloaker() {
       const titleInput = document.getElementById('cloakTitle');
       const faviconInput = document.getElementById('cloakFavicon');
-      const applyBtn = document.getElementById('applyCloak');
-      const resetBtn = document.getElementById('resetCloak');
+      
+      // FIX: Store original states safely
+      window.originalTitle = window.originalTitle || document.title;
+      const currentFav = document.querySelector("link[rel*='icon']");
+      window.originalFavicon = window.originalFavicon || (currentFav ? currentFav.href : '');
 
-      const originalTitle = document.title;
-      const originalFavicon = document.querySelector("link[rel*='icon']")?.href;
-
-      applyBtn.addEventListener('click', () => {
+      document.getElementById('applyCloak').addEventListener('click', () => {
         if(titleInput.value) document.title = titleInput.value;
         if(faviconInput.value) {
           let link = document.querySelector("link[rel*='icon']") || document.createElement("link");
@@ -352,23 +433,29 @@
         }
       });
 
-      resetBtn.addEventListener('click', () => {
-        document.title = originalTitle;
-        if(originalFavicon) {
+      document.getElementById('resetCloak').addEventListener('click', () => {
+        document.title = window.originalTitle;
+        if(window.originalFavicon) {
           let link = document.querySelector("link[rel*='icon']");
-          if(link) link.href = originalFavicon;
+          if(link) link.href = window.originalFavicon;
         }
       });
     }
 
     function initAboutBlank() {
       const input = document.getElementById('blankUrl');
-      const btn = document.getElementById('openBlank');
-      btn.addEventListener('click', () => {
-        if(!input.value) return;
+      document.getElementById('openBlank').addEventListener('click', () => {
+        let url = input.value.trim();
+        if(!url) return;
+        // Fix missing protocol
+        if (!url.startsWith('http://') && !url.startsWith('https://')) {
+          url = 'https://' + url;
+        }
         const win = window.open("about:blank");
-        win.document.write(\`<iframe src="\${input.value}" style="border:none;width:100%;height:100%"></iframe>\`);
-        win.document.title = "Loading...";
+        // FIX: Removed the buggy backslashes
+        win.document.write(`<iframe src="${url}" style="border:none;width:100vw;height:100vh;margin:0;padding:0;"></iframe>`);
+        win.document.body.style.margin = '0';
+        win.document.title = "Classes"; // Sneaky title
       });
     }
 
@@ -380,10 +467,7 @@
       if(tool==="aboutblank") initAboutBlank();
     }
 
-    /* ========================
-       INIT
-    =========================*/
-    loadTool(activeTool);
+    // Wire up Nav Buttons
     buttons.forEach(btn => {
       btn.addEventListener('click', () => {
         const tool = btn.id.replace("btn-","");
@@ -391,31 +475,88 @@
       });
     });
 
-    /* ========================
-       CUSTOM CURSOR
-    =========================*/
+    // Initial Load
+    loadTool(activeTool);
+
+    // --- 2. GLOBAL CURSOR LOGIC ---
     const cursor = document.getElementById('cursor');
-    let mouseX = 0, mouseY = 0;
-    let cursorX = 0, cursorY = 0;
+    let mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    let curPos = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
 
     document.addEventListener('mousemove', e => {
-      mouseX = e.clientX;
-      mouseY = e.clientY;
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
     });
 
     function animateCursor() {
-      cursorX += (mouseX - cursorX) * 0.15;
-      cursorY += (mouseY - cursorY) * 0.15;
-      cursor.style.transform = \`translate(\${cursorX}px, \${cursorY}px)\`;
+      const ease = 0.15;
+      curPos.x += (mouse.x - curPos.x) * ease;
+      curPos.y += (mouse.y - curPos.y) * ease;
+      cursor.style.left = `${curPos.x}px`;
+      cursor.style.top = `${curPos.y}px`;
       requestAnimationFrame(animateCursor);
     }
     animateCursor();
 
-    document.querySelectorAll('a, button').forEach(el => {
-      el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
-      el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
-    });
-  })();
+    function rebindHoverEvents() {
+      document.querySelectorAll('a, button, input, select, textarea').forEach(el => {
+        // Remove old listeners to prevent stacking
+        const newEl = el.cloneNode(true);
+        if(el.parentNode) el.parentNode.replaceChild(newEl, el);
+        
+        newEl.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+        newEl.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+        
+        // Re-attach specific tool logic if we replaced a dynamic button
+        if(newEl.id === 'btn-calculator') newEl.addEventListener('click', () => loadTool('calculator'));
+        if(newEl.id === 'btn-notepad') newEl.addEventListener('click', () => loadTool('notepad'));
+        if(newEl.id === 'btn-unitconverter') newEl.addEventListener('click', () => loadTool('unitconverter'));
+        if(newEl.id === 'btn-tabcloaker') newEl.addEventListener('click', () => loadTool('tabcloaker'));
+        if(newEl.id === 'btn-aboutblank') newEl.addEventListener('click', () => loadTool('aboutblank'));
+      });
+      // Re-init tool logic since we cloned elements to wipe listeners
+      initToolLogic(activeTool);
+    }
+
+    // --- 3. BACKGROUND STARS ---
+    const canvas = document.getElementById('bg-canvas');
+    const ctx = canvas.getContext('2d');
+    let width, height, stars = [];
+    
+    function resize() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+      stars = [];
+      const starCount = Math.floor((width * height) / 6000); 
+      for (let i = 0; i < starCount; i++) {
+        stars.push({
+          x: Math.random() * width, y: Math.random() * height,
+          size: Math.random() * 1.5, speed: Math.random() * 0.5 + 0.1
+        });
+      }
+    }
+    
+    function drawStars() {
+      ctx.clearRect(0, 0, width, height);
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      ctx.fillStyle = isDark ? "rgba(255, 255, 255, 0.8)" : "rgba(255, 255, 255, 0.6)"; 
+      
+      stars.forEach(star => {
+        const parallaxX = (mouse.x - width/2) * 0.01;
+        const parallaxY = (mouse.y - height/2) * 0.01;
+        ctx.beginPath();
+        ctx.arc(star.x + parallaxX, star.y + parallaxY, star.size, 0, Math.PI * 2);
+        ctx.fill();
+        star.y -= star.speed;
+        if (star.y < -5) star.y = height + 5;
+      });
+      requestAnimationFrame(drawStars);
+    }
+
+    window.addEventListener('resize', resize);
+    resize();
+    drawStars();
+
   </script>
 </body>
 </html>
