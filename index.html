@@ -1,10 +1,17 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Astra</title>
   
+  <!-- 🚀 THEME BOUNCER -->
+  <script>
+    if (localStorage.getItem('astra-theme') === 'dark') {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    }
+  </script>
+
   <!-- Roboto Flex Font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,6 +19,24 @@
   
   <!-- External CSS -->
   <link rel="stylesheet" href="style.css" />
+
+  <style>
+    /* 🎯 CURSOR OVERRIDES FOR INDEX.HTML */
+    .cursor {
+      z-index: 9999999 !important; /* Force cursor above absolutely everything */
+      transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1), 
+                  height 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+                  background 0.3s ease, border-color 0.3s ease;
+    }
+
+    /* Pinpoint accuracy shrink effect */
+    .cursor.shrink {
+      width: 12px !important;
+      height: 12px !important;
+      background: rgba(255, 255, 255, 0.9) !important;
+      border-color: transparent !important;
+    }
+  </style>
 </head>
 <body>
 
@@ -26,7 +51,6 @@
       <a href="/astra/tools.html">Tools</a>
       <a href="/astra/apps.html">Apps</a>
       <a href="https://ethandupe.github.io/astra/fluidcam">FluidCam</a>
-      <!-- Theme Toggle Button -->
       <button id="theme-toggle" aria-label="Toggle Dark Mode">◑</button>
     </nav>
   </div>
@@ -39,7 +63,7 @@
   <script type="text/javascript" src="https://counter5.optistats.ovh/private/counter.js?c=rjbejqnhn8bx29s5acyl9qx3fkk7aerg&down=async" async></script>
 
   <script>
-    // --- 0. BULLETPROOF THEME TOGGLE ---
+    // --- 0. THEME TOGGLE ---
     const themeToggle = document.getElementById('theme-toggle');
 
     function setTheme(isDark) {
@@ -52,14 +76,10 @@
       }
     }
 
-    // Check saved theme on load (with failsafe)
     let isDarkTheme = false;
-    try {
-      isDarkTheme = localStorage.getItem('astra-theme') === 'dark';
-    } catch(e) {}
+    try { isDarkTheme = localStorage.getItem('astra-theme') === 'dark'; } catch(e) {}
     setTheme(isDarkTheme);
 
-    // Toggle click event
     themeToggle.addEventListener('click', () => {
       isDarkTheme = document.documentElement.getAttribute('data-theme') !== 'dark';
       setTheme(isDarkTheme);
@@ -68,7 +88,7 @@
     // --- 1. SETUP & LOADING ---
     const loadingScreen = document.getElementById('loading-screen');
     const content = document.getElementById('content');
-    const cursor = document.getElementById('cursor');
+    const astraCursor = document.getElementById('cursor');
 
     window.addEventListener('load', () => {
       setTimeout(() => {
@@ -92,25 +112,22 @@
       curPos.x += (mouse.x - curPos.x) * ease;
       curPos.y += (mouse.y - curPos.y) * ease;
       
-      cursor.style.left = `${curPos.x}px`;
-      cursor.style.top = `${curPos.y}px`;
+      astraCursor.style.left = `${curPos.x}px`;
+      astraCursor.style.top = `${curPos.y}px`;
       
       requestAnimationFrame(animateCursor);
     }
     animateCursor();
 
-    // Hover Listeners
     document.querySelectorAll('a, button').forEach(el => {
-      el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
-      el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+      el.addEventListener('mouseenter', () => astraCursor.classList.add('hover'));
+      el.addEventListener('mouseleave', () => astraCursor.classList.remove('hover'));
     });
 
     // --- 3. BACKGROUND PARTICLES (STARS) ---
     const canvas = document.getElementById('bg-canvas');
     const ctx = canvas.getContext('2d');
-    
-    let width, height;
-    let stars = [];
+    let width, height, stars = [];
     
     function resize() {
       width = canvas.width = window.innerWidth;
@@ -133,7 +150,6 @@
     
     function drawStars() {
       ctx.clearRect(0, 0, width, height);
-      // Match stars to theme dynamically!
       const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
       ctx.fillStyle = isDark ? "rgba(255, 255, 255, 0.8)" : "rgba(255, 255, 255, 0.6)"; 
       
@@ -148,54 +164,108 @@
         star.y -= star.speed;
         if (star.y < -5) star.y = height + 5;
       });
-      
       requestAnimationFrame(drawStars);
     }
 
     window.addEventListener('resize', resize);
     resize();
     drawStars();
-  </script>
-<!-- 📡 ASTRA PUSH NOTIFICATION CLIENT -->
-<script>
-  (() => {
-    const NOTIFICATION_API_URL = "https://api.jsonbin.io/v3/b/6a0fb2fb6610dd3ae8858731?meta=false";
-    const READ_KEY = "$2a$10$dmsG1/GXWAA5tim8ejcE8uKD75pB.KxZxZDzIAb4AdPcJAU93f9nK"; 
 
-    async function checkNotifications() {
-      try {
-        const response = await fetch(NOTIFICATION_API_URL, { 
-          headers: { "X-Master-Key": READ_KEY },
-          cache: 'no-store' 
+    // --- 4. 📡 PUSH NOTIFICATION CLIENT ---
+    (() => {
+      const BIN_URL = "https://api.jsonbin.io/v3/b/6a0fb2fb6610dd3ae8858731?meta=false";
+      const API_KEY = "$2a$10$dmsG1/GXWAA5tim8ejcE8uKD75pB.KxZxZDzIAb4AdPcJAU93f9nK"; 
+
+      async function checkNotifications() {
+        try {
+          const response = await fetch(BIN_URL + "&t=" + Date.now(), { 
+            headers: { "X-Master-Key": API_KEY },
+            cache: 'no-store' 
+          });
+          const data = await response.json();
+          const liveMessage = data.message;
+          const savedMessage = localStorage.getItem('astra_last_notification');
+
+          if (liveMessage === "null" || !liveMessage) {
+            localStorage.removeItem('astra_last_notification');
+            return;
+          }
+
+          if (liveMessage !== savedMessage) {
+            showPushNotification(liveMessage);
+            localStorage.setItem('astra_last_notification', liveMessage);
+          }
+        } catch (error) { console.log("Notification check paused."); }
+      }
+
+      function showPushNotification(message) {
+        if (document.getElementById('astra-push-toast')) return;
+        
+        const toast = document.createElement('div');
+        toast.id = 'astra-push-toast';
+        
+        // Smoky Glass Aesthetic
+        toast.style.cssText = `
+          position: fixed; 
+          top: 20px; 
+          right: 20px; 
+          background: rgba(15, 15, 20, 0.65); 
+          backdrop-filter: blur(30px) saturate(120%); 
+          -webkit-backdrop-filter: blur(30px) saturate(120%);
+          border: 1px solid rgba(255, 255, 255, 0.08); 
+          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8), inset 0 0 0 1px rgba(255, 255, 255, 0.02); 
+          color: #e2e8f0; 
+          padding: 16px 24px; 
+          border-radius: 20px; 
+          z-index: 100000; 
+          display: flex; 
+          flex-direction: column; 
+          gap: 10px; 
+          font-family: 'Roboto Flex', sans-serif; 
+          animation: slideInRight 0.5s cubic-bezier(0.16, 1, 0.3, 1); 
+          max-width: 320px;
+        `;
+
+        toast.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 0.75rem; font-weight: 800; color: #a5b4fc; text-transform: uppercase; letter-spacing: 1.5px;">System Broadcast</span>
+            <button id="push-close" style="background: transparent; color: #64748b; border: none; font-size: 1.2rem; cursor: none; line-height: 1; transition: color 0.2s; padding: 0;">&times;</button>
+          </div>
+          <div style="font-size: 0.95rem; font-weight: 400; line-height: 1.5;">${message}</div>
+        `;
+
+        document.body.appendChild(toast);
+
+        if (!document.getElementById('push-keyframes')) {
+          const style = document.createElement('style');
+          style.id = 'push-keyframes';
+          style.innerHTML = `
+            @keyframes slideInRight {
+              from { right: -100px; opacity: 0; transform: scale(0.95); }
+              to { right: 20px; opacity: 1; transform: scale(1); }
+            }
+          `;
+          document.head.appendChild(style);
+        }
+
+        const closeBtn = document.getElementById('push-close');
+        closeBtn.addEventListener('click', () => {
+          toast.style.animation = 'slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1) reverse forwards';
+          setTimeout(() => toast.remove(), 300);
         });
-        const data = await response.json();
-        const liveMessage = data.message;
-        const savedMessage = localStorage.getItem('astra_last_notification');
 
-        if (liveMessage === "null" || !liveMessage) {
-          localStorage.removeItem('astra_last_notification');
-          return;
-        }
+        // 🎯 Cursor Shrink Logic
+        toast.addEventListener('mouseenter', () => astraCursor.classList.add('shrink'));
+        toast.addEventListener('mouseleave', () => astraCursor.classList.remove('shrink'));
+        
+        closeBtn.addEventListener('mouseenter', () => closeBtn.style.color = '#ff3b30');
+        closeBtn.addEventListener('mouseleave', () => closeBtn.style.color = '#64748b');
+      }
 
-        if (liveMessage !== savedMessage) {
-          showPushNotification(liveMessage);
-          localStorage.setItem('astra_last_notification', liveMessage);
-        }
-      } catch (error) { console.log("Notification check paused."); }
-    }
-
-    function showPushNotification(message) {
-      if (document.getElementById('astra-push-toast')) return;
-      const toast = document.createElement('div');
-      toast.id = 'astra-push-toast';
-      toast.style.cssText = `position:fixed; top:20px; right:20px; background:rgba(20,20,30,0.85); backdrop-filter:blur(20px); border:1px solid rgba(165,180,252,0.4); box-shadow:0 16px 40px rgba(0,0,0,0.7); color:#ffffff; padding:16px 24px; border-radius:20px; z-index:100000; display:flex; flex-direction:column; gap:8px; font-family:'Roboto Flex', sans-serif; animation:slideInRight 0.5s; max-width:300px;`;
-      toast.innerHTML = `<div style="display:flex; justify-content:space-between;"><span style="font-size:0.8rem; color:#a5b4fc; text-transform:uppercase;">Incoming Message</span><button id="push-close" style="background:transparent; color:#9aa0b8; border:none; cursor:none;">&times;</button></div><div style="font-size:0.95rem;">${message}</div>`;
-      document.body.appendChild(toast);
-      document.getElementById('push-close').addEventListener('click', () => toast.remove());
-    }
-
-    checkNotifications();
-    setInterval(checkNotifications, 30000);
-  })();
-</script>
-
+      // Check every 10 Seconds (10000ms)
+      checkNotifications();
+      setInterval(checkNotifications, 10000);
+    })();
+  </script>
+</body>
+</html>
