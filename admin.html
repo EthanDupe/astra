@@ -2,51 +2,298 @@
 <html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Astra – Admin Portal</title>
-  <link rel="stylesheet" href="style.css">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,100..1000&display=swap" rel="stylesheet">
+  
   <style>
-    body { background-color: #050505; }
-    .admin-container { max-width: 500px; margin: 15vh auto; background: var(--glass-bg); backdrop-filter: blur(25px); border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px; text-align: center; }
-    .glass-input { width: 100%; padding: 15px; border-radius: 12px; background: rgba(0,0,0,0.3); color: #fff; margin-bottom: 20px; }
-    .glass-btn { width: 100%; padding: 15px; border-radius: 12px; border: none; background: #6366f1; color: #fff; font-weight: 700; cursor: none; }
+    /* CORE ADMIN STYLES */
+    :root {
+      --glass-bg: rgba(20, 20, 30, 0.5); 
+      --glass-border: rgba(255, 255, 255, 0.1);
+      --glass-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.7);
+      --header-grad: linear-gradient(135deg, #ffffff 0%, #a5b4fc 100%);
+    }
+
+    *, *::before, *::after {
+      cursor: none !important;
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(-45deg, #09090e, #1a1a2e, #0f111a, #201a30);
+      background-size: 400% 400%;
+      animation: liquidBg 15s ease infinite;
+      color: #ffffff;
+      font-family: 'Roboto Flex', sans-serif;
+      overflow: hidden; 
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    @keyframes liquidBg {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    #bg-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    /* ADMIN CONTAINER */
+    .admin-container {
+      position: relative;
+      z-index: 10;
+      max-width: 500px;
+      width: 90%;
+      background: var(--glass-bg);
+      backdrop-filter: blur(25px) saturate(150%);
+      -webkit-backdrop-filter: blur(25px) saturate(150%);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      padding: 40px;
+      box-shadow: var(--glass-shadow);
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 900;
+      letter-spacing: -1px;
+      margin: 0 0 5px 0;
+      background: var(--header-grad);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    p { color: #9aa0b8; margin-bottom: 25px; font-weight: 500; }
+
+    .glass-input {
+      width: 100%;
+      padding: 15px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(0,0,0,0.3);
+      color: #fff;
+      font-family: inherit;
+      font-size: 1rem;
+      margin-bottom: 20px;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    .glass-input:focus {
+      border-color: rgba(165, 180, 252, 0.8);
+      box-shadow: 0 0 15px rgba(99, 102, 241, 0.3);
+    }
+
+    .glass-btn {
+      width: 100%;
+      padding: 15px;
+      border-radius: 12px;
+      border: none;
+      background: rgba(99, 102, 241, 0.8);
+      color: #fff;
+      font-weight: 700;
+      font-family: inherit;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: all 0.3s ease;
+      margin-bottom: 10px;
+    }
+
+    .glass-btn:hover {
+      background: rgba(165, 180, 252, 0.9);
+      color: #000;
+      transform: translateY(-2px);
+    }
+
+    .btn-danger {
+      background: transparent;
+      border: 1px solid rgba(255, 59, 48, 0.5);
+      color: #ff3b30;
+    }
+
+    .btn-danger:hover {
+      background: rgba(255, 59, 48, 0.2);
+      color: #ff3b30;
+    }
+
+    #dashboard { display: none; }
+
+    /* FLUID CURSOR */
+    .cursor {
+      width: 20px;
+      height: 20px;
+      background: rgba(165, 180, 252, 0.6);
+      backdrop-filter: blur(4px);
+      border: 1px solid rgba(255,255,255,0.8);
+      border-radius: 50%;
+      position: fixed;
+      top: 0; left: 0;
+      pointer-events: none;
+      z-index: 9999999;
+      transform: translate3d(-50%, -50%, 0); 
+      transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
+                  height 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                  background 0.5s ease; 
+    }
+
+    .cursor.hover {
+      width: 60px;
+      height: 60px;
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(165, 180, 252, 0.6);
+    }
   </style>
 </head>
 <body>
+
+  <canvas id="bg-canvas"></canvas>
+
+  <!-- LOGIN SCREEN -->
   <div class="admin-container" id="login-screen">
     <h1>Restricted Area</h1>
+    <p>Enter administrator passcode.</p>
     <input type="password" id="passcode-input" class="glass-input" placeholder="Passcode...">
     <button class="glass-btn" onclick="checkPasscode()">Unlock</button>
   </div>
 
-  <div class="admin-container" id="dashboard" style="display:none;">
+  <!-- ADMIN DASHBOARD -->
+  <div class="admin-container" id="dashboard">
     <h1>Broadcast</h1>
-    <textarea id="message-input" class="glass-input" placeholder="Type message..."></textarea>
+    <p>Push a notification to all active clients.</p>
+    
+    <textarea id="message-input" class="glass-input" style="min-height: 100px; resize: vertical;" placeholder="Type your message here..."></textarea>
+    
     <button class="glass-btn" onclick="sendNotification()">Push Notification</button>
-    <button class="glass-btn" onclick="clearNotification()" style="background:#ff3b30; margin-top:10px;">Send "Null"</button>
+    <button class="glass-btn btn-danger" onclick="clearNotification()">Send "Null" (Clear)</button>
+    
+    <p id="status-text" style="color: #34c759; opacity: 0; margin-top: 15px; transition: opacity 0.3s; font-weight: 700;">Broadcast Sent!</p>
   </div>
 
+  <!-- CUSTOM CURSOR -->
+  <div class="cursor" id="cursor"></div>
+
   <script>
-    const MASTER_KEY = "$2a$10$dmsG1/GXWAA5tim8ejcE8uKD75pB.KxZxZDzIAb4AdPcJAU93f9nK";
+    // --- 1. ASTRA CURSOR LOGIC ---
+    const astraCursor = document.getElementById('cursor');
+    let mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    let curPos = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+
+    document.addEventListener('mousemove', e => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+    });
+
+    function animateCursor() {
+      const ease = 0.15;
+      curPos.x += (mouse.x - curPos.x) * ease;
+      curPos.y += (mouse.y - curPos.y) * ease;
+      astraCursor.style.left = `${curPos.x}px`;
+      astraCursor.style.top = `${curPos.y}px`;
+      requestAnimationFrame(animateCursor);
+    }
+    animateCursor();
+
+    document.querySelectorAll('button, input, textarea').forEach(el => {
+      el.addEventListener('mouseenter', () => astraCursor.classList.add('hover'));
+      el.addEventListener('mouseleave', () => astraCursor.classList.remove('hover'));
+    });
+
+    // --- 2. BACKGROUND STARS ---
+    const canvas = document.getElementById('bg-canvas');
+    const ctx = canvas.getContext('2d');
+    let width, height, stars = [];
+    
+    function resize() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+      stars = [];
+      const starCount = Math.floor((width * height) / 6000); 
+      for (let i = 0; i < starCount; i++) {
+        stars.push({ x: Math.random() * width, y: Math.random() * height, size: Math.random() * 1.5, speed: Math.random() * 0.5 + 0.1 });
+      }
+    }
+    
+    function drawStars() {
+      ctx.clearRect(0, 0, width, height);
+      ctx.fillStyle = "rgba(255, 255, 255, 0.8)"; 
+      stars.forEach(star => {
+        const parallaxX = (mouse.x - width/2) * 0.02;
+        const parallaxY = (mouse.y - height/2) * 0.02;
+        ctx.beginPath();
+        ctx.arc(star.x + parallaxX, star.y + parallaxY, star.size, 0, Math.PI * 2);
+        ctx.fill();
+        star.y -= star.speed;
+        if (star.y < -5) star.y = height + 5;
+      });
+      requestAnimationFrame(drawStars);
+    }
+
+    window.addEventListener('resize', resize);
+    resize();
+    drawStars();
+
+    // --- 3. DATABASE PUSH LOGIC ---
+    const API_KEY = "$2a$10$dmsG1/GXWAA5tim8ejcE8uKD75pB.KxZxZDzIAb4AdPcJAU93f9nK";
     const BIN_URL = "https://api.jsonbin.io/v3/b/6a0fb2fb6610dd3ae8858731";
 
     function checkPasscode() {
       if (document.getElementById('passcode-input').value === 'superbut76') {
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('dashboard').style.display = 'block';
-      } else { alert('Access Denied.'); }
+      } else {
+        alert('Access Denied.');
+        document.getElementById('passcode-input').value = '';
+      }
     }
 
     async function pushToDatabase(messagePayload) {
-      await fetch(BIN_URL, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json", "X-Master-Key": MASTER_KEY },
-        body: JSON.stringify({ message: messagePayload })
-      });
-      alert("Broadcast Sent!");
+      try {
+        await fetch(BIN_URL, {
+          method: "PUT",
+          headers: { 
+            "Content-Type": "application/json",
+            "X-Master-Key": API_KEY 
+          },
+          body: JSON.stringify({ message: messagePayload })
+        });
+        
+        const status = document.getElementById('status-text');
+        status.innerText = messagePayload === "null" ? "Cleared successfully." : "Broadcast Sent!";
+        status.style.opacity = 1;
+        setTimeout(() => status.style.opacity = 0, 2500);
+
+      } catch (error) { alert("Failed to push to database."); }
     }
 
-    function sendNotification() { pushToDatabase(document.getElementById('message-input').value); }
+    function sendNotification() {
+      const msg = document.getElementById('message-input').value.trim();
+      if (!msg) return alert("Cannot send an empty message.");
+      pushToDatabase(msg);
+      document.getElementById('message-input').value = '';
+    }
+
     function clearNotification() { pushToDatabase("null"); }
+
+    document.getElementById('passcode-input').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') checkPasscode();
+    });
   </script>
 </body>
 </html>
