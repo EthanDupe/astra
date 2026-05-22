@@ -158,6 +158,103 @@
   </script>
 <!--  ASTRA AUTO-UPDATE CHECKER DO NOT TOUCH!-->
   <script src="updatechecker.js"></script>
+  <!-- 📡 ASTRA PUSH NOTIFICATION CLIENT -->
+<script>
+  (() => {
+    // 🛑 Replace this URL with your actual database/JSON link later!
+    const NOTIFICATION_API_URL = "https://api.yourdatabase.com/notification"; 
+    
+    async function checkNotifications() {
+      try {
+        // Fetch the latest message from your database
+        const response = await fetch(NOTIFICATION_API_URL + "?t=" + Date.now(), { cache: 'no-store' });
+        const data = await response.json();
+        const liveMessage = data.message; // e.g., "Server maintenance at 8PM!" or "null"
+
+        const savedMessage = localStorage.getItem('astra_last_notification');
+
+        // If the admin sent "null", we clear our local storage so the system resets
+        if (liveMessage === "null" || !liveMessage) {
+          localStorage.removeItem('astra_last_notification');
+          return;
+        }
+
+        // If the message is NEW, show it and save it!
+        if (liveMessage !== savedMessage) {
+          showPushNotification(liveMessage);
+          localStorage.setItem('astra_last_notification', liveMessage);
+        }
+
+      } catch (error) {
+        console.log("Notification check paused.");
+      }
+    }
+
+    function showPushNotification(message) {
+      if (document.getElementById('astra-push-toast')) return;
+
+      const toast = document.createElement('div');
+      toast.id = 'astra-push-toast';
+      
+      toast.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: rgba(20, 20, 30, 0.85);
+        backdrop-filter: blur(20px) saturate(150%);
+        -webkit-backdrop-filter: blur(20px) saturate(150%);
+        border: 1px solid rgba(165, 180, 252, 0.4);
+        box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.7), 0 0 20px rgba(99, 102, 241, 0.2);
+        color: #ffffff;
+        padding: 16px 24px;
+        border-radius: 20px;
+        z-index: 100000;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        font-family: 'Roboto Flex', sans-serif;
+        animation: slideInRight 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        max-width: 300px;
+      `;
+
+      toast.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-weight: 800; font-size: 0.8rem; letter-spacing: 1px; color: #a5b4fc; text-transform: uppercase;">Incoming Message</span>
+          <button id="push-close" style="background: transparent; color: #9aa0b8; border: none; font-size: 1.2rem; cursor: none; line-height: 1; transition: color 0.2s;">&times;</button>
+        </div>
+        <div style="font-size: 0.95rem; line-height: 1.4; font-weight: 500;">${message}</div>
+      `;
+
+      document.body.appendChild(toast);
+
+      if (!document.getElementById('push-keyframes')) {
+        const style = document.createElement('style');
+        style.id = 'push-keyframes';
+        style.innerHTML = `
+          @keyframes slideInRight {
+            from { right: -100px; opacity: 0; transform: scale(0.9); }
+            to { right: 20px; opacity: 1; transform: scale(1); }
+          }
+        `;
+        document.head.appendChild(style);
+      }
+
+      const closeBtn = document.getElementById('push-close');
+      closeBtn.addEventListener('click', () => {
+        toast.style.animation = 'slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1) reverse forwards';
+        setTimeout(() => toast.remove(), 300);
+      });
+
+      // Tie into your cursor!
+      closeBtn.addEventListener('mouseenter', () => document.getElementById('cursor').classList.add('hover'));
+      closeBtn.addEventListener('mouseleave', () => document.getElementById('cursor').classList.remove('hover'));
+    }
+
+    // Check immediately, then every 30 seconds
+    checkNotifications();
+    setInterval(checkNotifications, 30000);
+  })();
+</script>
 </body>
 </html>
 
