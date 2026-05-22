@@ -2,181 +2,51 @@
 <html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Astra – Admin Portal</title>
   <link rel="stylesheet" href="style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,100..1000&display=swap" rel="stylesheet">
-  
   <style>
-    body {
-      background-color: #050505;
-      overflow: hidden;
-    }
-    
-    .admin-container {
-      position: relative;
-      z-index: 10;
-      max-width: 500px;
-      width: 90%;
-      margin: 15vh auto;
-      background: var(--glass-bg);
-      backdrop-filter: blur(25px) saturate(150%);
-      border: 1px solid var(--glass-border);
-      border-radius: 24px;
-      padding: 40px;
-      box-shadow: var(--glass-shadow);
-      text-align: center;
-      transition: all 0.4s ease;
-    }
-
-    h1 {
-      font-size: 2.5rem;
-      font-weight: 900;
-      letter-spacing: -1px;
-      margin-bottom: 5px;
-      background: var(--header-grad);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    p { color: var(--text-muted); margin-bottom: 25px; font-weight: 500; }
-
-    .glass-input {
-      width: 100%;
-      padding: 15px;
-      border-radius: 12px;
-      border: 1px solid rgba(255,255,255,0.1);
-      background: rgba(0,0,0,0.3);
-      color: #fff;
-      font-family: inherit;
-      font-size: 1rem;
-      margin-bottom: 20px;
-      outline: none;
-      transition: all 0.3s ease;
-    }
-
-    .glass-input:focus {
-      border-color: rgba(165, 180, 252, 0.8);
-      box-shadow: 0 0 15px rgba(99, 102, 241, 0.3);
-    }
-
-    .glass-btn {
-      width: 100%;
-      padding: 15px;
-      border-radius: 12px;
-      border: none;
-      background: rgba(99, 102, 241, 0.8);
-      color: #fff;
-      font-weight: 700;
-      font-family: inherit;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      margin-bottom: 10px;
-    }
-
-    .glass-btn:hover {
-      background: rgba(165, 180, 252, 0.9);
-      color: #000;
-      transform: translateY(-2px);
-    }
-
-    .btn-danger {
-      background: transparent;
-      border: 1px solid rgba(255, 59, 48, 0.5);
-      color: #ff3b30;
-    }
-
-    .btn-danger:hover {
-      background: rgba(255, 59, 48, 0.2);
-      color: #ff3b30;
-    }
-
-    /* Hide the actual dashboard initially */
-    #dashboard { display: none; }
+    body { background-color: #050505; }
+    .admin-container { max-width: 500px; margin: 15vh auto; background: var(--glass-bg); backdrop-filter: blur(25px); border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px; text-align: center; }
+    .glass-input { width: 100%; padding: 15px; border-radius: 12px; background: rgba(0,0,0,0.3); color: #fff; margin-bottom: 20px; }
+    .glass-btn { width: 100%; padding: 15px; border-radius: 12px; border: none; background: #6366f1; color: #fff; font-weight: 700; cursor: none; }
   </style>
 </head>
 <body>
-
-  <canvas id="bg-canvas"></canvas>
-
-  <!-- LOGIN SCREEN -->
   <div class="admin-container" id="login-screen">
     <h1>Restricted Area</h1>
-    <p>Enter administrator passcode.</p>
     <input type="password" id="passcode-input" class="glass-input" placeholder="Passcode...">
     <button class="glass-btn" onclick="checkPasscode()">Unlock</button>
   </div>
 
-  <!-- ADMIN DASHBOARD -->
-  <div class="admin-container" id="dashboard">
+  <div class="admin-container" id="dashboard" style="display:none;">
     <h1>Broadcast</h1>
-    <p>Push a notification to all active clients.</p>
-    
-    <textarea id="message-input" class="glass-input" style="min-height: 100px; resize: vertical;" placeholder="Type your message here..."></textarea>
-    
+    <textarea id="message-input" class="glass-input" placeholder="Type message..."></textarea>
     <button class="glass-btn" onclick="sendNotification()">Push Notification</button>
-    <button class="glass-btn btn-danger" onclick="clearNotification()">Send "Null" (Clear)</button>
-    
-    <p id="status-text" style="color: #34c759; opacity: 0; margin-top: 15px; transition: opacity 0.3s;">Broadcast Sent!</p>
+    <button class="glass-btn" onclick="clearNotification()" style="background:#ff3b30; margin-top:10px;">Send "Null"</button>
   </div>
 
   <script>
-    // --- AUTHENTICATION ---
+    const MASTER_KEY = "$2a$10$dmsG1/GXWAA5tim8ejcE8uKD75pB.KxZxZDzIAb4AdPcJAU93f9nK";
+    const BIN_URL = "https://api.jsonbin.io/v3/b/6a0fb2fb6610dd3ae8858731";
+
     function checkPasscode() {
-      const input = document.getElementById('passcode-input').value;
-      if (input === 'superbut76') {
+      if (document.getElementById('passcode-input').value === 'superbut76') {
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('dashboard').style.display = 'block';
-      } else {
-        alert('Access Denied.');
-        document.getElementById('passcode-input').value = '';
-      }
+      } else { alert('Access Denied.'); }
     }
-
-    // --- DATABASE PUSH LOGIC ---
-    // 🛑 Replace this URL with your actual database endpoint!
-    const DATABASE_API_URL = "https://api.yourdatabase.com/notification";
 
     async function pushToDatabase(messagePayload) {
-      try {
-        /*
-        // THIS IS WHERE YOU SEND THE DATA TO YOUR DATABASE
-        await fetch(DATABASE_API_URL, {
-          method: "PUT", // or POST depending on your DB
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message: messagePayload })
-        });
-        */
-        
-        // UI Feedback
-        const status = document.getElementById('status-text');
-        status.innerText = messagePayload === "null" ? "Cleared successfully." : "Broadcast Sent!";
-        status.style.opacity = 1;
-        setTimeout(() => status.style.opacity = 0, 2000);
-
-        console.log("Simulated pushing to DB:", messagePayload);
-      } catch (error) {
-        alert("Failed to push to database. Check console.");
-      }
+      await fetch(BIN_URL, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", "X-Master-Key": MASTER_KEY },
+        body: JSON.stringify({ message: messagePayload })
+      });
+      alert("Broadcast Sent!");
     }
 
-    function sendNotification() {
-      const msg = document.getElementById('message-input').value.trim();
-      if (!msg) return alert("Cannot send an empty message.");
-      pushToDatabase(msg);
-      document.getElementById('message-input').value = '';
-    }
-
-    function clearNotification() {
-      pushToDatabase("null");
-    }
-
-    // Execute check on Enter key
-    document.getElementById('passcode-input').addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') checkPasscode();
-    });
+    function sendNotification() { pushToDatabase(document.getElementById('message-input').value); }
+    function clearNotification() { pushToDatabase("null"); }
   </script>
 </body>
 </html>
