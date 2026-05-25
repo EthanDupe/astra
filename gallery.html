@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Astra – Gallery</title>
+  
+  <script>
+    if (localStorage.getItem('astra-theme') === 'dark') {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    }
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,100..1000&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    /* PAGE SPECIFIC OVERRIDES */
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #050505;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    /* Top Nav */
+    .top-nav {
+      position: absolute;
+      top: 30px;
+      left: 30px;
+      z-index: 100;
+    }
+
+    .top-nav a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 1.05rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      padding: 10px 20px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(25px) saturate(150%);
+      border: 1px solid var(--glass-border);
+      border-radius: 40px;
+      box-shadow: var(--glass-shadow);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      display: inline-block;
+    }
+
+    .top-nav a:hover {
+      color: var(--nav-hover-text);
+      background: var(--nav-hover-bg);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+    }
+
+    /* Header */
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 100px 30px 50px 30px;
+      position: relative;
+      z-index: 10;
+    }
+
+    header.page-title {
+      font-size: 5rem;
+      line-height: 1;
+      font-weight: 900;
+      letter-spacing: -2px;
+      margin-bottom: 2rem;
+      text-align: center;
+      background: var(--header-grad);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 4px 15px rgba(99, 102, 241, 0.2));
+    }
+
+    /* 📸 MASONRY GALLERY GRID */
+    .masonry-grid {
+      column-count: 3;
+      column-gap: 25px;
+      padding: 20px 0;
+    }
+
+    @media (max-width: 1024px) { .masonry-grid { column-count: 2; } }
+    @media (max-width: 600px) { .masonry-grid { column-count: 1; } }
+
+    .masonry-item {
+      break-inside: avoid;
+      margin-bottom: 25px;
+      border-radius: 20px;
+      overflow: hidden;
+      position: relative;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--glass-shadow);
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
+    }
+
+    .masonry-item img {
+      width: 100%;
+      display: block;
+      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), filter 0.4s ease;
+      filter: grayscale(20%); /* Subtle desaturation until hovered */
+    }
+
+    .masonry-item::after {
+      content: 'VIEW';
+      position: absolute;
+      inset: 0;
+      background: rgba(10, 10, 15, 0.6);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 800;
+      font-size: 1.2rem;
+      letter-spacing: 4px;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      pointer-events: none;
+    }
+
+    .masonry-item:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(99, 102, 241, 0.3);
+      border-color: rgba(165, 180, 252, 0.6);
+    }
+
+    .masonry-item:hover img {
+      transform: scale(1.05);
+      filter: grayscale(0%);
+    }
+
+    .masonry-item:hover::after {
+      opacity: 1;
+    }
+
+    /* 🎬 CINEMATIC OVERLAY & COLOR GRADING */
+    .cinematic-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(5, 5, 8, 0.9);
+      backdrop-filter: blur(30px) saturate(120%);
+      -webkit-backdrop-filter: blur(30px) saturate(120%);
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      display: flex;
+      flex-direction: row;
+      transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .cinematic-overlay.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .image-stage {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      position: relative;
+    }
+
+    .image-stage img {
+      max-width: 100%;
+      max-height: 100%;
+      border-radius: 12px;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.8);
+      transition: filter 0.1s ease; /* Fast transition for live sliders */
+    }
+
+    /* Edit Panel */
+    .edit-panel {
+      width: 320px;
+      background: rgba(20, 20, 30, 0.6);
+      border-left: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 40px 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .panel-header h2 {
+      margin: 0;
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: #ffffff;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    .close-btn {
+      background: transparent;
+      border: none;
+      color: #9aa0b8;
+      font-size: 2rem;
+      line-height: 1;
+      transition: color 0.2s, transform 0.2s;
+    }
+
+    .close-btn:hover { color: #ff3b30; transform: scale(1.1); }
+
+    /* Custom Glass Sliders */
+    .slider-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .slider-group label {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #a5b4fc;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .slider-group span { color: #ffffff; }
+
+    input[type=range] {
+      -webkit-appearance: none;
+      width: 100%;
+      background: transparent;
+    }
+
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      height: 16px;
+      width: 16px;
+      border-radius: 50%;
+      background: #ffffff;
+      margin-top: -6px;
+      box-shadow: 0 0 10px rgba(255,255,255,0.5);
+    }
+
+    input[type=range]::-webkit-slider-runnable-track {
+      width: 100%;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 2px;
+    }
+
+    input[type=range]:focus { outline: none; }
+    input[type=range]:active::-webkit-slider-thumb { transform: scale(1.2); }
+
+    .reset-btn {
+      margin-top: auto;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+      padding: 12px;
+      border-radius: 12px;
+      font-family: inherit;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: all 0.3s;
+    }
+
+    .reset-btn:hover {
+      background: rgba(165, 180, 252, 0.2);
+      border-color: #a5b4fc;
+    }
+
+    /* 🎯 CURSOR OVERRIDES */
+    .cursor {
+      z-index: 9999999 !important; 
+      transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1), 
+                  height 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+                  background 0.3s ease, border-color 0.3s ease;
+    }
+    .cursor.shrink {
+      width: 12px !important;
+      height: 12px !important;
+      background: rgba(255, 255, 255, 0.9) !important;
+      border-color: transparent !important;
+    }
+    
+    @media (max-width: 768px) {
+      .cinematic-overlay { flex-direction: column; }
+      .edit-panel { width: 100%; border-left: none; border-top: 1px solid rgba(255,255,255,0.08); padding: 20px; }
+      .image-stage { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="bg-canvas"></canvas>
+
+  <nav class="top-nav">
+    <a href="/astra/index.html">← Home</a>
+  </nav>
+
+  <div class="container">
+    <header class="page-title">Gallery</header>
+
+    <div class="masonry-grid">
+      <div class="masonry-item"><img src="https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=800&q=80" alt="Car"></div>
+      <div class="masonry-item"><img src="https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&fit=crop&w=800&q=80" alt="Tech"></div>
+      <div class="masonry-item"><img src="https://images.unsplash.com/photo-1618331835717-801e976710b2?auto=format&fit=crop&w=800&q=80" alt="Setup"></div>
+      <div class="masonry-item"><img src="https://images.unsplash.com/photo-1517504734587-2890819debab?auto=format&fit=crop&w=800&q=80" alt="City"></div>
+      <div class="masonry-item"><img src="https://images.unsplash.com/photo-1542281286-9e0a16bb7366?auto=format&fit=crop&w=800&q=80" alt="Neon"></div>
+      <div class="masonry-item"><img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=800&q=80" alt="Code"></div>
+    </div>
+  </div>
+
+  <div class="cinematic-overlay" id="gallery-modal">
+    <div class="image-stage">
+      <img src="" id="modal-image" alt="Full Resolution">
+    </div>
+    
+    <div class="edit-panel">
+      <div class="panel-header">
+        <h2>Color Grade</h2>
+        <button class="close-btn" id="modal-close">&times;</button>
+      </div>
+
+      <div class="slider-group">
+        <label>Brightness <span id="val-bright">100%</span></label>
+        <input type="range" id="sl-bright" min="0" max="200" value="100">
+      </div>
+      
+      <div class="slider-group">
+        <label>Contrast <span id="val-contrast">100%</span></label>
+        <input type="range" id="sl-contrast" min="0" max="200" value="100">
+      </div>
+      
+      <div class="slider-group">
+        <label>Saturation <span id="val-sat">100%</span></label>
+        <input type="range" id="sl-sat" min="0" max="200" value="100">
+      </div>
+
+      <div class="slider-group">
+        <label>Warmth (Sepia) <span id="val-sepia">0%</span></label>
+        <input type="range" id="sl-sepia" min="0" max="100" value="0">
+      </div>
+
+      <button class="reset-btn" id="btn-reset">Reset Grading</button>
+    </div>
+  </div>
+
+  <div class="cursor" id="cursor"></div>
+
+  <script>
+    // --- 1. SMOOTH CURSOR ---
+    const astraCursor = document.getElementById('cursor');
+    let mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    let curPos = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+
+    document.addEventListener('mousemove', e => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+    });
+
+    function animateCursor() {
+      const ease = 0.15;
+      curPos.x += (mouse.x - curPos.x) * ease;
+      curPos.y += (mouse.y - curPos.y) * ease;
+      astraCursor.style.left = `${curPos.x}px`;
+      astraCursor.style.top = `${curPos.y}px`;
+      requestAnimationFrame(animateCursor);
+    }
+    animateCursor();
+
+    // Standard Buttons & Inputs
+    document.querySelectorAll('a, button, input').forEach(el => {
+      el.addEventListener('mouseenter', () => astraCursor.classList.add('hover'));
+      el.addEventListener('mouseleave', () => astraCursor.classList.remove('hover'));
+    });
+
+    // Masonry Grid Items get the accurate shrink cursor
+    document.querySelectorAll('.masonry-item').forEach(el => {
+      el.addEventListener('mouseenter', () => astraCursor.classList.add('shrink'));
+      el.addEventListener('mouseleave', () => astraCursor.classList.remove('shrink'));
+    });
+
+    // --- 2. GALLERY MODAL & COLOR GRADING LOGIC ---
+    const modal = document.getElementById('gallery-modal');
+    const modalImg = document.getElementById('modal-image');
+    const closeBtn = document.getElementById('modal-close');
+    
+    // Sliders
+    const slBright = document.getElementById('sl-bright');
+    const slContrast = document.getElementById('sl-contrast');
+    const slSat = document.getElementById('sl-sat');
+    const slSepia = document.getElementById('sl-sepia');
+    const resetBtn = document.getElementById('btn-reset');
+
+    // Values
+    const valBright = document.getElementById('val-bright');
+    const valContrast = document.getElementById('val-contrast');
+    const valSat = document.getElementById('val-sat');
+    const valSepia = document.getElementById('val-sepia');
+
+    function updateFilters() {
+      const b = slBright.value;
+      const c = slContrast.value;
+      const s = slSat.value;
+      const sep = slSepia.value;
+
+      modalImg.style.filter = `brightness(${b}%) contrast(${c}%) saturate(${s}%) sepia(${sep}%)`;
+      
+      valBright.innerText = `${b}%`;
+      valContrast.innerText = `${c}%`;
+      valSat.innerText = `${s}%`;
+      valSepia.innerText = `${sep}%`;
+    }
+
+    [slBright, slContrast, slSat, slSepia].forEach(slider => {
+      slider.addEventListener('input', updateFilters);
+    });
+
+    function resetFilters() {
+      slBright.value = 100;
+      slContrast.value = 100;
+      slSat.value = 100;
+      slSepia.value = 0;
+      updateFilters();
+    }
+
+    resetBtn.addEventListener('click', resetFilters);
+
+    // Open Modal
+    document.querySelectorAll('.masonry-item img').forEach(img => {
+      img.parentElement.addEventListener('click', () => {
+        resetFilters(); // Start fresh
+        modalImg.src = img.src;
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden'; // Stop background scrolling
+      });
+    });
+
+    // Close Modal
+    function closeModal() {
+      modal.classList.remove('active');
+      document.body.style.overflow = 'auto';
+      setTimeout(() => modalImg.src = "", 500);
+    }
+
+    closeBtn.addEventListener('click', closeModal);
+    
+    // Close on escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && modal.classList.contains('active')) closeModal();
+    });
+
+    // Close when clicking outside image/panel
+    modal.addEventListener('click', (e) => {
+      if (e.target === document.querySelector('.image-stage')) closeModal();
+    });
+
+    // Close btn cursor shrink
+    closeBtn.addEventListener('mouseenter', () => astraCursor.classList.add('shrink'));
+    closeBtn.addEventListener('mouseleave', () => astraCursor.classList.remove('shrink'));
+
+
+    // --- 3. BACKGROUND STARS ---
+    const canvas = document.getElementById('bg-canvas');
+    const ctx = canvas.getContext('2d');
+    let width, height, stars = [];
+    
+    function resize() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+      stars = [];
+      const starCount = Math.floor((width * height) / 6000); 
+      for (let i = 0; i < starCount; i++) {
+        stars.push({ x: Math.random() * width, y: Math.random() * height, size: Math.random() * 1.5, speed: Math.random() * 0.5 + 0.1 });
+      }
+    }
+    
+    function drawStars() {
+      ctx.clearRect(0, 0, width, height);
+      ctx.fillStyle = "rgba(255, 255, 255, 0.8)"; 
+      stars.forEach(star => {
+        const parallaxX = (mouse.x - width/2) * 0.02;
+        const parallaxY = (mouse.y - height/2) * 0.02;
+        ctx.beginPath();
+        ctx.arc(star.x + parallaxX, star.y + parallaxY, star.size, 0, Math.PI * 2);
+        ctx.fill();
+        star.y -= star.speed;
+        if (star.y < -5) star.y = height + 5;
+      });
+      requestAnimationFrame(drawStars);
+    }
+
+    window.addEventListener('resize', resize);
+    resize();
+    drawStars();
+
+  </script>
+
+  <script src="updatechecker.js"></script>
+
+</body>
+</html>
