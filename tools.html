@@ -1,562 +1,693 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="no-js" data-theme="dark">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Astra | Utility Tools</title>
-  
-  <!-- 🚀 THEME BOUNCER: Put this at the top of EVERY page to remember Dark Mode! -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Astra – Tools</title>
+  <meta name="description" content="Calculator, notepad, unit converter, tab cloaker and stealth window — all offline, all in one place." />
+  <meta name="theme-color" content="#0f111a" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <meta property="og:site_name" content="Astra" />
+  <meta property="og:title" content="Astra – Tools" />
+  <meta property="og:description" content="Calculator, notepad, unit converter, tab cloaker and stealth window." />
+  <meta property="og:type" content="website" />
+
   <script>
-    if (localStorage.getItem('astra-theme') === 'dark') {
-      document.documentElement.setAttribute('data-theme', 'dark');
-    }
+    (function (d) {
+      var r = d.documentElement;
+      r.classList.remove("no-js");
+      r.classList.add("js");
+      try {
+        r.setAttribute("data-theme", localStorage.getItem("astra-theme") === "light" ? "light" : "dark");
+      } catch (e) {}
+    })(document);
   </script>
 
-  <!-- Roboto Flex Font -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,100..1000&display=swap" rel="stylesheet">
-  
-  <!-- Link to our global liquid glass styles -->
-  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,100..1000&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
 
   <style>
-    /* === Page-Specific Glass Styles === */
-    .tools-layout {
+    /* Page-specific: the panel each tool is rendered into. */
+    .tool-panel {
+      max-width: 620px;
+      margin: 0 auto;
+      min-height: 420px;
       display: flex;
-      flex-direction: column;
       align-items: center;
-      width: 100%;
-      max-width: 900px;
-      margin-top: 2rem;
-      z-index: 10;
-    }
-
-    /* Main Navigation Override (to sit at the top) */
-    .top-nav {
-      position: absolute;
-      top: 30px;
-      z-index: 100;
-    }
-
-    header.page-title {
-      font-size: 4rem;
-      margin-bottom: 1rem;
-      margin-top: 80px; /* Make room for top nav */
-      animation: floatFluid 6s ease-in-out infinite;
-    }
-
-    /* Tools Category Nav */
-    .tools-nav {
-      display: flex;
       justify-content: center;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 2rem;
-      background: var(--glass-bg);
-      backdrop-filter: blur(20px);
-      padding: 10px 20px;
-      border-radius: 40px;
-      border: 1px solid var(--glass-border);
-      box-shadow: var(--glass-shadow);
-    }
-
-    .tools-nav button {
-      background: transparent;
-      border: none;
-      color: var(--text-muted);
-      font-family: inherit;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      padding: 8px 16px;
-      border-radius: 30px;
-      transition: all 0.4s ease;
-      font-size: 0.9rem;
-    }
-
-    .tools-nav button:hover {
-      color: var(--text-main);
-      background: rgba(165, 180, 252, 0.2);
-    }
-
-    .tools-nav button.active {
-      background: var(--nav-hover-bg);
-      color: var(--nav-hover-text);
-      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
-    }
-
-    /* The Main Tool Container */
-    .tool-frame {
-      background: var(--glass-bg);
-      backdrop-filter: blur(30px) saturate(150%);
-      border: 1px solid var(--glass-border);
-      border-radius: 24px;
-      width: 100%;
-      min-height: 400px;
-      padding: 2rem;
-      box-shadow: var(--glass-shadow);
       opacity: 0;
-      transform: translateY(20px);
-      transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
+      transform: translateY(16px);
+      transition: opacity var(--dur) ease, transform var(--dur) var(--ease);
     }
 
-    .tool-frame.show {
+    .tool-panel.is-shown {
       opacity: 1;
       transform: translateY(0);
     }
 
-    /* Reusable Glass Inputs & Buttons inside tools */
-    .glass-input, .glass-select, .glass-textarea {
+    .tool {
       width: 100%;
-      padding: 12px 16px;
-      border-radius: 12px;
-      border: 1px solid var(--glass-border);
-      background: rgba(255, 255, 255, 0.1);
-      color: var(--text-main);
-      font-family: inherit;
-      font-size: 1rem;
+    }
+
+    .tool--narrow {
+      max-width: 360px;
+      margin: 0 auto;
+    }
+
+    /* Calculator */
+    .calc-display {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      min-height: 68px;
       margin-bottom: 1rem;
-      outline: none;
-      transition: border-color 0.3s ease, box-shadow 0.3s ease;
-    }
-    
-    :root[data-theme="dark"] .glass-input, 
-    :root[data-theme="dark"] .glass-select, 
-    :root[data-theme="dark"] .glass-textarea {
-      background: rgba(0, 0, 0, 0.2);
-    }
-
-    .glass-input:focus, .glass-select:focus, .glass-textarea:focus {
-      border-color: var(--nav-hover-bg);
-      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
-    }
-
-    .glass-textarea {
-      min-height: 200px;
-      resize: vertical;
-    }
-
-    .glass-btn {
-      background: var(--glass-bg);
+      padding: 12px 16px;
+      overflow-x: auto;
       border: 1px solid var(--glass-border);
-      color: var(--text-main);
-      font-family: inherit;
-      font-weight: 600;
-      padding: 10px 20px;
-      border-radius: 12px;
-      cursor: none; /* Let the custom cursor do the work */
-      transition: all 0.3s ease;
-      text-transform: uppercase;
-      letter-spacing: 1px;
+      border-radius: var(--r-sm);
+      background: var(--field-bg);
+      font-size: 2rem;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
     }
 
-    .glass-btn:hover {
-      background: var(--nav-hover-bg);
-      color: var(--nav-hover-text);
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(99, 102, 241, 0.3);
+    .calc-keys {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
     }
 
-    /* Tool Specific Layouts */
-    .calculator { width: 100%; max-width: 350px; }
-    .notepad { width: 100%; max-width: 600px; }
-    .unit-converter, .tab-cloaker, .about-blank { width: 100%; max-width: 400px; text-align: left;}
-    
-    label {
-      display: block;
-      margin-bottom: 5px;
-      font-weight: 600;
-      font-size: 0.9rem;
+    .calc-keys .btn {
+      padding: 14px 0;
+      font-size: 1.05rem;
+    }
+
+    /* Notepad */
+    .notepad-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .char-count {
       color: var(--text-muted);
+      font-size: 0.82rem;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .convert-result {
+      margin-top: 1.5rem;
+      padding: 14px;
+      border-radius: var(--r-sm);
+      background: var(--accent-soft);
+      font-size: 1.4rem;
+      font-weight: 800;
+      text-align: center;
+      font-variant-numeric: tabular-nums;
+      min-height: 60px;
     }
   </style>
 </head>
-<body>
+<body data-layout="scroll">
 
-  <!-- Liquid Background Stars -->
-  <canvas id="bg-canvas"></canvas>
+  <a class="skip-link" href="#main">Skip to content</a>
 
-  <!-- Global Navigation (Back to home + Theme Toggle) -->
-  <nav class="top-nav">
-    <a href="/astra/index.html">← Home</a>
-    <button id="theme-toggle" aria-label="Toggle Dark Mode">◑</button>
-  </nav>
+  <canvas id="bg-canvas" aria-hidden="true"></canvas>
 
-  <div class="tools-layout" id="content">
-    <header class="page-title">Utility Tools</header>
+  <div data-astra-nav-mount></div>
 
-    <!-- Tools Navigation -->
-    <div class="tools-nav" role="tablist">
-      <button role="tab" id="btn-calculator" class="active">Calculator</button>
-      <button role="tab" id="btn-notepad">Notepad</button>
-      <button role="tab" id="btn-unitconverter">Unit Converter</button>
-      <button role="tab" id="btn-tabcloaker">Tab Cloaker</button>
-      <button role="tab" id="btn-aboutblank">About:Blank</button>
+  <main class="page" id="main">
+    <h1 class="page-title">Tools</h1>
+    <p class="page-lead">Small utilities that run entirely in your browser. Nothing is uploaded anywhere.</p>
+
+    <div class="segmented" role="tablist" aria-label="Tools" id="tool-tabs">
+      <button type="button" role="tab" id="tab-calculator" aria-controls="tool-panel" aria-selected="true">Calculator</button>
+      <button type="button" role="tab" id="tab-notepad" aria-controls="tool-panel" aria-selected="false">Notepad</button>
+      <button type="button" role="tab" id="tab-converter" aria-controls="tool-panel" aria-selected="false">Converter</button>
+      <button type="button" role="tab" id="tab-cloaker" aria-controls="tool-panel" aria-selected="false">Tab Cloaker</button>
+      <button type="button" role="tab" id="tab-stealth" aria-controls="tool-panel" aria-selected="false">Stealth Window</button>
     </div>
 
-    <!-- Tool Frame -->
-    <section id="tool-frame" class="tool-frame" role="tabpanel"></section>
-  </div>
+    <section class="glass-panel tool-panel" id="tool-panel" role="tabpanel" aria-live="polite"></section>
 
-  <!-- Custom Cursor (Linked from style.css) -->
-  <div class="cursor" id="cursor"></div>
+    <p class="panic-hint">Press <span class="kbd">]</span> to leave instantly.</p>
+  </main>
 
-  <!-- Script Logic -->
+  <script src="astra.js"></script>
   <script>
-    // --- 0. THEME TOGGLE (Synced with Home Page) ---
-    const themeToggle = document.getElementById('theme-toggle');
+    (function () {
+      var panel = document.getElementById("tool-panel");
+      var tabs = Array.prototype.slice.call(document.querySelectorAll("#tool-tabs [role='tab']"));
+      var activeTool = "calculator";
+      /* Lets a tool unregister document-level listeners when you switch away. */
+      var teardown = [];
 
-    function setTheme(isDark) {
-      if (isDark) {
-        document.documentElement.setAttribute('data-theme', 'dark');
-        try { localStorage.setItem('astra-theme', 'dark'); } catch(e) {}
-      } else {
-        document.documentElement.setAttribute('data-theme', 'light');
-        try { localStorage.setItem('astra-theme', 'light'); } catch(e) {}
-      }
-    }
+      /* ---------------------------------------------------- tool templates */
 
-    themeToggle.addEventListener('click', () => {
-      const isDarkTheme = document.documentElement.getAttribute('data-theme') !== 'dark';
-      setTheme(isDarkTheme);
-    });
+      var templates = {
+        calculator:
+          '<div class="tool tool--narrow">' +
+          '  <div class="calc-display" id="calc-display" role="status" aria-live="polite" aria-label="Calculator display">0</div>' +
+          '  <div class="calc-keys" id="calc-keys"></div>' +
+          "</div>",
 
-    // --- 1. TOOLS LOGIC ---
-    const toolFrame = document.getElementById('tool-frame');
-    const buttons = document.querySelectorAll('.tools-nav button');
+        notepad:
+          '<div class="tool">' +
+          '  <label class="field-label" for="notepad">Scratch pad</label>' +
+          '  <textarea id="notepad" class="textarea" placeholder="Type your notes here — they are saved in this browser only."></textarea>' +
+          '  <div class="notepad-meta">' +
+          '    <button type="button" class="btn btn--primary" id="note-save">Save now</button>' +
+          '    <span class="char-count" id="note-count">0 characters</span>' +
+          "  </div>" +
+          "</div>",
 
-    const templates = {
-      calculator: `
-        <div class="calculator">
-          <div id="calcDisplay" class="glass-input" style="text-align:right;font-size:2rem;font-weight:700;margin-bottom:1rem;height:60px;display:flex;align-items:center;justify-content:flex-end;">0</div>
-          <div class="buttons" style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.5rem;"></div>
-        </div>
-      `,
-      notepad: `
-        <div class="notepad">
-          <textarea id="notepadTextarea" class="glass-textarea" placeholder="Type your notes here..."></textarea>
-          <div style="display:flex; align-items:center; gap:15px;">
-            <button class="glass-btn" id="saveNote">Save Notes</button>
-            <span id="saveMsg" style="color:var(--nav-hover-bg); font-weight:700; opacity:0; transition:opacity 0.3s;">Saved!</span>
-          </div>
-        </div>
-      `,
-      unitconverter: `
-        <div class="unit-converter">
-          <label>Select Unit Type:</label>
-          <select id="unitType" class="glass-select">
-            <option value="length">Length</option>
-            <option value="weight">Weight</option>
-            <option value="temperature">Temperature</option>
-          </select>
-          
-          <label>Value:</label>
-          <input type="number" id="unitInput" class="glass-input" placeholder="Enter value">
-          
-          <label>From:</label>
-          <select id="unitFrom" class="glass-select"></select>
-          
-          <label>To:</label>
-          <select id="unitTo" class="glass-select"></select>
-          
-          <div id="conversionResult" style="margin-top:1.5rem; font-size:1.5rem; font-weight:800; text-align:center; color:var(--text-main);"></div>
-        </div>
-      `,
-      tabcloaker: `
-        <div class="tab-cloaker">
-          <label>Tab Title:</label>
-          <input type="text" id="cloakTitle" class="glass-input" placeholder="e.g. Google Classroom">
-          
-          <label>Favicon URL (optional):</label>
-          <input type="text" id="cloakFavicon" class="glass-input" placeholder="https://...">
-          
-          <div style="display:flex; gap:10px; margin-top:1rem;">
-            <button class="glass-btn" id="applyCloak" style="flex:1;">Apply</button>
-            <button class="glass-btn" id="resetCloak" style="flex:1;">Reset</button>
-          </div>
-        </div>
-      `,
-      aboutblank: `
-        <div class="about-blank">
-          <label>Target URL:</label>
-          <input type="url" id="blankUrl" class="glass-input" placeholder="https://example.com">
-          <button class="glass-btn" id="openBlank" style="width:100%;">Open Stealth Window</button>
-        </div>
-      `
-    };
+        converter:
+          '<div class="tool tool--narrow">' +
+          '  <div class="field">' +
+          '    <label class="field-label" for="conv-type">Measurement</label>' +
+          '    <select id="conv-type" class="select">' +
+          '      <option value="length">Length</option>' +
+          '      <option value="mass">Mass</option>' +
+          '      <option value="temperature">Temperature</option>' +
+          '      <option value="data">Data</option>' +
+          "    </select>" +
+          "  </div>" +
+          '  <div class="field">' +
+          '    <label class="field-label" for="conv-value">Value</label>' +
+          '    <input type="number" step="any" id="conv-value" class="input" placeholder="Enter a value" />' +
+          "  </div>" +
+          '  <div class="field">' +
+          '    <label class="field-label" for="conv-from">From</label>' +
+          '    <select id="conv-from" class="select"></select>' +
+          "  </div>" +
+          '  <div class="field">' +
+          '    <label class="field-label" for="conv-to">To</label>' +
+          '    <select id="conv-to" class="select"></select>' +
+          "  </div>" +
+          '  <div class="convert-result" id="conv-result" role="status" aria-live="polite"></div>' +
+          "</div>",
 
-    let activeTool = 'calculator';
+        cloaker:
+          '<div class="tool tool--narrow">' +
+          '  <div class="field">' +
+          '    <label class="field-label" for="cloak-title">Tab title</label>' +
+          '    <input type="text" id="cloak-title" class="input" placeholder="e.g. Google Classroom" />' +
+          "  </div>" +
+          '  <div class="field">' +
+          '    <label class="field-label" for="cloak-favicon">Favicon URL (optional)</label>' +
+          '    <input type="url" id="cloak-favicon" class="input" placeholder="https://…" />' +
+          "  </div>" +
+          '  <div class="row row--wrap">' +
+          '    <button type="button" class="btn btn--primary" id="cloak-apply" style="flex:1">Apply</button>' +
+          '    <button type="button" class="btn" id="cloak-reset" style="flex:1">Reset</button>' +
+          "  </div>" +
+          '  <p class="form-note" style="margin-top:14px">' +
+          "    Presets live on the Apps page. Whatever you set here follows you around the site until you reset it." +
+          "  </p>" +
+          "</div>",
 
-    function updateNav() {
-      buttons.forEach(btn => btn.classList.remove('active'));
-      document.getElementById(`btn-${activeTool}`).classList.add('active');
-    }
-
-    function loadTool(tool) {
-      if (!templates[tool]) return;
-      
-      // Animate out
-      toolFrame.classList.remove('show');
-      
-      setTimeout(() => {
-        toolFrame.innerHTML = templates[tool];
-        activeTool = tool;
-        updateNav();
-        initToolLogic(tool);
-        rebindHoverEvents(); // Ensure new buttons get the hover cursor
-        
-        // Animate in
-        requestAnimationFrame(() => {
-          toolFrame.classList.add('show');
-        });
-      }, 300); // Matches the CSS transition time
-    }
-
-    // Initialize specific tool logic
-    function initCalculator() {
-      const display = document.getElementById('calcDisplay');
-      const buttonsDiv = document.querySelector('.buttons');
-      const keys = ["7","8","9","/","4","5","6","*","1","2","3","-","0",".","C","="];
-      let current = "";
-
-      keys.forEach(k => {
-        const btn = document.createElement('button');
-        btn.textContent = k === "/" ? "÷" : k === "*" ? "×" : k;
-        btn.className = "glass-btn";
-        if(k === "C" || k === "=") btn.style.background = "var(--nav-hover-bg)";
-        if(k === "C" || k === "=") btn.style.color = "var(--nav-hover-text)";
-        
-        btn.addEventListener('click', () => {
-          if(k === "C") { current = ""; display.textContent = "0"; return; }
-          if(k === "=") {
-            try { 
-                if(current === "") return;
-                // Basic eval sanitization
-                current = eval(current.replace(/[^0-9\+\-\*\/\.]/g, '')).toString(); 
-            }
-            catch { current = "Error"; }
-            display.textContent = current; 
-            return;
-          }
-          if(current === "Error" || current === "0") current = "";
-          current += k;
-          display.textContent = current;
-        });
-        buttonsDiv.appendChild(btn);
-      });
-    }
-
-    function initNotepad() {
-      const textarea = document.getElementById('notepadTextarea');
-      const saveBtn = document.getElementById('saveNote');
-      const saveMsg = document.getElementById('saveMsg');
-      textarea.value = localStorage.getItem('astra_notepad') || "";
-
-      saveBtn.addEventListener('click', () => {
-        localStorage.setItem('astra_notepad', textarea.value);
-        saveMsg.style.opacity = 1;
-        setTimeout(() => saveMsg.style.opacity = 0, 1500);
-      });
-    }
-
-    function initUnitConverter() {
-      const unitType = document.getElementById('unitType');
-      const unitFrom = document.getElementById('unitFrom');
-      const unitTo = document.getElementById('unitTo');
-      const inputValue = document.getElementById('unitInput');
-      const resultDisplay = document.getElementById('conversionResult');
-
-      const units = {
-        length: { meter: 1, kilometer: 1000, centimeter: 0.01, inch: 0.0254, foot: 0.3048, mile: 1609.34 },
-        weight: { kilogram: 1, gram: 0.001, pound: 0.453592, ounce: 0.0283495 },
-        temperature: { Celsius: null, Fahrenheit: null, Kelvin: null }
+        stealth:
+          '<div class="tool tool--narrow">' +
+          '  <div class="field">' +
+          '    <label class="field-label" for="stealth-url">Target URL</label>' +
+          '    <input type="url" id="stealth-url" class="input" placeholder="https://example.com" />' +
+          "  </div>" +
+          '  <button type="button" class="btn btn--primary btn--block" id="stealth-open">Open stealth window</button>' +
+          '  <p class="form-note" style="margin-top:14px">' +
+          "    Opens a blank window with the page embedded, so the address bar stays empty. Allow pop-ups for this site." +
+          "  </p>" +
+          "</div>"
       };
 
-      function populateUnits(type) {
-        unitFrom.innerHTML = "";
-        unitTo.innerHTML = "";
-        Object.keys(units[type]).forEach(u => {
-          unitFrom.add(new Option(u,u));
-          unitTo.add(new Option(u,u));
+      /* ---------------------------------------------------- 1. calculator */
+
+      /* A tiny recursive-descent parser. The previous version used eval(),
+         which will happily run anything a visitor pastes into the display. */
+      function evaluate(source) {
+        var expr = String(source);
+        var i = 0;
+
+        function skip() {
+          while (expr.charAt(i) === " ") i++;
+        }
+
+        function primary() {
+          skip();
+          var ch = expr.charAt(i);
+          if (ch === "(") {
+            i++;
+            var inner = sum();
+            skip();
+            if (expr.charAt(i) !== ")") throw new Error("Unbalanced brackets");
+            i++;
+            return inner;
+          }
+          if (ch === "-") {
+            i++;
+            return -primary();
+          }
+          if (ch === "+") {
+            i++;
+            return primary();
+          }
+          var start = i;
+          while (i < expr.length && "0123456789.".indexOf(expr.charAt(i)) !== -1) i++;
+          if (start === i) throw new Error("Unexpected character");
+          var value = parseFloat(expr.slice(start, i));
+          if (isNaN(value)) throw new Error("Not a number");
+          return value;
+        }
+
+        function product() {
+          var value = primary();
+          for (;;) {
+            skip();
+            var ch = expr.charAt(i);
+            if (ch === "*") {
+              i++;
+              value *= primary();
+            } else if (ch === "/") {
+              i++;
+              var divisor = primary();
+              if (divisor === 0) throw new Error("Divide by zero");
+              value /= divisor;
+            } else {
+              return value;
+            }
+          }
+        }
+
+        function sum() {
+          var value = product();
+          for (;;) {
+            skip();
+            var ch = expr.charAt(i);
+            if (ch === "+") {
+              i++;
+              value += product();
+            } else if (ch === "-") {
+              i++;
+              value -= product();
+            } else {
+              return value;
+            }
+          }
+        }
+
+        var result = sum();
+        skip();
+        if (i < expr.length) throw new Error("Unexpected character");
+        if (!isFinite(result)) throw new Error("Out of range");
+        /* Trim binary floating-point noise: 0.1 + 0.2 should read 0.3. */
+        return parseFloat(result.toPrecision(12));
+      }
+
+      function initCalculator() {
+        var display = document.getElementById("calc-display");
+        var keypad = document.getElementById("calc-keys");
+        var expression = "";
+        var isResult = false;
+
+        var KEYS = [
+          { label: "C", action: "clear", variant: "btn--danger" },
+          /* "DEL" rather than ⌫ — the glyph is missing from some font stacks
+             and renders as a hollow box. */
+          { label: "DEL", action: "back", aria: "Backspace" },
+          { label: "(", value: "(" },
+          { label: ")", value: ")" },
+          { label: "7", value: "7" },
+          { label: "8", value: "8" },
+          { label: "9", value: "9" },
+          { label: "÷", value: "/", aria: "Divide" },
+          { label: "4", value: "4" },
+          { label: "5", value: "5" },
+          { label: "6", value: "6" },
+          { label: "×", value: "*", aria: "Multiply" },
+          { label: "1", value: "1" },
+          { label: "2", value: "2" },
+          { label: "3", value: "3" },
+          { label: "−", value: "-", aria: "Minus" },
+          { label: "0", value: "0" },
+          { label: ".", value: "." },
+          { label: "+", value: "+", aria: "Plus" },
+          { label: "=", action: "equals", variant: "btn--primary" }
+        ];
+
+        function render() {
+          display.textContent = expression === "" ? "0" : expression;
+          display.scrollLeft = display.scrollWidth;
+        }
+
+        function push(value) {
+          if (isResult && "0123456789.".indexOf(value) !== -1) expression = "";
+          isResult = false;
+          expression += value;
+          render();
+        }
+
+        function equals() {
+          if (expression === "") return;
+          try {
+            expression = String(evaluate(expression));
+            isResult = true;
+          } catch (err) {
+            display.textContent = err.message;
+            expression = "";
+            isResult = false;
+            return;
+          }
+          render();
+        }
+
+        function run(key) {
+          if (key.action === "clear") {
+            expression = "";
+            isResult = false;
+            render();
+          } else if (key.action === "back") {
+            expression = expression.slice(0, -1);
+            isResult = false;
+            render();
+          } else if (key.action === "equals") {
+            equals();
+          } else {
+            push(key.value);
+          }
+        }
+
+        KEYS.forEach(function (key) {
+          var btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "btn " + (key.variant || "");
+          btn.textContent = key.label;
+          if (key.aria) btn.setAttribute("aria-label", key.aria);
+          btn.addEventListener("click", function () {
+            run(key);
+          });
+          keypad.appendChild(btn);
         });
-        unitTo.selectedIndex = 1;
+
+        /* Keyboard support — a calculator you can only click is half a tool. */
+        function onKey(e) {
+          if (activeTool !== "calculator") return;
+          if (e.target && (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA")) return;
+
+          if ("0123456789.+-*/()".indexOf(e.key) !== -1 && e.key.length === 1) {
+            push(e.key);
+          } else if (e.key === "Enter" || e.key === "=") {
+            e.preventDefault();
+            equals();
+          } else if (e.key === "Backspace") {
+            e.preventDefault();
+            expression = expression.slice(0, -1);
+            render();
+          } else if (e.key === "Escape") {
+            expression = "";
+            render();
+          }
+        }
+
+        document.addEventListener("keydown", onKey);
+        teardown.push(function () {
+          document.removeEventListener("keydown", onKey);
+        });
+
+        render();
       }
 
-      function convert(val, from, to, type) {
-        if(type === "temperature") {
-          let v = parseFloat(val);
-          if(from==="Celsius"&&to==="Fahrenheit") return v*9/5+32;
-          if(from==="Celsius"&&to==="Kelvin") return v+273.15;
-          if(from==="Fahrenheit"&&to==="Celsius") return (v-32)*5/9;
-          if(from==="Fahrenheit"&&to==="Kelvin") return (v-32)*5/9+273.15;
-          if(from==="Kelvin"&&to==="Celsius") return v-273.15;
-          if(from==="Kelvin"&&to==="Fahrenheit") return (v-273.15)*9/5+32;
-          return v;
+      /* ------------------------------------------------------- 2. notepad */
+
+      function initNotepad() {
+        var textarea = document.getElementById("notepad");
+        var saveBtn = document.getElementById("note-save");
+        var count = document.getElementById("note-count");
+        var timer = null;
+
+        /* `astra_notepad` was the old key — read it once so existing notes
+           survive the rename. */
+        textarea.value =
+          localStorage.getItem(Astra.storeKeys.notepad) || localStorage.getItem("astra_notepad") || "";
+
+        function updateCount() {
+          var n = textarea.value.length;
+          count.textContent = n + (n === 1 ? " character" : " characters");
         }
-        const base = val * units[type][from];
-        return base / units[type][to];
+
+        function save(announce) {
+          try {
+            localStorage.setItem(Astra.storeKeys.notepad, textarea.value);
+            if (announce) Astra.toast("Notes saved");
+          } catch (e) {
+            Astra.toast("Could not save — storage is unavailable");
+          }
+        }
+
+        /* Autosave so a closed tab never loses work; the button is for peace of mind. */
+        textarea.addEventListener("input", function () {
+          updateCount();
+          clearTimeout(timer);
+          timer = setTimeout(function () {
+            save(false);
+          }, 600);
+        });
+
+        saveBtn.addEventListener("click", function () {
+          clearTimeout(timer);
+          save(true);
+        });
+
+        teardown.push(function () {
+          clearTimeout(timer);
+          save(false);
+        });
+
+        updateCount();
       }
 
-      function updateResult() {
-        let v = parseFloat(inputValue.value);
-        if(isNaN(v)) { resultDisplay.textContent = ""; return; }
-        resultDisplay.textContent = convert(v, unitFrom.value, unitTo.value, unitType.value).toFixed(2) + " " + unitTo.value;
+      /* ----------------------------------------------------- 3. converter */
+
+      /* Everything except temperature converts through a base unit. */
+      var UNITS = {
+        length: {
+          Millimetre: 0.001,
+          Centimetre: 0.01,
+          Metre: 1,
+          Kilometre: 1000,
+          Inch: 0.0254,
+          Foot: 0.3048,
+          Yard: 0.9144,
+          Mile: 1609.344
+        },
+        mass: {
+          Gram: 0.001,
+          Kilogram: 1,
+          Tonne: 1000,
+          Ounce: 0.028349523125,
+          Pound: 0.45359237,
+          Stone: 6.35029318
+        },
+        data: {
+          Bit: 0.125,
+          Byte: 1,
+          Kilobyte: 1024,
+          Megabyte: 1048576,
+          Gigabyte: 1073741824,
+          Terabyte: 1099511627776
+        },
+        temperature: { Celsius: 1, Fahrenheit: 1, Kelvin: 1 }
+      };
+
+      function toCelsius(value, unit) {
+        if (unit === "Fahrenheit") return (value - 32) * (5 / 9);
+        if (unit === "Kelvin") return value - 273.15;
+        return value;
       }
 
-      unitType.addEventListener('change', () => { populateUnits(unitType.value); updateResult(); });
-      [unitFrom, unitTo, inputValue].forEach(el => el.addEventListener('input', updateResult));
+      function fromCelsius(value, unit) {
+        if (unit === "Fahrenheit") return value * (9 / 5) + 32;
+        if (unit === "Kelvin") return value + 273.15;
+        return value;
+      }
 
-      populateUnits(unitType.value);
-    }
+      function initConverter() {
+        var type = document.getElementById("conv-type");
+        var from = document.getElementById("conv-from");
+        var to = document.getElementById("conv-to");
+        var value = document.getElementById("conv-value");
+        var result = document.getElementById("conv-result");
 
-    function initTabCloaker() {
-      const titleInput = document.getElementById('cloakTitle');
-      const faviconInput = document.getElementById('cloakFavicon');
-      
-      // FIX: Store original states safely
-      window.originalTitle = window.originalTitle || document.title;
-      const currentFav = document.querySelector("link[rel*='icon']");
-      window.originalFavicon = window.originalFavicon || (currentFav ? currentFav.href : '');
-
-      document.getElementById('applyCloak').addEventListener('click', () => {
-        if(titleInput.value) document.title = titleInput.value;
-        if(faviconInput.value) {
-          let link = document.querySelector("link[rel*='icon']") || document.createElement("link");
-          link.rel = "icon";
-          link.href = faviconInput.value;
-          document.head.appendChild(link);
+        function populate() {
+          var names = Object.keys(UNITS[type.value]);
+          from.innerHTML = "";
+          to.innerHTML = "";
+          names.forEach(function (name) {
+            from.add(new Option(name, name));
+            to.add(new Option(name, name));
+          });
+          from.selectedIndex = 0;
+          to.selectedIndex = Math.min(1, names.length - 1);
         }
-      });
 
-      document.getElementById('resetCloak').addEventListener('click', () => {
-        document.title = window.originalTitle;
-        if(window.originalFavicon) {
-          let link = document.querySelector("link[rel*='icon']");
-          if(link) link.href = window.originalFavicon;
+        function format(n) {
+          if (!isFinite(n)) return "—";
+          var rounded = parseFloat(n.toPrecision(10));
+          return Math.abs(rounded) >= 1e9 || (Math.abs(rounded) < 1e-6 && rounded !== 0)
+            ? rounded.toExponential(4)
+            : rounded.toLocaleString(undefined, { maximumFractionDigits: 6 });
         }
-      });
-    }
 
-    function initAboutBlank() {
-      const input = document.getElementById('blankUrl');
-      document.getElementById('openBlank').addEventListener('click', () => {
-        let url = input.value.trim();
-        if(!url) return;
-        // Fix missing protocol
-        if (!url.startsWith('http://') && !url.startsWith('https://')) {
-          url = 'https://' + url;
+        function update() {
+          var input = parseFloat(value.value);
+          if (isNaN(input)) {
+            result.textContent = "";
+            return;
+          }
+          var out;
+          if (type.value === "temperature") {
+            out = fromCelsius(toCelsius(input, from.value), to.value);
+          } else {
+            out = (input * UNITS[type.value][from.value]) / UNITS[type.value][to.value];
+          }
+          result.textContent = format(out) + " " + to.value;
         }
-        const win = window.open("about:blank");
-        // FIX: Removed the buggy backslashes
-        win.document.write(`<iframe src="${url}" style="border:none;width:100vw;height:100vh;margin:0;padding:0;"></iframe>`);
-        win.document.body.style.margin = '0';
-        win.document.title = "Classes"; // Sneaky title
-      });
-    }
 
-    function initToolLogic(tool) {
-      if(tool==="calculator") initCalculator();
-      if(tool==="notepad") initNotepad();
-      if(tool==="unitconverter") initUnitConverter();
-      if(tool==="tabcloaker") initTabCloaker();
-      if(tool==="aboutblank") initAboutBlank();
-    }
+        type.addEventListener("change", function () {
+          populate();
+          update();
+        });
+        [from, to].forEach(function (el) {
+          el.addEventListener("change", update);
+        });
+        value.addEventListener("input", update);
 
-    // Wire up Nav Buttons
-    buttons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const tool = btn.id.replace("btn-","");
-        if(tool!==activeTool) loadTool(tool);
-      });
-    });
+        populate();
+        update();
+      }
 
-    // Initial Load
-    loadTool(activeTool);
+      /* ------------------------------------------------------- 4. cloaker */
 
-    // --- 2. GLOBAL CURSOR LOGIC ---
-    const cursor = document.getElementById('cursor');
-    let mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-    let curPos = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+      function initCloaker() {
+        var title = document.getElementById("cloak-title");
+        var favicon = document.getElementById("cloak-favicon");
 
-    document.addEventListener('mousemove', e => {
-      mouse.x = e.clientX;
-      mouse.y = e.clientY;
-    });
+        document.getElementById("cloak-apply").addEventListener("click", function () {
+          if (!title.value.trim() && !favicon.value.trim()) {
+            Astra.toast("Enter a title or a favicon URL first");
+            return;
+          }
+          Astra.cloak({ title: title.value.trim(), favicon: favicon.value.trim() });
+          Astra.toast("Cloak applied");
+        });
 
-    function animateCursor() {
-      const ease = 0.15;
-      curPos.x += (mouse.x - curPos.x) * ease;
-      curPos.y += (mouse.y - curPos.y) * ease;
-      cursor.style.left = `${curPos.x}px`;
-      cursor.style.top = `${curPos.y}px`;
-      requestAnimationFrame(animateCursor);
-    }
-    animateCursor();
-
-    function rebindHoverEvents() {
-      document.querySelectorAll('a, button, input, select, textarea').forEach(el => {
-        // Remove old listeners to prevent stacking
-        const newEl = el.cloneNode(true);
-        if(el.parentNode) el.parentNode.replaceChild(newEl, el);
-        
-        newEl.addEventListener('mouseenter', () => cursor.classList.add('hover'));
-        newEl.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
-        
-        // Re-attach specific tool logic if we replaced a dynamic button
-        if(newEl.id === 'btn-calculator') newEl.addEventListener('click', () => loadTool('calculator'));
-        if(newEl.id === 'btn-notepad') newEl.addEventListener('click', () => loadTool('notepad'));
-        if(newEl.id === 'btn-unitconverter') newEl.addEventListener('click', () => loadTool('unitconverter'));
-        if(newEl.id === 'btn-tabcloaker') newEl.addEventListener('click', () => loadTool('tabcloaker'));
-        if(newEl.id === 'btn-aboutblank') newEl.addEventListener('click', () => loadTool('aboutblank'));
-      });
-      // Re-init tool logic since we cloned elements to wipe listeners
-      initToolLogic(activeTool);
-    }
-
-    // --- 3. BACKGROUND STARS ---
-    const canvas = document.getElementById('bg-canvas');
-    const ctx = canvas.getContext('2d');
-    let width, height, stars = [];
-    
-    function resize() {
-      width = canvas.width = window.innerWidth;
-      height = canvas.height = window.innerHeight;
-      stars = [];
-      const starCount = Math.floor((width * height) / 6000); 
-      for (let i = 0; i < starCount; i++) {
-        stars.push({
-          x: Math.random() * width, y: Math.random() * height,
-          size: Math.random() * 1.5, speed: Math.random() * 0.5 + 0.1
+        document.getElementById("cloak-reset").addEventListener("click", function () {
+          title.value = "";
+          favicon.value = "";
+          Astra.cloak("reset");
         });
       }
-    }
-    
-    function drawStars() {
-      ctx.clearRect(0, 0, width, height);
-      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-      ctx.fillStyle = isDark ? "rgba(255, 255, 255, 0.8)" : "rgba(255, 255, 255, 0.6)"; 
-      
-      stars.forEach(star => {
-        const parallaxX = (mouse.x - width/2) * 0.01;
-        const parallaxY = (mouse.y - height/2) * 0.01;
-        ctx.beginPath();
-        ctx.arc(star.x + parallaxX, star.y + parallaxY, star.size, 0, Math.PI * 2);
-        ctx.fill();
-        star.y -= star.speed;
-        if (star.y < -5) star.y = height + 5;
+
+      /* ------------------------------------------------- 5. stealth window */
+
+      function initStealth() {
+        var input = document.getElementById("stealth-url");
+
+        function open() {
+          var raw = input.value.trim();
+          if (!raw) {
+            Astra.toast("Enter a URL first");
+            return;
+          }
+          if (!/^https?:\/\//i.test(raw)) raw = "https://" + raw;
+
+          var target;
+          try {
+            target = new URL(raw);
+          } catch (e) {
+            Astra.toast("That does not look like a valid URL");
+            return;
+          }
+          if (target.protocol !== "http:" && target.protocol !== "https:") {
+            Astra.toast("Only http and https addresses are allowed");
+            return;
+          }
+
+          var win = window.open("about:blank");
+          if (!win) {
+            Astra.toast("Pop-up blocked — allow pop-ups for this site");
+            return;
+          }
+
+          /* Built with DOM calls rather than document.write so the URL can
+             never break out of the markup. */
+          var doc = win.document;
+          doc.title = document.title;
+          doc.body.style.margin = "0";
+          doc.body.style.background = "#000";
+          var frame = doc.createElement("iframe");
+          frame.style.cssText = "border:0;display:block;width:100vw;height:100vh";
+          frame.src = target.href;
+          doc.body.appendChild(frame);
+        }
+
+        document.getElementById("stealth-open").addEventListener("click", open);
+        input.addEventListener("keydown", function (e) {
+          if (e.key === "Enter") open();
+        });
+      }
+
+      var initialisers = {
+        calculator: initCalculator,
+        notepad: initNotepad,
+        converter: initConverter,
+        cloaker: initCloaker,
+        stealth: initStealth
+      };
+
+      /* ------------------------------------------------------- switching */
+
+      function show(tool) {
+        if (!templates[tool]) return;
+
+        teardown.forEach(function (fn) {
+          fn();
+        });
+        teardown = [];
+
+        panel.classList.remove("is-shown");
+
+        setTimeout(function () {
+          panel.innerHTML = templates[tool];
+          activeTool = tool;
+
+          tabs.forEach(function (tab) {
+            tab.setAttribute("aria-selected", String(tab.id === "tab-" + tool));
+          });
+
+          initialisers[tool]();
+          requestAnimationFrame(function () {
+            panel.classList.add("is-shown");
+          });
+        }, Astra.prefersReducedMotion() ? 0 : 260);
+      }
+
+      tabs.forEach(function (tab) {
+        tab.addEventListener("click", function () {
+          var tool = tab.id.replace("tab-", "");
+          if (tool !== activeTool) show(tool);
+        });
       });
-      requestAnimationFrame(drawStars);
-    }
 
-    window.addEventListener('resize', resize);
-    resize();
-    drawStars();
-
+      /* Deep-link support: tools.html#notepad opens straight into the notepad. */
+      var requested = window.location.hash.replace("#", "");
+      Astra.ready(function () {
+        show(templates[requested] ? requested : "calculator");
+      });
+    })();
   </script>
 </body>
 </html>

@@ -1,596 +1,112 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" class="no-js" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Astra – Apps</title>
-  <link rel="icon" type="image/x-icon" href="/favicon.ico" id="dynamic-favicon">
-
-  <!-- Roboto Flex Font -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,100..1000&display=swap" rel="stylesheet">
-
-  <!-- Global Liquid Glass Styles -->
-  <link rel="stylesheet" href="style.css">
-
-  <style>
-    /* === Page-Specific Glass Styles === */
-    
-    /* CRITICAL FIX: Restores default cursor when app iframe is open */
-    body.app-active, body.app-active * {
-      cursor: auto !important;
-    }
-    /* Hide our custom fluid cursor when an app is open */
-    body.app-active #cursor {
-      display: none !important;
-    }
-
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 80px 20px 40px 20px; /* Extra top padding for nav */
-      text-align: center;
-      position: relative;
-      z-index: 10;
-      opacity: 0;
-      transform: translateY(20px);
-      animation: fadeUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    }
-
-    @keyframes fadeUp {
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* Top Navigation (Matches Tools Page) */
-    .top-nav {
-      position: absolute;
-      top: 30px;
-      left: 30px; /* Aligned to the left for this page */
-      z-index: 100;
-    }
-
-    .top-nav a {
-      color: var(--text-muted);
-      text-decoration: none;
-      font-size: 1.05rem;
-      font-weight: 600;
-      font-variation-settings: "wdth" 110; 
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-      padding: 10px 20px;
-      background: var(--glass-bg);
-      backdrop-filter: blur(25px) saturate(150%);
-      border: 1px solid var(--glass-border);
-      border-radius: 40px;
-      box-shadow: var(--glass-shadow);
-      transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-      display: inline-block;
-    }
-
-    .top-nav a:hover {
-      color: var(--nav-hover-text);
-      background: var(--nav-hover-bg);
-      transform: translateY(-3px);
-      box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
-    }
-
-    header.page-title {
-      font-size: 5rem;
-      line-height: 1;
-      font-weight: 900;
-      letter-spacing: -2px;
-      margin-bottom: 2rem;
-      background: var(--header-grad);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      filter: drop-shadow(0 4px 15px rgba(99, 102, 241, 0.2));
-      animation: floatFluid 6s ease-in-out infinite;
-    }
-
-    /* Cloaking Utility Bar */
-    .utility-bar {
-      display: inline-flex;
-      gap: 15px;
-      background: var(--glass-bg);
-      padding: 12px 25px;
-      border-radius: 50px;
-      border: 1px solid var(--glass-border);
-      backdrop-filter: blur(20px);
-      box-shadow: var(--glass-shadow);
-      margin-bottom: 30px;
-    }
-
-    .utility-btn {
-      background: transparent;
-      border: 1px solid rgba(255,255,255,0.1);
-      color: var(--text-muted);
-      padding: 8px 16px;
-      border-radius: 20px;
-      font-size: 0.85rem;
-      font-family: inherit;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .utility-btn:hover {
-      background: rgba(165, 180, 252, 0.15);
-      color: #ffffff;
-      border-color: rgba(165, 180, 252, 0.4);
-      transform: translateY(-2px);
-    }
-
-    .panic-text {
-      color: var(--text-muted);
-      font-size: 0.85rem;
-      margin-top: -15px;
-      margin-bottom: 40px;
-      letter-spacing: 0.5px;
-    }
-    .panic-text b { color: #ffffff; background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; }
-
-    /* Glass App Grid */
-    .app-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-      gap: 25px;
-      max-width: 1000px;
-      margin: 0 auto;
-    }
-
-    .app-card {
-      background: var(--glass-bg);
-      border: 1px solid var(--glass-border);
-      border-radius: 28px;
-      aspect-ratio: 1 / 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 15px;
-      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-      backdrop-filter: blur(15px);
-      box-shadow: var(--glass-shadow);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .app-card img {
-      width: 54px;
-      height: 54px;
-      object-fit: contain;
-      filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5));
-      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-      z-index: 2;
-    }
-
-    .app-card span {
-      font-size: 1rem;
-      font-weight: 700;
-      color: var(--text-muted);
-      letter-spacing: 0.5px;
-      transition: color 0.3s ease;
-      z-index: 2;
-    }
-
-    /* Hover Glow Effect */
-    .app-card::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at center, rgba(165, 180, 252, 0.2) 0%, transparent 70%);
-      opacity: 0;
-      transition: opacity 0.4s ease;
-      z-index: 1;
-    }
-
-    .app-card:hover {
-      background: rgba(255, 255, 255, 0.05);
-      border-color: rgba(165, 180, 252, 0.5);
-      transform: translateY(-8px) scale(1.02);
-      box-shadow: 0 20px 40px -10px rgba(0,0,0,0.7);
-    }
-
-    .app-card:hover::before { opacity: 1; }
-    .app-card:hover img { transform: scale(1.15) translateY(-5px); }
-    .app-card:hover span { color: #ffffff; }
-
-    /* Iframe Overlay Modal */
-    .overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(10, 10, 15, 0.85);
-      backdrop-filter: blur(20px);
-      z-index: 999;
-      opacity: 0;
-      pointer-events: none;
-      display: flex;
-      flex-direction: column;
-      transition: opacity 0.4s ease;
-    }
-
-    .overlay.active {
-      opacity: 1;
-      pointer-events: all;
-    }
-
-    .overlay-bar {
-      height: 45px;
-      background: rgba(0, 0, 0, 0.5);
-      border-bottom: 1px solid rgba(255,255,255,0.1);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 20px;
-    }
-
-    .overlay-title {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: var(--text-muted);
-      letter-spacing: 1px;
-    }
-
-    .close-btn {
-      background: transparent;
-      border: none;
-      color: var(--text-muted);
-      font-size: 28px;
-      cursor: pointer !important; /* Force pointer for close btn */
-      transition: color 0.2s, transform 0.2s;
-      line-height: 1;
-    }
-
-    .close-btn:hover { 
-      color: #ff4d4d; 
-      transform: scale(1.1);
-    }
-
-    .iframe-wrapper {
-      flex: 1;
-      width: 100%;
-      position: relative;
-    }
-
-    iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-      background: #ffffff; /* Keeping iframe background white just in case the proxy needs it */
-    }
-
-    /* Toast Notification */
-    .toast {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: var(--glass-bg);
-      border: 1px solid var(--glass-border);
-      color: white;
-      padding: 12px 24px;
-      border-radius: 12px;
-      backdrop-filter: blur(20px) saturate(150%);
-      box-shadow: var(--glass-shadow);
-      transform: translateY(100px);
-      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      z-index: 2000;
-      font-size: 0.95rem;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-    }
-    .toast.show { transform: translateY(0); }
-  </style>
-</head>
-<body>
-
-  <!-- Liquid Background Stars -->
-  <canvas id="bg-canvas"></canvas>
-
-  <nav class="top-nav">
-    <a href="/astra/index.html">← Home</a>
-  </nav>
-
-  <div class="container">
-    <header class="page-title">Apps</header>
-
-    <div class="utility-bar">
-      <button class="utility-btn" onclick="cloakTab('default')"><span>Reset</span></button>
-      <button class="utility-btn" onclick="cloakTab('drive')">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/1/12/Google_Drive_icon_%282020%29.svg" width="16" alt="">
-        <span>Drive</span>
-      </button>
-      <button class="utility-btn" onclick="cloakTab('classroom')">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/5/59/Google_Classroom_Logo.png" width="16" alt="">
-        <span>Classroom</span>
-      </button>
-    </div>
-    
-    <p class="panic-text">
-      Panic Button: Press <b>]</b> to exit immediately.
-    </p>
-
-    <div class="app-grid">
-      <div class="app-card" data-url="https://scramjet.mercurywork.shop/scramjet/https%3A%2F%2Fwww.google.com%2F%3Fzx%3D1770699498684%26no_sw_cr%3D1">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Browser">
-        <span>Browser</span>
-      </div>
-
-      <div class="app-card" data-url="https://scramjet.mercurywork.shop/scramjet/https%3A%2F%2Fwww.youtube.com%2F">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon_%282017%29.svg" alt="YouTube">
-        <span>YouTube</span>
-      </div>
-
-      <div class="app-card" data-url="https://scramjet.mercurywork.shop/scramjet/https%3A%2F%2Fdiscord.com%2F">
-        <img src="https://assets-global.website-files.com/6257adef93867e56f84d3092/636e0a6a49cf127bf92de1e2_icon_clyde_blurple_RGB.png" alt="Discord">
-        <span>Discord</span>
-      </div>
-
-      <div class="app-card" data-url="https://scramjet.mercurywork.shop/scramjet/https%3A%2F%2Fwww.tiktok.com%2Fexplore">
-        <img src="https://sf16-scmcdn-va.ibytedtos.com/goofy/tiktok/web/node/_next/static/images/logo-dark-e95da587b61837f722a774360d50a699.svg" style="filter: invert(1);" alt="TikTok">
-        <span>TikTok</span>
-      </div>
-
-      <div class="app-card" data-url="https://scramjet.mercurywork.shop/scramjet/https%3A%2F%2Fchatgpt.com%2F">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg" alt="ChatGPT">
-        <span>ChatGPT</span>
-      </div>
-
-      <div class="app-card" data-url="https://open.spotify.com">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg" alt="Spotify">
-        <span>Spotify</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- Fullscreen App Container -->
-  <div class="overlay" id="appOverlay">
-    <div class="overlay-bar">
-      <div class="overlay-title" id="overlayTitle">App</div>
-      <button class="close-btn" id="closeOverlayBtn" title="Close App">&times;</button>
-    </div>
-    <div class="iframe-wrapper">
-      <iframe src="" id="appFrame" allow="fullscreen; clipboard-read; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
-    </div>
-  </div>
-
-  <div class="cursor" id="cursor"></div>
-  <div class="toast" id="toast">Tab Cloaked</div>
+  <meta name="description" content="Open the web apps you need in a frosted-glass window, without leaving Astra." />
+  <meta name="theme-color" content="#0f111a" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <meta property="og:site_name" content="Astra" />
+  <meta property="og:title" content="Astra – Apps" />
+  <meta property="og:description" content="Open the web apps you need in a frosted-glass window." />
+  <meta property="og:type" content="website" />
 
   <script>
-    // --- 1. SMOOTH CURSOR ---
-    const cursor = document.getElementById('cursor');
-    let mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-    let curPos = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    (function (d) {
+      var r = d.documentElement;
+      r.classList.remove("no-js");
+      r.classList.add("js");
+      try {
+        r.setAttribute("data-theme", localStorage.getItem("astra-theme") === "light" ? "light" : "dark");
+      } catch (e) {}
+    })(document);
+  </script>
 
-    document.addEventListener('mousemove', e => {
-      mouse.x = e.clientX;
-      mouse.y = e.clientY;
-    });
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,100..1000&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body data-layout="scroll">
 
-    function animateCursor() {
-      const ease = 0.15;
-      curPos.x += (mouse.x - curPos.x) * ease;
-      curPos.y += (mouse.y - curPos.y) * ease;
-      cursor.style.left = `${curPos.x}px`;
-      cursor.style.top = `${curPos.y}px`;
-      requestAnimationFrame(animateCursor);
-    }
-    animateCursor();
+  <a class="skip-link" href="#main">Skip to content</a>
 
-    // Hover Listeners
-    document.querySelectorAll('button, .app-card, a').forEach(el => {
-      el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
-      el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
-    });
+  <canvas id="bg-canvas" aria-hidden="true"></canvas>
 
-    // --- 2. STARFIELD BACKGROUND ---
-    const canvas = document.getElementById('bg-canvas');
-    const ctx = canvas.getContext('2d');
-    let width, height, stars = [];
+  <div data-astra-nav-mount></div>
 
-    function resize() {
-      width = canvas.width = window.innerWidth;
-      height = canvas.height = window.innerHeight;
-      stars = [];
-      const starCount = Math.floor((width * height) / 5000);
-      for (let i = 0; i < starCount; i++) {
-        stars.push({
-          x: Math.random() * width,
-          y: Math.random() * height,
-          size: Math.random() * 1.5,
-          speed: Math.random() * 0.4 + 0.1,
-          opacity: Math.random()
+  <main class="page" id="main">
+    <h1 class="page-title">Apps</h1>
+    <p class="page-lead">
+      Everything opens in a frosted window on top of Astra. Cloak the tab first if you need to.
+    </p>
+
+    <div class="segmented" aria-label="Tab cloak">
+      <button type="button" data-cloak="drive">Drive</button>
+      <button type="button" data-cloak="classroom">Classroom</button>
+      <button type="button" data-cloak="docs">Docs</button>
+      <button type="button" data-cloak="reset">Reset</button>
+    </div>
+
+    <p class="panic-hint" style="margin-bottom: 2.5rem">
+      The cloak follows you across pages. Press <span class="kbd">]</span> to leave instantly.
+    </p>
+
+    <div class="tile-grid" id="app-grid"></div>
+  </main>
+
+  <script src="astra.js"></script>
+  <script>
+    /* App catalogue — edit this list to change the grid.
+       Icons come from Simple Icons so every tile shares one flat, single-colour
+       style instead of mixing logos from four different sources.
+       `external: true` is for sites that refuse to be framed, so they open in a
+       new tab instead of showing an empty window. */
+    var APPS = [
+      {
+        label: "Browser",
+        url: "https://scramjet.mercurywork.shop/scramjet/https%3A%2F%2Fwww.google.com%2F",
+        icon: "https://cdn.simpleicons.org/google/4285F4"
+      },
+      {
+        label: "YouTube",
+        url: "https://scramjet.mercurywork.shop/scramjet/https%3A%2F%2Fwww.youtube.com%2F",
+        icon: "https://cdn.simpleicons.org/youtube/FF0000"
+      },
+      {
+        label: "Discord",
+        url: "https://scramjet.mercurywork.shop/scramjet/https%3A%2F%2Fdiscord.com%2F",
+        icon: "https://cdn.simpleicons.org/discord/5865F2"
+      },
+      {
+        label: "TikTok",
+        url: "https://scramjet.mercurywork.shop/scramjet/https%3A%2F%2Fwww.tiktok.com%2Fexplore",
+        icon: "https://cdn.simpleicons.org/tiktok/EE1D52"
+      },
+      {
+        /* Not published by Simple Icons, so this one stays on Wikimedia. */
+        label: "ChatGPT",
+        url: "https://scramjet.mercurywork.shop/scramjet/https%3A%2F%2Fchatgpt.com%2F",
+        icon: "https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg"
+      },
+      {
+        label: "Spotify",
+        url: "https://open.spotify.com",
+        icon: "https://cdn.simpleicons.org/spotify/1DB954",
+        external: true
+      }
+    ];
+
+    Astra.ready(function () {
+      Astra.mountTiles(document.getElementById("app-grid"), APPS);
+
+      document.querySelectorAll("[data-cloak]").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          Astra.cloak(btn.getAttribute("data-cloak"));
         });
-      }
-    }
-
-    function drawStars() {
-      ctx.clearRect(0, 0, width, height);
-      ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
-      
-      stars.forEach(star => {
-        // Subtle parallax
-        const parallaxX = (mouse.x - width/2) * 0.01;
-        const parallaxY = (mouse.y - height/2) * 0.01;
-
-        ctx.globalAlpha = star.opacity;
-        ctx.beginPath();
-        ctx.arc(star.x + parallaxX, star.y + parallaxY, star.size, 0, Math.PI * 2);
-        ctx.fill();
-        
-        star.y -= star.speed;
-        if (star.y < -5) star.y = height + 5;
-      });
-      requestAnimationFrame(drawStars);
-    }
-
-    window.addEventListener('resize', resize);
-    resize();
-    drawStars();
-
-    // --- 3. UTILITIES (Cloak / Panic) ---
-    const favicon = document.getElementById('dynamic-favicon');
-    
-    function cloakTab(type) {
-      if (type === 'drive') {
-        document.title = 'My Drive - Google Drive';
-        favicon.href = 'https://ssl.gstatic.com/images/branding/product/1x/drive_2020q4_32dp.png';
-        showToast("✨ Cloaked as Google Drive");
-      } else if (type === 'classroom') {
-        document.title = 'Classes';
-        favicon.href = 'https://ssl.gstatic.com/classroom/favicon.png';
-        showToast("✨ Cloaked as Google Classroom");
-      } else {
-        document.title = 'Astra – Apps';
-        favicon.href = '/favicon.ico';
-        showToast("🔄 Cloak Reset");
-      }
-    }
-
-    function showToast(msg) {
-      const toast = document.getElementById('toast');
-      toast.innerText = msg;
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 2500);
-    }
-
-    document.addEventListener('keydown', (e) => {
-      if (e.key === ']') window.location.href = 'https://www.google.com';
-    });
-
-    // --- 4. APP OPENING LOGIC ---
-    const overlay = document.getElementById('appOverlay');
-    const iframe = document.getElementById('appFrame');
-    const overlayTitle = document.getElementById('overlayTitle');
-    const closeOverlayBtn = document.getElementById('closeOverlayBtn');
-
-    document.querySelectorAll('.app-card').forEach(card => {
-      card.addEventListener('click', () => {
-        const url = card.getAttribute('data-url');
-        const name = card.querySelector('span').innerText;
-        
-        if (url) {
-          overlayTitle.innerText = name;
-          iframe.src = url;
-          // Add class to body to revert cursor to system default so you can click in the app
-          document.body.classList.add('app-active'); 
-          overlay.classList.add('active');
-        }
       });
     });
-
-    function closeApp() {
-      overlay.classList.remove('active');
-      // Remove class from body to bring back Astra's custom cursor
-      document.body.classList.remove('app-active');
-      setTimeout(() => { iframe.src = ''; }, 400); // Wait for fade out before killing source
-    }
-
-    closeOverlayBtn.addEventListener('click', closeApp);
-    
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && overlay.classList.contains('active')) {
-        closeApp();
-      }
-    });
-
-    // --- 5. 🚀 ASTRA AUTO-UPDATE CHECKER ---
-    (() => {
-      let lastVersion = null;
-
-      async function checkForUpdates() {
-        try {
-          const response = await fetch(window.location.href.split('?')[0] + '?t=' + Date.now(), { 
-            method: 'HEAD',
-            cache: 'no-store'
-          });
-
-          const currentVersion = response.headers.get('Last-Modified') || response.headers.get('ETag');
-
-          if (!lastVersion) {
-            lastVersion = currentVersion;
-            return;
-          }
-
-          if (currentVersion && currentVersion !== lastVersion) {
-            showUpdateNotification();
-            lastVersion = currentVersion; 
-          }
-        } catch (error) {
-          console.log("Update check paused.");
-        }
-      }
-
-      function showUpdateNotification() {
-        if (document.getElementById('astra-update-toast')) return;
-
-        const toast = document.createElement('div');
-        toast.id = 'astra-update-toast';
-        
-        toast.style.cssText = `
-          position: fixed;
-          top: 20px;
-          left: 50%;
-          transform: translateX(-50%);
-          background: rgba(20, 20, 30, 0.85);
-          backdrop-filter: blur(20px) saturate(150%);
-          -webkit-backdrop-filter: blur(20px) saturate(150%);
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.7);
-          color: #ffffff;
-          padding: 12px 20px;
-          border-radius: 50px;
-          z-index: 100000;
-          display: flex;
-          align-items: center;
-          gap: 15px;
-          font-family: 'Roboto Flex', sans-serif;
-          animation: slideDown 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-        `;
-
-        toast.innerHTML = `
-          <span style="font-weight: 600; font-size: 0.95rem; letter-spacing: 0.5px;">✨ Update Available</span>
-          <button id="toast-reload" style="background: rgba(165, 180, 252, 0.85); color: #050505; border: none; padding: 6px 16px; border-radius: 30px; font-weight: 700; font-family: inherit; cursor: none; transition: transform 0.2s;">Reload</button>
-          <button id="toast-close" style="background: transparent; color: #9aa0b8; border: none; font-size: 1.5rem; cursor: none; padding: 0; line-height: 1; transition: color 0.2s;">&times;</button>
-        `;
-
-        document.body.appendChild(toast);
-
-        if (!document.getElementById('toast-keyframes')) {
-          const style = document.createElement('style');
-          style.id = 'toast-keyframes';
-          style.innerHTML = `
-            @keyframes slideDown {
-              from { top: -50px; opacity: 0; transform: translateX(-50%) scale(0.9); }
-              to { top: 20px; opacity: 1; transform: translateX(-50%) scale(1); }
-            }
-          `;
-          document.head.appendChild(style);
-        }
-
-        const reloadBtn = document.getElementById('toast-reload');
-        const closeBtn = document.getElementById('toast-close');
-
-        reloadBtn.addEventListener('click', () => window.location.reload(true));
-        closeBtn.addEventListener('click', () => {
-          toast.style.animation = 'slideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1) reverse forwards';
-          setTimeout(() => toast.remove(), 300);
-        });
-
-        [reloadBtn, closeBtn].forEach(btn => {
-          btn.addEventListener('mouseenter', () => document.getElementById('cursor').classList.add('hover'));
-          btn.addEventListener('mouseleave', () => document.getElementById('cursor').classList.remove('hover'));
-        });
-      }
-
-      checkForUpdates();
-      setInterval(checkForUpdates, 25000);
-    })();
   </script>
 </body>
 </html>

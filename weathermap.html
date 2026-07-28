@@ -1,418 +1,405 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" class="no-js" data-theme="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Astra – Weather Monitor</title>
-    
-    <!-- 🚀 THEME BOUNCER -->
-    <script>
-      if (localStorage.getItem('astra-theme') === 'dark') {
-        document.documentElement.setAttribute('data-theme', 'dark');
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Astra – Weather</title>
+  <meta name="description" content="Live NOAA severe-weather alerts on a dark map." />
+  <meta name="theme-color" content="#0f111a" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <meta property="og:site_name" content="Astra" />
+  <meta property="og:title" content="Astra – Weather" />
+  <meta property="og:description" content="Live NOAA severe-weather alerts on a dark map." />
+  <meta property="og:type" content="website" />
+
+  <script>
+    (function (d) {
+      var r = d.documentElement;
+      r.classList.remove("no-js");
+      r.classList.add("js");
+      try {
+        r.setAttribute("data-theme", localStorage.getItem("astra-theme") === "light" ? "light" : "dark");
+      } catch (e) {}
+    })(document);
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,100..1000&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="style.css" />
+
+  <style>
+    #map {
+      width: 100vw;
+      height: 100vh;
+      background: #0f111a;
+    }
+
+    .weather-panel {
+      position: absolute;
+      top: 84px;
+      left: 24px;
+      z-index: 1000;
+      width: 320px;
+      max-height: calc(100vh - 108px);
+      overflow-y: auto;
+    }
+
+    .weather-panel h1 {
+      margin: 0;
+      font-size: 1.7rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: var(--header-grad);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .weather-panel .subtitle {
+      margin: 6px 0 22px;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      font-weight: 500;
+      min-height: 2.6em;
+    }
+
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(165, 180, 252, 0.6); }
+      70% { box-shadow: 0 0 0 8px rgba(165, 180, 252, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(165, 180, 252, 0); }
+    }
+
+    .legend-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 12px;
+      color: var(--text-muted);
+      font-size: 0.92rem;
+      font-weight: 600;
+    }
+
+    .legend-key {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 auto;
+      width: 36px;
+      height: 36px;
+      border-radius: var(--r-sm);
+      color: #fff;
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    /* User position marker */
+    .user-marker {
+      border: 3px solid #ffffff;
+      border-radius: 50%;
+      background-color: var(--brand-500);
+      box-shadow: 0 0 20px rgba(99, 102, 241, 0.8);
+      animation: userPulse 2s infinite;
+    }
+
+    @keyframes userPulse {
+      0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.6); }
+      70% { box-shadow: 0 0 0 20px rgba(99, 102, 241, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
+    }
+
+    /* Leaflet popups, restyled to match the rest of the site */
+    .leaflet-popup-content-wrapper,
+    .leaflet-popup-tip {
+      background: var(--glass-bg-strong);
+      backdrop-filter: blur(20px) saturate(150%);
+      -webkit-backdrop-filter: blur(20px) saturate(150%);
+      border: 1px solid var(--glass-border);
+      color: var(--text-main);
+      box-shadow: var(--glass-shadow);
+    }
+
+    .leaflet-popup-content-wrapper {
+      border-radius: var(--r-lg);
+      font-family: inherit;
+    }
+
+    .leaflet-popup-content {
+      margin: 18px;
+      width: 250px !important;
+    }
+
+    .leaflet-container a.leaflet-popup-close-button {
+      padding: 8px 8px 0 0;
+      color: var(--text-muted);
+    }
+
+    .leaflet-container a.leaflet-popup-close-button:hover {
+      color: var(--text-main);
+    }
+
+    .popup-tag {
+      margin-bottom: 6px;
+      color: var(--brand-300);
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .popup-title {
+      margin-bottom: 8px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+
+    .popup-meta {
+      color: var(--text-muted);
+      font-size: 0.84rem;
+      font-weight: 500;
+    }
+
+    .leaflet-control-attribution {
+      background: var(--glass-bg-strong) !important;
+      color: var(--text-muted) !important;
+    }
+
+    .leaflet-control-attribution a {
+      color: var(--brand-300) !important;
+    }
+
+    /* Zoom buttons ship as plain white squares; bring them into the glass set. */
+    .leaflet-bar {
+      border: none !important;
+      border-radius: var(--r-sm) !important;
+      overflow: hidden;
+      box-shadow: var(--glass-shadow) !important;
+    }
+
+    .leaflet-bar a,
+    .leaflet-bar a:hover {
+      width: 34px;
+      height: 34px;
+      line-height: 34px;
+      background: var(--glass-bg-strong);
+      border-bottom: 1px solid var(--glass-hairline);
+      color: var(--text-main);
+      font-weight: 700;
+      transition: background var(--dur-fast) ease, color var(--dur-fast) ease;
+    }
+
+    .leaflet-bar a:last-child {
+      border-bottom: none;
+    }
+
+    .leaflet-bar a:hover,
+    .leaflet-bar a:focus-visible {
+      background: var(--nav-hover-bg);
+      color: var(--nav-hover-text);
+    }
+
+    @media (max-width: 768px) {
+      .weather-panel {
+        top: 64px;
+        left: 12px;
+        right: 12px;
+        width: auto;
+        padding: 20px;
+        max-height: 46vh;
       }
-    </script>
-
-    <!-- Roboto Flex Font -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,100..1000&display=swap" rel="stylesheet">
-    
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
-    
-    <!-- Global Liquid Glass Styles -->
-    <link rel="stylesheet" href="style.css">
-
-    <style>
-        /* --- PAGE SPECIFIC OVERRIDES --- */
-        body {
-            margin: 0;
-            padding: 0;
-            overflow: hidden; /* Lock scrolling so map fills screen */
-            background-color: #050505;
-        }
-
-        /* Nav back to home */
-        .top-nav {
-            position: absolute;
-            top: 24px;
-            right: 24px; /* Moved to right so it doesn't overlap the panel */
-            z-index: 2000;
-        }
-
-        .top-nav a {
-            color: var(--text-muted);
-            text-decoration: none;
-            font-size: 0.9rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            padding: 10px 20px;
-            background: var(--glass-bg);
-            backdrop-filter: blur(25px) saturate(150%);
-            border: 1px solid var(--glass-border);
-            border-radius: 40px;
-            box-shadow: var(--glass-shadow);
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            display: inline-block;
-        }
-
-        .top-nav a:hover {
-            color: var(--nav-hover-text);
-            background: var(--nav-hover-bg);
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
-        }
-
-        /* --- THE MAP --- */
-        #map { 
-            height: 100vh; 
-            width: 100vw; 
-            z-index: 1; 
-            background: #0f111a; /* Match Astra dark background */
-        }
-
-        /* Allow default cursor interactions ON the map */
-        #map, #map * {
-            cursor: auto !important; 
-        }
-
-        /* --- ASTRA FROSTED GLASS PANEL --- */
-        .glass-panel {
-            position: absolute;
-            top: 24px;
-            left: 24px;
-            z-index: 1000;
-            width: 320px;
-            background: var(--glass-bg);
-            backdrop-filter: blur(25px) saturate(150%);
-            -webkit-backdrop-filter: blur(25px) saturate(150%);
-            border: 1px solid var(--glass-border);
-            border-radius: 28px;
-            padding: 28px;
-            box-shadow: var(--glass-shadow);
-            color: var(--text-main);
-            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        /* Typography */
-        h1 { 
-            margin: 0; 
-            font-size: 1.8rem; 
-            font-weight: 800; 
-            letter-spacing: -0.5px; 
-            background: var(--header-grad);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        
-        p.subtitle { 
-            margin: 6px 0 24px 0; 
-            font-size: 0.9rem; 
-            color: var(--text-muted); 
-            font-weight: 500; 
-        }
-
-        /* Status Indicator */
-        .live-status {
-            display: inline-flex;
-            align-items: center;
-            background: rgba(99, 102, 241, 0.15);
-            color: #a5b4fc;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 16px;
-            border: 1px solid rgba(99, 102, 241, 0.3);
-        }
-
-        .pulse-dot {
-            width: 8px; height: 8px; 
-            background: #a5b4fc; 
-            border-radius: 50%; 
-            margin-right: 10px;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(165, 180, 252, 0.6); }
-            70% { box-shadow: 0 0 0 8px rgba(165, 180, 252, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(165, 180, 252, 0); }
-        }
-
-        /* --- ASTRA LOCATION BUTTON --- */
-        .location-btn {
-            width: 100%;
-            padding: 14px;
-            margin-bottom: 24px;
-            background: transparent;
-            color: var(--text-main);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            font-size: 0.95rem;
-            font-family: inherit;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        
-        .location-btn:hover { 
-            background: var(--nav-hover-bg); 
-            color: var(--nav-hover-text);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
-            border-color: transparent;
-        }
-        .loc-icon { width: 18px; height: 18px; fill: currentColor; }
-
-        /* Legend Rows */
-        .alert-row { 
-            display: flex; 
-            align-items: center; 
-            margin-bottom: 14px; 
-            font-size: 0.95rem; 
-            font-weight: 600; 
-            color: var(--text-muted);
-        }
-        .icon-box {
-            width: 36px; height: 36px; 
-            border-radius: 12px; 
-            margin-right: 14px;
-            display: flex; align-items: center; justify-content: center;
-            font-weight: 800; color: #fff; font-size: 0.7rem; letter-spacing: 0.5px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-        }
-
-        /* --- USER LOCATION MARKER --- */
-        .user-marker {
-            background-color: #6366f1;
-            border: 3px solid #ffffff;
-            border-radius: 50%;
-            box-shadow: 0 0 20px rgba(99, 102, 241, 0.8);
-            animation: userPulse 2s infinite;
-        }
-        @keyframes userPulse {
-            0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.6); }
-            70% { box-shadow: 0 0 0 20px rgba(99, 102, 241, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
-        }
-
-        /* --- ASTRA LEAFLET POPUP STYLING --- */
-        .leaflet-popup-content-wrapper {
-            background: rgba(20, 20, 30, 0.85);
-            backdrop-filter: blur(20px) saturate(150%);
-            -webkit-backdrop-filter: blur(20px) saturate(150%);
-            border-radius: 20px;
-            padding: 0;
-            border: 1px solid rgba(255,255,255,0.1);
-            color: #ffffff;
-            font-family: 'Roboto Flex', sans-serif;
-            box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.7);
-        }
-        .leaflet-popup-tip {
-            background: rgba(20, 20, 30, 0.85);
-            border: 1px solid rgba(255,255,255,0.1);
-            backdrop-filter: blur(20px);
-        }
-        .leaflet-popup-content { margin: 20px; width: 260px !important; }
-        .popup-tag { 
-            font-size: 0.7rem; 
-            font-weight: 800; 
-            text-transform: uppercase; 
-            letter-spacing: 1px;
-            color: #a5b4fc; 
-            margin-bottom: 6px; 
-        }
-        .popup-header { 
-            font-size: 1.1rem; 
-            font-weight: 700; 
-            margin-bottom: 8px; 
-            line-height: 1.3; 
-        }
-        .leaflet-container a.leaflet-popup-close-button {
-            color: #9aa0b8;
-            padding: 6px 6px 0 0;
-        }
-        .leaflet-container a.leaflet-popup-close-button:hover {
-            color: #ffffff;
-        }
-    </style>
+    }
+  </style>
 </head>
-<body>
+<body data-layout="fixed" data-astra-stars="off">
 
-    <nav class="top-nav">
-        <a href="/astra/index.html" class="nav-btn">← Home</a>
-    </nav>
+  <div data-astra-nav-mount></div>
 
-    <!-- The Map Container -->
-    <div id="map"></div>
+  <!-- native-cursor lets the map keep its own grab/pointer cursors -->
+  <div id="map" class="native-cursor"></div>
 
-    <!-- The Astra Glass UI Panel -->
-    <div class="glass-panel" id="ui-panel">
-        <div class="live-status">
-            <div class="pulse-dot"></div>
-            LIVE MONITOR
-        </div>
-        <h1>NOAA Feed</h1>
-        <p id="status-text" class="subtitle">Waiting for user location..</p>
-        
-        <button class="location-btn" onclick="findUser()" id="loc-btn">
-            <svg class="loc-icon" viewBox="0 0 24 24"><path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3c-.46-4.17-3.77-7.48-7.94-7.94V1h-2v2.06C6.83 3.52 3.52 6.83 3.06 11H1v2h2.06c.46 4.17 3.77 7.48 7.94 7.94V23h2v-2.06c4.17-.46 7.48-3.77 7.94-7.94H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg>
-            Locate Me
-        </button>
-
-        <div class="alert-row">
-            <div class="icon-box" style="background: #ff3b30;">EXT</div>
-            <span>Extreme Warning</span>
-        </div>
-        <div class="alert-row">
-            <div class="icon-box" style="background: #ff9500;">SEV</div>
-            <span>Severe Warning</span>
-        </div>
-        <div class="alert-row">
-            <div class="icon-box" style="background: #ffcc00; color: #1a1a2e;">MOD</div>
-            <span>Moderate Watch</span>
-        </div>
+  <section class="glass-panel weather-panel" id="weather-panel" aria-label="Weather alerts">
+    <div class="eyebrow" style="margin-bottom:16px">
+      <span class="pulse-dot" aria-hidden="true"></span>
+      Live monitor
     </div>
 
-    <!-- The Custom Astra Cursor -->
-    <div class="cursor" id="cursor"></div>
+    <h1>NOAA Feed</h1>
+    <p class="subtitle" id="status-text" role="status" aria-live="polite">Loading active alerts…</p>
 
-    <!-- Leaflet JS -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    <button type="button" class="btn btn--block" id="locate-btn" style="margin-bottom:22px">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3c-.46-4.17-3.77-7.48-7.94-7.94V1h-2v2.06C6.83 3.52 3.52 6.83 3.06 11H1v2h2.06c.46 4.17 3.77 7.48 7.94 7.94V23h2v-2.06c4.17-.46 7.48-3.77 7.94-7.94H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z" />
+      </svg>
+      Locate me
+    </button>
 
-    <script>
-        // --- 1. SMOOTH CURSOR (Astra Logic) ---
-        const cursor = document.getElementById('cursor');
-        const mapContainer = document.getElementById('map');
-        let mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-        let curPos = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    <p class="section-label">Severity</p>
+    <div class="legend-row"><span class="legend-key" style="background:#ff3b30">EXT</span><span>Extreme warning</span></div>
+    <div class="legend-row"><span class="legend-key" style="background:#ff9500">SEV</span><span>Severe warning</span></div>
+    <div class="legend-row"><span class="legend-key" style="background:#ffcc00;color:#1a1a2e">MOD</span><span>Moderate watch</span></div>
+    <div class="legend-row" style="margin-bottom:0"><span class="legend-key" style="background:#34c759">MIN</span><span>Minor / advisory</span></div>
+  </section>
 
-        document.addEventListener('mousemove', e => {
-            mouse.x = e.clientX;
-            mouse.y = e.clientY;
-        });
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="astra.js"></script>
+  <script>
+    (function () {
+      var status = document.getElementById("status-text");
 
-        function animateCursor() {
-            const ease = 0.15;
-            curPos.x += (mouse.x - curPos.x) * ease;
-            curPos.y += (mouse.y - curPos.y) * ease;
-            cursor.style.left = `${curPos.x}px`;
-            cursor.style.top = `${curPos.y}px`;
-            requestAnimationFrame(animateCursor);
-        }
-        animateCursor();
+      /* Leaflet comes from a CDN — say so plainly if it did not arrive rather
+         than throwing and leaving a blank screen. */
+      if (typeof L === "undefined") {
+        status.textContent = "The map library could not be loaded. Check your connection and reload.";
+        document.getElementById("locate-btn").disabled = true;
+        return;
+      }
 
-        // Wire hover events to Astra UI buttons, but HIDE cursor when over the map
-        document.querySelectorAll('a, button').forEach(el => {
-            el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
-            el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
-        });
+      var map = L.map("map", { zoomControl: false, zoomSnap: 0, zoomDelta: 0.5 })
+        .setView([39.8283, -98.5795], 4);
 
-        mapContainer.addEventListener('mouseenter', () => cursor.style.display = 'none');
-        document.getElementById('ui-panel').addEventListener('mouseenter', () => cursor.style.display = 'block');
-        document.querySelector('.top-nav').addEventListener('mouseenter', () => cursor.style.display = 'block');
+      var tiles = {
+        dark: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+        light: "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+      };
 
+      var tileLayer = null;
 
-        // --- 2. MAP INIT (DARK MODE TILES) ---
-        const map = L.map('map', {
-            zoomControl: false,
-            zoomSnap: 0,
-            zoomDelta: 0.5
-        }).setView([39.8283, -98.5795], 4); // Center of USA
-
-        // CARTO Dark Matter Tiles - Matches Astra perfectly
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-            maxZoom: 19,
-            attribution: '&copy; OpenStreetMap &copy; CARTO'
+      /* The basemap follows the site theme instead of being locked to dark. */
+      function paintBasemap() {
+        var url = Astra.theme.get() === "light" ? tiles.light : tiles.dark;
+        if (tileLayer) map.removeLayer(tileLayer);
+        tileLayer = L.tileLayer(url, {
+          maxZoom: 19,
+          attribution: "&copy; OpenStreetMap &copy; CARTO"
         }).addTo(map);
+      }
 
-        // Optional Zoom Controls in bottom right
-        L.control.zoom({ position: 'bottomright' }).addTo(map);
+      Astra.ready(function () {
+        paintBasemap();
+        document.addEventListener("astra:themechange", paintBasemap);
+      });
 
-        // --- 3. USER LOCATION LOGIC ---
-        function findUser() {
-            const status = document.getElementById('status-text');
-            status.innerText = "Requesting GPS access...";
+      L.control.zoom({ position: "bottomright" }).addTo(map);
 
-            if (!navigator.geolocation) {
-                status.innerText = "Geolocation not supported.";
-                return;
-            }
+      /* ---------------------------------------------------- user location */
 
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    const lat = position.coords.latitude;
-                    const lon = position.coords.longitude;
-                    
-                    // Fly to user
-                    map.flyTo([lat, lon], 9, { duration: 2 });
-                    
-                    // Add User Marker
-                    const userIcon = L.divIcon({
-                        className: 'user-marker',
-                        iconSize: [20, 20],
-                        iconAnchor: [10, 10]
-                    });
-                    
-                    L.marker([lat, lon], {icon: userIcon}).addTo(map)
-                     .bindPopup("<div style='text-align:center;font-weight:700;'>You are here 📍</div>").openPopup();
-
-                    status.innerText = "Scanning immediate sector...";
-                },
-                () => {
-                    status.innerText = "Location access denied.";
-                }
-            );
+      document.getElementById("locate-btn").addEventListener("click", function () {
+        if (!navigator.geolocation) {
+          status.textContent = "This browser cannot share a location.";
+          return;
         }
 
-        // --- 4. NOAA WEATHER FETCH LOGIC ---
-        function getStyle(feature) {
-            let color = '#34c759'; // Safe Green
-            const severity = feature.properties.severity;
-            if (severity === 'Extreme') color = '#ff3b30'; // Red
-            else if (severity === 'Severe') color = '#ff9500'; // Orange
-            else if (severity === 'Moderate') color = '#ffcc00'; // Yellow
+        status.textContent = "Requesting location…";
 
-            return { fillColor: color, color: color, weight: 1, fillOpacity: 0.4 };
-        }
+        navigator.geolocation.getCurrentPosition(
+          function (position) {
+            var lat = position.coords.latitude;
+            var lon = position.coords.longitude;
 
-        fetch('https://api.weather.gov/alerts/active?status=actual&message_type=alert,update')
-            .then(res => res.json())
-            .then(data => {
-                const validFeatures = data.features.filter(f => f.geometry !== null);
-                L.geoJSON(validFeatures, {
-                    style: getStyle,
-                    onEachFeature: (feature, layer) => {
-                        const p = feature.properties;
-                        layer.bindPopup(`
-                            <div class="popup-tag">${p.severity} Priority</div>
-                            <div class="popup-header">${p.event}</div>
-                            <div style="font-size:0.85rem;color:#9aa0b8;font-weight:500;">
-                              Ends: ${new Date(p.expires).toLocaleTimeString()}
-                            </div>
-                        `);
-                    }
-                }).addTo(map);
-                
-                document.getElementById('status-text').innerText = `${validFeatures.length} active alerts nationwide.`;
+            map.flyTo([lat, lon], 9, { duration: Astra.prefersReducedMotion() ? 0 : 2 });
+
+            L.marker([lat, lon], {
+              icon: L.divIcon({ className: "user-marker", iconSize: [20, 20], iconAnchor: [10, 10] })
             })
-            .catch(err => {
-                document.getElementById('status-text').innerText = "Failed to load NOAA feed.";
-            });
+              .addTo(map)
+              .bindPopup('<div class="popup-title" style="margin:0;text-align:center">You are here</div>')
+              .openPopup();
 
-    </script>
+            status.textContent = "Centred on your location.";
+          },
+          function () {
+            status.textContent = "Location access denied.";
+          },
+          { timeout: 10000 }
+        );
+      });
 
-    <!-- 🚀 ASTRA AUTO-UPDATE CHECKER -->
-    <script src="updatechecker.js"></script>
+      /* ------------------------------------------------------- NOAA feed */
 
+      var SEVERITY_COLOURS = {
+        Extreme: "#ff3b30",
+        Severe: "#ff9500",
+        Moderate: "#ffcc00",
+        Minor: "#34c759"
+      };
+
+      function styleFor(feature) {
+        var colour = SEVERITY_COLOURS[feature.properties.severity] || "#34c759";
+        return { fillColor: colour, color: colour, weight: 1, fillOpacity: 0.4 };
+      }
+
+      function expiryText(iso) {
+        if (!iso) return "No expiry given";
+        var when = new Date(iso);
+        if (isNaN(when.getTime())) return "No expiry given";
+        return "Ends " + when.toLocaleString();
+      }
+
+      /* Popups are built with DOM nodes so alert text from the feed can never
+         inject markup into the page. */
+      function popupFor(properties) {
+        var wrap = document.createElement("div");
+
+        var tag = document.createElement("div");
+        tag.className = "popup-tag";
+        tag.textContent = (properties.severity || "Unknown") + " priority";
+
+        var title = document.createElement("div");
+        title.className = "popup-title";
+        title.textContent = properties.event || "Weather alert";
+
+        var meta = document.createElement("div");
+        meta.className = "popup-meta";
+        meta.textContent = [properties.areaDesc, expiryText(properties.expires)]
+          .filter(Boolean)
+          .join(" · ");
+
+        wrap.appendChild(tag);
+        wrap.appendChild(title);
+        wrap.appendChild(meta);
+        return wrap;
+      }
+
+      fetch("https://api.weather.gov/alerts/active?status=actual&message_type=alert,update")
+        .then(function (response) {
+          if (!response.ok) throw new Error("NOAA responded " + response.status);
+          return response.json();
+        })
+        .then(function (data) {
+          var features = (data.features || []).filter(function (f) {
+            return f.geometry !== null;
+          });
+
+          if (!features.length) {
+            status.textContent = "No active alerts right now.";
+            return;
+          }
+
+          L.geoJSON(features, {
+            style: styleFor,
+            onEachFeature: function (feature, layer) {
+              layer.bindPopup(popupFor(feature.properties));
+            }
+          }).addTo(map);
+
+          status.textContent = features.length + " active alerts nationwide.";
+        })
+        .catch(function (error) {
+          status.textContent = "Could not load the NOAA feed. " + error.message;
+        });
+    })();
+  </script>
 </body>
 </html>

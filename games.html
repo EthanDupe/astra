@@ -1,108 +1,71 @@
-<div role="region" aria-label="Games section" style="max-width: 960px; margin: 0 auto;">
-  <h2 style="color:#00FFFF; font-family:'Playfair Display', serif; font-size:2rem; text-align:center; margin-bottom:1rem;">Games</h2>
-  <div id="gamesGrid" style="
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 1rem;
-    justify-items: center;
-    padding: 0 1rem;
-  ">
-    <button class="game-btn" data-url="https://example.com/amongus" aria-label="Play Among Us" style="
-      background: linear-gradient(135deg, #00FFFF, #004466);
-      border: none;
-      color: #0A192F;
-      font-weight: 700;
-      border-radius: 14px;
-      padding: 1rem 0.5rem;
-      width: 100%;
-      max-width: 160px;
-      cursor: pointer;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      font-size: 1.1rem;
-      box-shadow: 0 0 10px #00FFFFaa;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    ">Among Us</button>
+<!DOCTYPE html>
+<html lang="en" class="no-js" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Astra – Games</title>
+  <meta name="description" content="Play the Astra games library in a frosted-glass window." />
+  <meta name="theme-color" content="#0f111a" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <meta property="og:site_name" content="Astra" />
+  <meta property="og:title" content="Astra – Games" />
+  <meta property="og:description" content="Play the Astra games library in a frosted-glass window." />
+  <meta property="og:type" content="website" />
 
-    <button class="game-btn" data-url="https://example.com/slope" aria-label="Play Slope" style="
-      background: linear-gradient(135deg, #00FFFF, #004466);
-      border: none;
-      color: #0A192F;
-      font-weight: 700;
-      border-radius: 14px;
-      padding: 1rem 0.5rem;
-      width: 100%;
-      max-width: 160px;
-      cursor: pointer;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      font-size: 1.1rem;
-      box-shadow: 0 0 10px #00FFFFaa;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    ">Slope</button>
+  <script>
+    (function (d) {
+      var r = d.documentElement;
+      r.classList.remove("no-js");
+      r.classList.add("js");
+      try {
+        r.setAttribute("data-theme", localStorage.getItem("astra-theme") === "light" ? "light" : "dark");
+      } catch (e) {}
+    })(document);
+  </script>
 
-    <button class="game-btn" data-url="https://example.com/vex5" aria-label="Play Vex 5" style="
-      background: linear-gradient(135deg, #00FFFF, #004466);
-      border: none;
-      color: #0A192F;
-      font-weight: 700;
-      border-radius: 14px;
-      padding: 1rem 0.5rem;
-      width: 100%;
-      max-width: 160px;
-      cursor: pointer;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      font-size: 1.1rem;
-      box-shadow: 0 0 10px #00FFFFaa;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    ">Vex 5</button>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,100..1000&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body data-layout="scroll">
 
-    <button class="game-btn" data-url="https://example.com/run3" aria-label="Play Run 3" style="
-      background: linear-gradient(135deg, #00FFFF, #004466);
-      border: none;
-      color: #0A192F;
-      font-weight: 700;
-      border-radius: 14px;
-      padding: 1rem 0.5rem;
-      width: 100%;
-      max-width: 160px;
-      cursor: pointer;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      font-size: 1.1rem;
-      box-shadow: 0 0 10px #00FFFFaa;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    ">Run 3</button>
+  <a class="skip-link" href="#main">Skip to content</a>
 
-    <button class="game-btn" data-url="https://example.com/retrobowl" aria-label="Play Retro Bowl" style="
-      background: linear-gradient(135deg, #00FFFF, #004466);
-      border: none;
-      color: #0A192F;
-      font-weight: 700;
-      border-radius: 14px;
-      padding: 1rem 0.5rem;
-      width: 100%;
-      max-width: 160px;
-      cursor: pointer;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      font-size: 1.1rem;
-      box-shadow: 0 0 10px #00FFFFaa;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    ">Retro Bowl</button>
-  </div>
-</div>
+  <canvas id="bg-canvas" aria-hidden="true"></canvas>
 
-<script>
-  const gameButtons = document.querySelectorAll('.game-btn');
-  gameButtons.forEach(btn => {
-    btn.addEventListener('mouseenter', () => {
-      btn.style.transform = 'rotateX(10deg) scale(1.05)';
-      btn.style.boxShadow = '0 0 18px #00FFFF';
+  <div data-astra-nav-mount></div>
+
+  <main class="page" id="main">
+    <h1 class="page-title">Games</h1>
+    <p class="page-lead">
+      Games open in a frosted window on top of Astra. If one refuses to load, use
+      <strong>Open in new tab</strong> in the window bar.
+    </p>
+
+    <div class="tile-grid" id="game-grid"></div>
+
+    <p class="panic-hint">Press <span class="kbd">]</span> to leave instantly.</p>
+  </main>
+
+  <script src="astra.js"></script>
+  <script>
+    /* The games library lives on its own GitHub Pages site. Each tile opens the
+       hub; swap in a per-game deep link as `url` when one is available. */
+    var GAMES_HUB = "https://ethandupe.github.io/games-main/";
+
+    var GAMES = [
+      { label: "All Games", url: GAMES_HUB, glyph: "★" },
+      { label: "Among Us", url: GAMES_HUB },
+      { label: "Slope", url: GAMES_HUB },
+      { label: "Vex 5", url: GAMES_HUB },
+      { label: "Run 3", url: GAMES_HUB },
+      { label: "Retro Bowl", url: GAMES_HUB }
+    ];
+
+    Astra.ready(function () {
+      Astra.mountTiles(document.getElementById("game-grid"), GAMES);
     });
-    btn.addEventListener('mouseleave', () => {
-      btn.style.transform = 'rotateX(0) scale(1)';
-      btn.style.boxShadow = '0 0 10px #00FFFFaa';
-    });
-    btn.addEventListener('click', () => {
-      const url = btn.getAttribute('data-url');
-      window.open(url, '_blank', 'noopener');
-    });
-  });
-</script>
+  </script>
+</body>
+</html>

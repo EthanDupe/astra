@@ -1,299 +1,217 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" class="no-js" data-theme="dark">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Astra – Admin Portal</title>
-  
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,100..1000&display=swap" rel="stylesheet">
-  
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Astra – Admin</title>
+  <meta name="description" content="Astra broadcast console." />
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="theme-color" content="#0f111a" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+
+  <script>
+    (function (d) {
+      var r = d.documentElement;
+      r.classList.remove("no-js");
+      r.classList.add("js");
+      try {
+        r.setAttribute("data-theme", localStorage.getItem("astra-theme") === "light" ? "light" : "dark");
+      } catch (e) {}
+    })(document);
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,100..1000&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+
   <style>
-    /* CORE ADMIN STYLES */
-    :root {
-      --glass-bg: rgba(20, 20, 30, 0.5); 
-      --glass-border: rgba(255, 255, 255, 0.1);
-      --glass-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.7);
-      --header-grad: linear-gradient(135deg, #ffffff 0%, #a5b4fc 100%);
-    }
-
-    *, *::before, *::after {
-      cursor: none !important;
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      padding: 0;
-      background: linear-gradient(-45deg, #09090e, #1a1a2e, #0f111a, #201a30);
-      background-size: 400% 400%;
-      animation: liquidBg 15s ease infinite;
-      color: #ffffff;
-      font-family: 'Roboto Flex', sans-serif;
-      overflow: hidden; 
-      height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    @keyframes liquidBg {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
-    #bg-canvas {
-      position: fixed;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 1;
-      opacity: 0.5;
-      pointer-events: none;
-    }
-
-    /* ADMIN CONTAINER */
-    .admin-container {
-      position: relative;
-      z-index: 10;
-      max-width: 500px;
-      width: 90%;
-      background: var(--glass-bg);
-      backdrop-filter: blur(25px) saturate(150%);
-      -webkit-backdrop-filter: blur(25px) saturate(150%);
-      border: 1px solid var(--glass-border);
-      border-radius: 24px;
-      padding: 40px;
-      box-shadow: var(--glass-shadow);
+    .admin-card {
+      width: min(520px, calc(100vw - 32px));
       text-align: center;
     }
 
-    h1 {
-      font-size: 2.5rem;
+    .admin-card h1 {
+      margin: 0 0 6px;
+      font-size: 2.2rem;
       font-weight: 900;
       letter-spacing: -1px;
-      margin: 0 0 5px 0;
       background: var(--header-grad);
       -webkit-background-clip: text;
+      background-clip: text;
       -webkit-text-fill-color: transparent;
     }
 
-    p { color: #9aa0b8; margin-bottom: 25px; font-weight: 500; }
+    .admin-card > p {
+      margin: 0 0 24px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
 
-    .glass-input {
-      width: 100%;
-      padding: 15px;
-      border-radius: 12px;
-      border: 1px solid rgba(255,255,255,0.1);
-      background: rgba(0,0,0,0.3);
-      color: #fff;
-      font-family: inherit;
-      font-size: 1rem;
+    .current-broadcast {
       margin-bottom: 20px;
-      outline: none;
-      transition: all 0.3s ease;
+      padding: 14px 16px;
+      border: 1px solid var(--glass-hairline);
+      border-radius: var(--r-sm);
+      background: var(--field-bg);
+      text-align: left;
+      font-size: 0.92rem;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
     }
 
-    .glass-input:focus {
-      border-color: rgba(165, 180, 252, 0.8);
-      box-shadow: 0 0 15px rgba(99, 102, 241, 0.3);
-    }
-
-    .glass-btn {
-      width: 100%;
-      padding: 15px;
-      border-radius: 12px;
-      border: none;
-      background: rgba(99, 102, 241, 0.8);
-      color: #fff;
-      font-weight: 700;
-      font-family: inherit;
+    .current-broadcast strong {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--text-muted);
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 1.2px;
       text-transform: uppercase;
-      letter-spacing: 1px;
-      transition: all 0.3s ease;
-      margin-bottom: 10px;
     }
 
-    .glass-btn:hover {
-      background: rgba(165, 180, 252, 0.9);
-      color: #000;
-      transform: translateY(-2px);
-    }
-
-    .btn-danger {
-      background: transparent;
-      border: 1px solid rgba(255, 59, 48, 0.5);
-      color: #ff3b30;
-    }
-
-    .btn-danger:hover {
-      background: rgba(255, 59, 48, 0.2);
-      color: #ff3b30;
-    }
-
-    #dashboard { display: none; }
-
-    /* FLUID CURSOR */
-    .cursor {
-      width: 20px;
-      height: 20px;
-      background: rgba(165, 180, 252, 0.6);
-      backdrop-filter: blur(4px);
-      border: 1px solid rgba(255,255,255,0.8);
-      border-radius: 50%;
-      position: fixed;
-      top: 0; left: 0;
-      pointer-events: none;
-      z-index: 9999999;
-      transform: translate3d(-50%, -50%, 0); 
-      transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
-                  height 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-                  background 0.5s ease; 
-    }
-
-    .cursor.hover {
-      width: 60px;
-      height: 60px;
-      background: rgba(255, 255, 255, 0.15);
-      border-color: rgba(165, 180, 252, 0.6);
+    [hidden] {
+      display: none !important;
     }
   </style>
 </head>
-<body>
+<!-- Broadcasts are muted here so the console does not toast its own messages. -->
+<body data-layout="center" data-astra-broadcast="off">
 
-  <canvas id="bg-canvas"></canvas>
+  <canvas id="bg-canvas" aria-hidden="true"></canvas>
 
-  <!-- LOGIN SCREEN -->
-  <div class="admin-container" id="login-screen">
-    <h1>Restricted Area</h1>
-    <p>Enter administrator passcode.</p>
-    <input type="password" id="passcode-input" class="glass-input" placeholder="Passcode...">
-    <button class="glass-btn" onclick="checkPasscode()">Unlock</button>
-  </div>
+  <div data-astra-nav-mount></div>
 
-  <!-- ADMIN DASHBOARD -->
-  <div class="admin-container" id="dashboard">
-    <h1>Broadcast</h1>
-    <p>Push a notification to all active clients.</p>
-    
-    <textarea id="message-input" class="glass-input" style="min-height: 100px; resize: vertical;" placeholder="Type your message here..."></textarea>
-    
-    <button class="glass-btn" onclick="sendNotification()">Push Notification</button>
-    <button class="glass-btn btn-danger" onclick="clearNotification()">Send "Null" (Clear)</button>
-    
-    <p id="status-text" style="color: #34c759; opacity: 0; margin-top: 15px; transition: opacity 0.3s; font-weight: 700;">Broadcast Sent!</p>
-  </div>
+  <main>
+    <!-- Gate -->
+    <section class="glass-panel admin-card" id="gate">
+      <h1>Restricted</h1>
+      <p>Enter the administrator passcode.</p>
 
-  <!-- CUSTOM CURSOR -->
-  <div class="cursor" id="cursor"></div>
+      <label class="field-label" for="passcode">Passcode</label>
+      <input type="password" id="passcode" class="input" placeholder="••••••••" autocomplete="current-password" />
 
+      <button type="button" class="btn btn--primary btn--block" id="unlock" style="margin-top:16px">Unlock</button>
+      <p class="status-msg status-msg--error" id="gate-error">Access denied.</p>
+    </section>
+
+    <!-- Console -->
+    <section class="glass-panel admin-card" id="console" hidden>
+      <h1>Broadcast</h1>
+      <p>Pushes a notification to everyone browsing Astra.</p>
+
+      <div class="current-broadcast" id="current">
+        <strong>Currently live</strong>
+        <span id="current-text">Checking…</span>
+      </div>
+
+      <label class="field-label" for="message">Message</label>
+      <textarea id="message" class="textarea" style="min-height:110px" placeholder="Type your message here…"></textarea>
+
+      <button type="button" class="btn btn--primary btn--block" id="send" style="margin-top:12px">Push notification</button>
+      <button type="button" class="btn btn--danger btn--block" id="clear" style="margin-top:10px">Clear current broadcast</button>
+
+      <p class="status-msg" id="status"></p>
+    </section>
+  </main>
+
+  <script src="astra.js"></script>
   <script>
-    // --- 1. ASTRA CURSOR LOGIC ---
-    const astraCursor = document.getElementById('cursor');
-    let mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-    let curPos = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    (function () {
+      /* SECURITY NOTE — read before relying on this page.
+         This is a static site, so both the passcode and the jsonbin key below
+         are visible to anyone who views source. The gate is a speed bump, not
+         access control, and the key can write to the bin. See README.md. */
+      var PASSCODE = "superbut76";
+      var BIN = "https://api.jsonbin.io/v3/b/" + Astra.config.broadcastBin;
+      var KEY = Astra.config.broadcastKey;
 
-    document.addEventListener('mousemove', e => {
-      mouse.x = e.clientX;
-      mouse.y = e.clientY;
-    });
+      var gate = document.getElementById("gate");
+      var consolePanel = document.getElementById("console");
+      var passcode = document.getElementById("passcode");
+      var gateError = document.getElementById("gate-error");
+      var status = document.getElementById("status");
+      var currentText = document.getElementById("current-text");
+      var message = document.getElementById("message");
 
-    function animateCursor() {
-      const ease = 0.15;
-      curPos.x += (mouse.x - curPos.x) * ease;
-      curPos.y += (mouse.y - curPos.y) * ease;
-      astraCursor.style.left = `${curPos.x}px`;
-      astraCursor.style.top = `${curPos.y}px`;
-      requestAnimationFrame(animateCursor);
-    }
-    animateCursor();
-
-    document.querySelectorAll('button, input, textarea').forEach(el => {
-      el.addEventListener('mouseenter', () => astraCursor.classList.add('hover'));
-      el.addEventListener('mouseleave', () => astraCursor.classList.remove('hover'));
-    });
-
-    // --- 2. BACKGROUND STARS ---
-    const canvas = document.getElementById('bg-canvas');
-    const ctx = canvas.getContext('2d');
-    let width, height, stars = [];
-    
-    function resize() {
-      width = canvas.width = window.innerWidth;
-      height = canvas.height = window.innerHeight;
-      stars = [];
-      const starCount = Math.floor((width * height) / 6000); 
-      for (let i = 0; i < starCount; i++) {
-        stars.push({ x: Math.random() * width, y: Math.random() * height, size: Math.random() * 1.5, speed: Math.random() * 0.5 + 0.1 });
+      function say(text, isError) {
+        status.textContent = text;
+        status.classList.toggle("status-msg--error", !!isError);
+        status.classList.add("is-visible");
+        setTimeout(function () {
+          status.classList.remove("is-visible");
+        }, 3000);
       }
-    }
-    
-    function drawStars() {
-      ctx.clearRect(0, 0, width, height);
-      ctx.fillStyle = "rgba(255, 255, 255, 0.8)"; 
-      stars.forEach(star => {
-        const parallaxX = (mouse.x - width/2) * 0.02;
-        const parallaxY = (mouse.y - height/2) * 0.02;
-        ctx.beginPath();
-        ctx.arc(star.x + parallaxX, star.y + parallaxY, star.size, 0, Math.PI * 2);
-        ctx.fill();
-        star.y -= star.speed;
-        if (star.y < -5) star.y = height + 5;
-      });
-      requestAnimationFrame(drawStars);
-    }
 
-    window.addEventListener('resize', resize);
-    resize();
-    drawStars();
-
-    // --- 3. DATABASE PUSH LOGIC ---
-    const API_KEY = "$2a$10$dmsG1/GXWAA5tim8ejcE8uKD75pB.KxZxZDzIAb4AdPcJAU93f9nK";
-    const BIN_URL = "https://api.jsonbin.io/v3/b/6a0fb2fb6610dd3ae8858731";
-
-    function checkPasscode() {
-      if (document.getElementById('passcode-input').value === 'superbut76') {
-        document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('dashboard').style.display = 'block';
-      } else {
-        alert('Access Denied.');
-        document.getElementById('passcode-input').value = '';
+      function unlock() {
+        if (passcode.value !== PASSCODE) {
+          gateError.classList.add("is-visible");
+          passcode.value = "";
+          passcode.focus();
+          return;
+        }
+        gate.hidden = true;
+        consolePanel.hidden = false;
+        message.focus();
+        refresh();
       }
-    }
 
-    async function pushToDatabase(messagePayload) {
-      try {
-        await fetch(BIN_URL, {
+      function refresh() {
+        fetch(BIN + "/latest?meta=false&t=" + Date.now(), {
+          cache: "no-store",
+          headers: { "X-Master-Key": KEY }
+        })
+          .then(function (response) {
+            if (!response.ok) throw new Error(String(response.status));
+            return response.json();
+          })
+          .then(function (data) {
+            var live = data && typeof data.message === "string" ? data.message.trim() : "";
+            currentText.textContent = !live || live === "null" ? "Nothing is being broadcast." : live;
+          })
+          .catch(function () {
+            currentText.textContent = "Could not read the current broadcast.";
+          });
+      }
+
+      function push(payload, successText) {
+        fetch(BIN, {
           method: "PUT",
-          headers: { 
-            "Content-Type": "application/json",
-            "X-Master-Key": API_KEY 
-          },
-          body: JSON.stringify({ message: messagePayload })
-        });
-        
-        const status = document.getElementById('status-text');
-        status.innerText = messagePayload === "null" ? "Cleared successfully." : "Broadcast Sent!";
-        status.style.opacity = 1;
-        setTimeout(() => status.style.opacity = 0, 2500);
+          headers: { "Content-Type": "application/json", "X-Master-Key": KEY },
+          body: JSON.stringify({ message: payload })
+        })
+          .then(function (response) {
+            if (!response.ok) throw new Error(String(response.status));
+            say(successText);
+            refresh();
+          })
+          .catch(function (error) {
+            say("Push failed (" + error.message + ").", true);
+          });
+      }
 
-      } catch (error) { alert("Failed to push to database."); }
-    }
+      document.getElementById("unlock").addEventListener("click", unlock);
+      passcode.addEventListener("keydown", function (e) {
+        if (e.key === "Enter") unlock();
+      });
+      passcode.addEventListener("input", function () {
+        gateError.classList.remove("is-visible");
+      });
 
-    function sendNotification() {
-      const msg = document.getElementById('message-input').value.trim();
-      if (!msg) return alert("Cannot send an empty message.");
-      pushToDatabase(msg);
-      document.getElementById('message-input').value = '';
-    }
+      document.getElementById("send").addEventListener("click", function () {
+        var text = message.value.trim();
+        if (!text) {
+          say("Cannot send an empty message.", true);
+          return;
+        }
+        push(text, "Broadcast sent.");
+        message.value = "";
+      });
 
-    function clearNotification() { pushToDatabase("null"); }
-
-    document.getElementById('passcode-input').addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') checkPasscode();
-    });
+      document.getElementById("clear").addEventListener("click", function () {
+        push("null", "Broadcast cleared.");
+      });
+    })();
   </script>
 </body>
 </html>
