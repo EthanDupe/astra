@@ -24,10 +24,28 @@
     /* 🎯 CURSOR OVERRIDES FOR INDEX.HTML */
     .cursor {
       z-index: 9999999 !important; /* Force cursor above absolutely everything */
-      transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1), 
-                  height 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+      transition: width 0.25s cubic-bezier(0.16, 1, 0.3, 1), 
+                  height 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                  border-radius 0.25s cubic-bezier(0.16, 1, 0.3, 1),
                   background 0.3s ease, border-color 0.3s ease;
     }
+
+    .cursor::before,
+    .cursor::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      width: 10px;
+      height: 2px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 2px;
+      transform: translateX(-50%) scaleX(0);
+      opacity: 0;
+      transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+
+    .cursor::before { top: -3px; }
+    .cursor::after { bottom: -3px; }
 
     /* Pinpoint accuracy shrink effect */
     .cursor.shrink {
@@ -35,6 +53,24 @@
       height: 12px !important;
       background: rgba(255, 255, 255, 0.9) !important;
       border-color: transparent !important;
+    }
+
+    /* Glass I-Beam Text Select Effect */
+    .cursor.text-select {
+      width: 4px !important;
+      height: 26px !important;
+      border-radius: 3px !important;
+      background: rgba(165, 180, 252, 0.35) !important;
+      backdrop-filter: blur(6px) !important;
+      -webkit-backdrop-filter: blur(6px) !important;
+      border: 1px solid rgba(255, 255, 255, 0.9) !important;
+      box-shadow: 0 0 10px rgba(165, 180, 252, 0.45);
+    }
+
+    .cursor.text-select::before,
+    .cursor.text-select::after {
+      transform: translateX(-50%) scaleX(1);
+      opacity: 1;
     }
   </style>
 </head>
@@ -98,7 +134,7 @@
       }, 800);
     });
 
-    // --- 2. SMOOTH CURSOR ---
+    // --- 2. SMOOTH CURSOR (WITH GLASS TEXT SELECT) ---
     let mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
     let curPos = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
 
@@ -119,9 +155,28 @@
     }
     animateCursor();
 
-    document.querySelectorAll('a, button').forEach(el => {
-      el.addEventListener('mouseenter', () => astraCursor.classList.add('hover'));
-      el.addEventListener('mouseleave', () => astraCursor.classList.remove('hover'));
+    document.addEventListener('mouseover', e => {
+      const interactive = e.target.closest('a, button');
+      const textElement = e.target.closest('input, textarea, [contenteditable="true"], .notif-selectable-text');
+
+      if (textElement && !interactive) {
+        astraCursor.classList.remove('hover', 'shrink');
+        astraCursor.classList.add('text-select');
+      } else if (interactive) {
+        astraCursor.classList.remove('text-select');
+        if (!e.target.closest('.astra-notif-card')) {
+          astraCursor.classList.add('hover');
+        }
+      }
+    });
+
+    document.addEventListener('mouseout', e => {
+      if (e.target.closest('input, textarea, [contenteditable="true"], .notif-selectable-text')) {
+        astraCursor.classList.remove('text-select');
+      }
+      if (e.target.closest('a, button')) {
+        astraCursor.classList.remove('hover');
+      }
     });
 
     // --- 3. BACKGROUND PARTICLES (STARS) ---
@@ -171,10 +226,100 @@
     resize();
     drawStars();
 
-    // --- 4. 📡 PUSH NOTIFICATION CLIENT ---
+    // --- 4. 📡 MULTI-NOTIFICATION CLIENT (SIDE STACK & CENTER POPUP) ---
     (() => {
       const BIN_URL = "https://api.jsonbin.io/v3/b/6a0fb2fb6610dd3ae8858731?meta=false";
-      const API_KEY = "$2a$10$dmsG1/GXWAA5tim8ejcE8uKD75pB.KxZxZDzIAb4AdPcJAU93f9nK"; 
+      const API_KEY = "$2a$10$dmsG1/GXWAA5tim8ejcE8uKD75pB.KxZxZDzIAb4AdPcJAU93f9nK";
+      const STORAGE_KEY = "astra_dismissed_ids";
+
+      const shownThisSession = new Set();
+
+      function getDismissedIds() {
+        try {
+          return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+        } catch (e) {
+          return [];
+        }
+      }
+
+      function saveDismissedId(id) {
+        try {
+          const list = getDismissedIds();
+          if (!list.includes(id)) {
+            list.push(id);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+          }
+        } catch (e) {}
+      }
+
+      function syncDismissedIds(liveIds) {
+        try {
+          const list = getDismissedIds().filter(id => liveIds.includes(id));
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+        } catch (e) {}
+      }
+
+      function ensureContainersAndStyles() {
+        if (!document.getElementById('push-keyframes')) {
+          const style = document.createElement('style');
+          style.id = 'push-keyframes';
+          style.innerHTML = `
+            @keyframes slideInRight {
+              from { transform: translateX(120%) scale(0.95); opacity: 0; }
+              to { transform: translateX(0) scale(1); opacity: 1; }
+            }
+            @keyframes popInCenter {
+              from { transform: scale(0.9); opacity: 0; }
+              to { transform: scale(1); opacity: 1; }
+            }
+          `;
+          document.head.appendChild(style);
+        }
+
+        if (!document.getElementById('astra-side-stack')) {
+          const sideStack = document.createElement('div');
+          sideStack.id = 'astra-side-stack';
+          sideStack.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 100000;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            pointer-events: none;
+            max-width: 340px;
+            width: calc(100vw - 40px);
+          `;
+          document.body.appendChild(sideStack);
+        }
+
+        if (!document.getElementById('astra-popup-stack')) {
+          const popupStack = document.createElement('div');
+          popupStack.id = 'astra-popup-stack';
+          popupStack.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 100001;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            pointer-events: none;
+            max-width: 440px;
+            width: calc(100vw - 40px);
+          `;
+          document.body.appendChild(popupStack);
+        }
+      }
+
+      function escapeHtml(str) {
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+      }
 
       async function checkNotifications() {
         try {
@@ -183,32 +328,68 @@
             cache: 'no-store' 
           });
           const data = await response.json();
-          const liveMessage = data.message;
-          const savedMessage = localStorage.getItem('astra_last_notification');
 
-          if (liveMessage === "null" || !liveMessage) {
-            localStorage.removeItem('astra_last_notification');
-            return;
+          let liveList = [];
+          if (Array.isArray(data.notifications)) {
+            liveList = data.notifications;
+          } else if (data.message && data.message !== "null") {
+            liveList = [{
+              id: "legacy_" + data.message,
+              type: "side",
+              title: "System Broadcast",
+              message: data.message,
+              persistent: false
+            }];
           }
 
-          if (liveMessage !== savedMessage) {
-            showPushNotification(liveMessage);
-            localStorage.setItem('astra_last_notification', liveMessage);
-          }
-        } catch (error) { console.log("Notification check paused."); }
+          const liveIds = liveList.map(n => n.id);
+          syncDismissedIds(liveIds);
+
+          // Remove any on-screen notifications that were deleted from JSONBin
+          document.querySelectorAll('.astra-notif-card').forEach(el => {
+            const notifId = el.getAttribute('data-notif-id');
+            if (!liveIds.includes(notifId)) {
+              el.remove();
+            }
+          });
+
+          const dismissedIds = getDismissedIds();
+
+          liveList.forEach(notif => {
+            if (shownThisSession.has(notif.id)) return;
+
+            if (!notif.persistent && dismissedIds.includes(notif.id)) {
+              return;
+            }
+
+            shownThisSession.add(notif.id);
+            if (!notif.persistent) {
+              saveDismissedId(notif.id);
+            }
+
+            if (notif.type === 'popup') {
+              showCenterPopup(notif);
+            } else {
+              showSideNotification(notif);
+            }
+          });
+        } catch (error) {
+          console.log("Notification check paused.");
+        }
       }
 
-      function showPushNotification(message) {
-        if (document.getElementById('astra-push-toast')) return;
-        
+      function showSideNotification(notif) {
+        ensureContainersAndStyles();
+        const stack = document.getElementById('astra-side-stack');
+        if (document.querySelector(`[data-notif-id="${notif.id}"]`)) return;
+
         const toast = document.createElement('div');
-        toast.id = 'astra-push-toast';
+        toast.className = 'astra-notif-card';
+        toast.setAttribute('data-notif-id', notif.id);
         
         // Smoky Glass Aesthetic
         toast.style.cssText = `
-          position: fixed; 
-          top: 20px; 
-          right: 20px; 
+          pointer-events: auto;
           background: rgba(15, 15, 20, 0.65); 
           backdrop-filter: blur(30px) saturate(120%); 
           -webkit-backdrop-filter: blur(30px) saturate(120%);
@@ -217,47 +398,81 @@
           color: #e2e8f0; 
           padding: 16px 24px; 
           border-radius: 20px; 
-          z-index: 100000; 
           display: flex; 
           flex-direction: column; 
           gap: 10px; 
           font-family: 'Roboto Flex', sans-serif; 
-          animation: slideInRight 0.5s cubic-bezier(0.16, 1, 0.3, 1); 
-          max-width: 320px;
+          animation: slideInRight 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; 
+          width: 100%;
         `;
 
         toast.innerHTML = `
           <div style="display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-size: 0.75rem; font-weight: 800; color: #a5b4fc; text-transform: uppercase; letter-spacing: 1.5px;">System Broadcast</span>
-            <button id="push-close" style="background: transparent; color: #64748b; border: none; font-size: 1.2rem; cursor: none; line-height: 1; transition: color 0.2s; padding: 0;">&times;</button>
+            <span class="notif-selectable-text" style="font-size: 0.75rem; font-weight: 800; color: #a5b4fc; text-transform: uppercase; letter-spacing: 1.5px;">${escapeHtml(notif.title || 'System Broadcast')}</span>
+            <button class="notif-close-btn" style="background: transparent; color: #64748b; border: none; font-size: 1.2rem; cursor: none; line-height: 1; transition: color 0.2s; padding: 0;">&times;</button>
           </div>
-          <div style="font-size: 0.95rem; font-weight: 400; line-height: 1.5;">${message}</div>
+          <div class="notif-selectable-text" style="font-size: 0.95rem; font-weight: 400; line-height: 1.5; word-break: break-word;">${escapeHtml(notif.message)}</div>
         `;
 
-        document.body.appendChild(toast);
+        stack.appendChild(toast);
+        bindCardInteractions(toast, 'slideInRight');
+      }
 
-        if (!document.getElementById('push-keyframes')) {
-          const style = document.createElement('style');
-          style.id = 'push-keyframes';
-          style.innerHTML = `
-            @keyframes slideInRight {
-              from { right: -100px; opacity: 0; transform: scale(0.95); }
-              to { right: 20px; opacity: 1; transform: scale(1); }
-            }
-          `;
-          document.head.appendChild(style);
-        }
+      function showCenterPopup(notif) {
+        ensureContainersAndStyles();
+        const stack = document.getElementById('astra-popup-stack');
+        if (document.querySelector(`[data-notif-id="${notif.id}"]`)) return;
 
-        const closeBtn = document.getElementById('push-close');
+        const popup = document.createElement('div');
+        popup.className = 'astra-notif-card';
+        popup.setAttribute('data-notif-id', notif.id);
+
+        // Smoky Glass Aesthetic scaled for center popup
+        popup.style.cssText = `
+          pointer-events: auto;
+          background: rgba(15, 15, 20, 0.72); 
+          backdrop-filter: blur(30px) saturate(130%); 
+          -webkit-backdrop-filter: blur(30px) saturate(130%);
+          border: 1px solid rgba(255, 255, 255, 0.12); 
+          box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85), inset 0 0 0 1px rgba(255, 255, 255, 0.04); 
+          color: #e2e8f0; 
+          padding: 28px 32px; 
+          border-radius: 24px; 
+          display: flex; 
+          flex-direction: column; 
+          gap: 14px; 
+          font-family: 'Roboto Flex', sans-serif; 
+          animation: popInCenter 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards; 
+          width: 100%;
+          text-align: center;
+          position: relative;
+        `;
+
+        popup.innerHTML = `
+          <button class="notif-close-btn" style="position: absolute; top: 18px; right: 22px; background: transparent; color: #64748b; border: none; font-size: 1.4rem; cursor: none; line-height: 1; transition: color 0.2s; padding: 0;">&times;</button>
+          <div class="notif-selectable-text" style="font-size: 1.5rem; font-weight: 900; letter-spacing: -0.5px; background: linear-gradient(135deg, #ffffff 0%, #a5b4fc 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; padding: 0 20px;">
+            ${escapeHtml(notif.title || 'System Notice')}
+          </div>
+          <div class="notif-selectable-text" style="font-size: 1rem; font-weight: 400; line-height: 1.6; color: #e2e8f0; word-break: break-word;">
+            ${escapeHtml(notif.message)}
+          </div>
+        `;
+
+        stack.appendChild(popup);
+        bindCardInteractions(popup, 'popInCenter');
+      }
+
+      function bindCardInteractions(card, animName) {
+        const closeBtn = card.querySelector('.notif-close-btn');
         closeBtn.addEventListener('click', () => {
-          toast.style.animation = 'slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1) reverse forwards';
-          setTimeout(() => toast.remove(), 300);
+          card.style.animation = `${animName} 0.3s cubic-bezier(0.16, 1, 0.3, 1) reverse forwards`;
+          astraCursor.classList.remove('shrink', 'text-select');
+          setTimeout(() => card.remove(), 280);
         });
 
-        // 🎯 Cursor Shrink Logic
-        toast.addEventListener('mouseenter', () => astraCursor.classList.add('shrink'));
-        toast.addEventListener('mouseleave', () => astraCursor.classList.remove('shrink'));
-        
+        card.addEventListener('mouseenter', () => astraCursor.classList.add('shrink'));
+        card.addEventListener('mouseleave', () => astraCursor.classList.remove('shrink', 'text-select'));
+
         closeBtn.addEventListener('mouseenter', () => closeBtn.style.color = '#ff3b30');
         closeBtn.addEventListener('mouseleave', () => closeBtn.style.color = '#64748b');
       }
