@@ -7,12 +7,12 @@ function switchTab(tabId) {
   
   // Add active class to target section
   const target = document.getElementById(tabId);
-  if(target) {
+  if (target) {
     target.classList.add('active');
   }
 }
 
-// --- SMOOTH CURSOR ---
+// --- SMOOTH CURSOR (WITH GLASS TEXT SELECT) ---
 const cursor = document.getElementById('cursor');
 let mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
 let curPos = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
@@ -26,30 +26,46 @@ function animateCursor() {
   const ease = 0.15;
   curPos.x += (mouse.x - curPos.x) * ease;
   curPos.y += (mouse.y - curPos.y) * ease;
-  cursor.style.left = `${curPos.x}px`;
-  cursor.style.top = `${curPos.y}px`;
+  if (cursor) {
+    cursor.style.left = `${curPos.x}px`;
+    cursor.style.top = `${curPos.y}px`;
+  }
   requestAnimationFrame(animateCursor);
 }
 animateCursor();
 
-// Attach hover effects dynamically
+// Attach hover and glass text-select effects dynamically
 document.addEventListener('mouseover', e => {
-  if(e.target.closest('a, button, .app-card, .game-btn')) {
+  if (!cursor) return;
+  const textTarget = e.target.closest('input, textarea, [contenteditable="true"], .notif-selectable-text');
+  const interactiveTarget = e.target.closest('a, button, .app-card, .game-btn');
+
+  if (textTarget && !interactiveTarget) {
+    cursor.classList.remove('hover');
+    cursor.classList.add('text-select');
+  } else if (interactiveTarget) {
+    cursor.classList.remove('text-select');
     cursor.classList.add('hover');
   }
 });
+
 document.addEventListener('mouseout', e => {
-  if(e.target.closest('a, button, .app-card, .game-btn')) {
+  if (!cursor) return;
+  if (e.target.closest('input, textarea, [contenteditable="true"], .notif-selectable-text')) {
+    cursor.classList.remove('text-select');
+  }
+  if (e.target.closest('a, button, .app-card, .game-btn')) {
     cursor.classList.remove('hover');
   }
 });
 
 // --- STARFIELD BACKGROUND ---
 const canvas = document.getElementById('bg-canvas');
-const ctx = canvas.getContext('2d');
+const ctx = canvas ? canvas.getContext('2d') : null;
 let width, height, stars = [];
 
 function initCanvas() {
+  if (!canvas) return;
   width = canvas.width = window.innerWidth;
   height = canvas.height = window.innerHeight;
   stars = Array.from({ length: Math.floor((width * height) / 5000) }, () => ({
@@ -62,6 +78,7 @@ function initCanvas() {
 }
 
 function drawStars() {
+  if (!ctx) return;
   ctx.clearRect(0, 0, width, height);
   ctx.fillStyle = "white";
   stars.forEach(star => {
@@ -75,9 +92,11 @@ function drawStars() {
   requestAnimationFrame(drawStars);
 }
 
-window.addEventListener('resize', initCanvas);
-initCanvas();
-drawStars();
+if (canvas) {
+  window.addEventListener('resize', initCanvas);
+  initCanvas();
+  drawStars();
+}
 
 // --- APP OVERLAY LOGIC ---
 function openApp(url) {
@@ -85,7 +104,7 @@ function openApp(url) {
   document.getElementById('appFrame').src = url;
   overlay.classList.add('active');
   document.body.style.cursor = 'auto'; // Re-enable system cursor for iframe
-  cursor.style.display = 'none';
+  if (cursor) cursor.style.display = 'none';
 }
 
 function closeApp() {
@@ -93,5 +112,5 @@ function closeApp() {
   overlay.classList.remove('active');
   document.getElementById('appFrame').src = '';
   document.body.style.cursor = 'none';
-  cursor.style.display = 'block';
+  if (cursor) cursor.style.display = 'block';
 }
