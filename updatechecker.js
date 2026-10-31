@@ -61,7 +61,7 @@
       `;
 
       toast.innerHTML = `
-        <span style="font-weight: 600; font-size: 0.95rem; letter-spacing: 0.5px;">✨ Update Available</span>
+        <span class="notif-selectable-text" style="font-weight: 600; font-size: 0.95rem; letter-spacing: 0.5px;">✨ Update Available</span>
         <button id="toast-reload" style="background: rgba(165, 180, 252, 0.85); color: #050505; border: none; padding: 6px 16px; border-radius: 30px; font-weight: 700; font-family: inherit; cursor: none; transition: transform 0.2s;">Reload</button>
         <button id="toast-close" style="background: transparent; color: #9aa0b8; border: none; font-size: 1.5rem; cursor: none; padding: 0; line-height: 1; transition: color 0.2s;">&times;</button>
       `;
@@ -94,8 +94,14 @@
 
       // Bind your custom fluid cursor to the new buttons!
       [reloadBtn, closeBtn].forEach(btn => {
-        btn.addEventListener('mouseenter', () => document.getElementById('cursor').classList.add('hover'));
-        btn.addEventListener('mouseleave', () => document.getElementById('cursor').classList.remove('hover'));
+        btn.addEventListener('mouseenter', () => {
+          const cur = document.getElementById('cursor');
+          if (cur) cur.classList.add('hover');
+        });
+        btn.addEventListener('mouseleave', () => {
+          const cur = document.getElementById('cursor');
+          if (cur) cur.classList.remove('hover');
+        });
       });
     }
 
