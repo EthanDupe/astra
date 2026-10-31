@@ -1,7 +1,7 @@
 /* 1. CORE RESET & VARIABLES */
 :root {
   --cursor-size: 20px;
-  --cursor-hover-size: 36px; /* Reduced from 60px */
+  --cursor-hover-size: 36px;
   
   /* LIGHT THEME (Default) */
   --text-main: #1a1a2e;
@@ -12,7 +12,7 @@
   --glass-shadow: 0 16px 40px -10px rgba(100, 110, 140, 0.3);
   --nav-hover-bg: rgba(99, 102, 241, 0.8);
   --nav-hover-text: #ffffff;
-  --cursor-bg: rgba(99, 102, 241, 0.45);
+  --cursor-bg: rgba(99, 102, 241, 0.38);
   --cursor-glow: rgba(99, 102, 241, 0.35);
   --loader-bg: rgba(255, 255, 255, 0.8);
 }
@@ -27,7 +27,7 @@
   --glass-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.7);
   --nav-hover-bg: rgba(165, 180, 252, 0.85);
   --nav-hover-text: #050505;
-  --cursor-bg: rgba(165, 180, 252, 0.45);
+  --cursor-bg: rgba(165, 180, 252, 0.38);
   --cursor-glow: rgba(165, 180, 252, 0.35);
   --loader-bg: rgba(10, 10, 15, 0.85);
 }
@@ -194,23 +194,17 @@ nav a:hover, nav button:hover {
   transform: scale(1.05);
 }
 
-/* 7. LIQUID GLASS CURSOR */
-@keyframes liquidWobble {
-  0%, 100% { border-radius: 50% 46% 52% 48% / 48% 52% 46% 50%; }
-  33% { border-radius: 46% 54% 48% 52% / 52% 46% 54% 48%; }
-  66% { border-radius: 53% 47% 51% 49% / 47% 53% 49% 51%; }
-}
-
+/* 7. REALISTIC WATER GLASS CURSOR */
 .cursor {
   width: var(--cursor-size);
   height: var(--cursor-size);
-  background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.55), var(--cursor-bg) 70%);
-  backdrop-filter: blur(8px) saturate(180%);
-  -webkit-backdrop-filter: blur(8px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.85);
+  background: radial-gradient(circle at 32% 32%, rgba(255, 255, 255, 0.65), var(--cursor-bg) 68%);
+  backdrop-filter: blur(8px) saturate(190%);
+  -webkit-backdrop-filter: blur(8px) saturate(190%);
+  border: 1.2px solid rgba(255, 255, 255, 0.88);
   box-shadow: 
-    inset 0 2px 5px rgba(255, 255, 255, 0.75),
-    inset 0 -2px 5px var(--cursor-glow),
+    inset 0 2px 6px rgba(255, 255, 255, 0.85),
+    inset 0 -3px 6px var(--cursor-glow),
     0 6px 18px var(--cursor-glow);
   border-radius: 50%;
   position: fixed;
@@ -221,9 +215,8 @@ nav a:hover, nav button:hover {
   will-change: transform, width, height, border-radius;
   transform: translate3d(-50%, -50%, 0);
   transition: 
-    width 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), 
-    height 0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
-    border-radius 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+    width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), 
+    height 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
     background 0.3s ease,
     border-color 0.3s ease,
     box-shadow 0.3s ease;
@@ -247,17 +240,16 @@ nav a:hover, nav button:hover {
 .cursor::before { top: -3px; }
 .cursor::after { bottom: -3px; }
 
-/* Smaller, Liquid Hover State (36px) */
+/* Smaller 36px Water Droplet Hover State */
 .cursor.hover {
   width: var(--cursor-hover-size);
   height: var(--cursor-hover-size);
-  background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.4), rgba(165, 180, 252, 0.18) 75%);
+  background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.45), rgba(165, 180, 252, 0.16) 72%);
   border-color: rgba(255, 255, 255, 0.95);
   box-shadow: 
-    inset 0 3px 8px rgba(255, 255, 255, 0.8),
+    inset 0 3px 8px rgba(255, 255, 255, 0.9),
     inset 0 -3px 8px var(--cursor-glow),
     0 8px 24px var(--cursor-glow);
-  animation: liquidWobble 3s ease-in-out infinite;
 }
 
 /* Pinpoint Shrink State */
@@ -267,7 +259,6 @@ nav a:hover, nav button:hover {
   background: radial-gradient(circle at 35% 35%, #ffffff, rgba(220, 230, 255, 0.95)) !important;
   border-color: transparent !important;
   box-shadow: 0 0 12px rgba(255, 255, 255, 0.8) !important;
-  animation: none !important;
 }
 
 /* Liquid Glass I-Beam Text Select State */
@@ -275,14 +266,13 @@ nav a:hover, nav button:hover {
   width: 4px !important;
   height: 24px !important;
   border-radius: 4px !important;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.7), var(--cursor-bg)) !important;
-  backdrop-filter: blur(8px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(8px) saturate(180%) !important;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.75), var(--cursor-bg)) !important;
+  backdrop-filter: blur(8px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(8px) saturate(190%) !important;
   border: 1px solid rgba(255, 255, 255, 0.95) !important;
   box-shadow: 
     inset 0 1px 3px rgba(255, 255, 255, 0.9),
     0 0 12px var(--cursor-glow) !important;
-  animation: none !important;
 }
 
 .cursor.text-select::before,
