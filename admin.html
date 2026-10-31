@@ -25,17 +25,17 @@
 
     body {
       margin: 0;
-      padding: 0;
+      padding: 20px;
       background: linear-gradient(-45deg, #09090e, #1a1a2e, #0f111a, #201a30);
       background-size: 400% 400%;
       animation: liquidBg 15s ease infinite;
       color: #ffffff;
       font-family: 'Roboto Flex', sans-serif;
-      overflow: hidden; 
-      height: 100vh;
+      min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
+      overflow-y: auto;
     }
 
     @keyframes liquidBg {
@@ -58,14 +58,14 @@
     .admin-container {
       position: relative;
       z-index: 10;
-      max-width: 500px;
-      width: 90%;
+      max-width: 540px;
+      width: 100%;
       background: var(--glass-bg);
       backdrop-filter: blur(25px) saturate(150%);
       -webkit-backdrop-filter: blur(25px) saturate(150%);
       border: 1px solid var(--glass-border);
       border-radius: 24px;
-      padding: 40px;
+      padding: 36px;
       box-shadow: var(--glass-shadow);
       text-align: center;
     }
@@ -80,18 +80,18 @@
       -webkit-text-fill-color: transparent;
     }
 
-    p { color: #9aa0b8; margin-bottom: 25px; font-weight: 500; }
+    p { color: #9aa0b8; margin-bottom: 22px; font-weight: 500; }
 
     .glass-input {
       width: 100%;
-      padding: 15px;
+      padding: 14px 16px;
       border-radius: 12px;
       border: 1px solid rgba(255,255,255,0.1);
       background: rgba(0,0,0,0.3);
       color: #fff;
       font-family: inherit;
-      font-size: 1rem;
-      margin-bottom: 20px;
+      font-size: 0.95rem;
+      margin-bottom: 14px;
       outline: none;
       transition: all 0.3s ease;
     }
@@ -99,6 +99,107 @@
     .glass-input:focus {
       border-color: rgba(165, 180, 252, 0.8);
       box-shadow: 0 0 15px rgba(99, 102, 241, 0.3);
+    }
+
+    /* TYPE SELECTOR & PERSISTENT TOGGLE ROW */
+    .options-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .type-selector {
+      display: flex;
+      flex: 1;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 4px;
+      gap: 4px;
+    }
+
+    .type-btn {
+      flex: 1;
+      padding: 10px;
+      border-radius: 9px;
+      border: none;
+      background: transparent;
+      color: #9aa0b8;
+      font-family: inherit;
+      font-weight: 700;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      transition: all 0.3s ease;
+    }
+
+    .type-btn.active {
+      background: rgba(99, 102, 241, 0.8);
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    }
+
+    .persistent-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin-bottom: 16px;
+      transition: border-color 0.3s ease, background 0.3s ease;
+    }
+
+    .persistent-toggle.active {
+      border-color: rgba(165, 180, 252, 0.6);
+      background: rgba(99, 102, 241, 0.12);
+    }
+
+    .persistent-label {
+      text-align: left;
+    }
+
+    .persistent-label span {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #e2e8f0;
+    }
+
+    .persistent-label small {
+      color: #9aa0b8;
+      font-size: 0.75rem;
+    }
+
+    .switch-pill {
+      width: 44px;
+      height: 24px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 20px;
+      position: relative;
+      transition: background 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    .switch-pill::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 18px;
+      height: 18px;
+      background: #ffffff;
+      border-radius: 50%;
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .persistent-toggle.active .switch-pill {
+      background: rgba(99, 102, 241, 0.9);
+    }
+
+    .persistent-toggle.active .switch-pill::after {
+      transform: translateX(20px);
     }
 
     .glass-btn {
@@ -133,14 +234,109 @@
       color: #ff3b30;
     }
 
+    /* ACTIVE NOTIFICATIONS QUEUE */
+    .active-queue {
+      margin-top: 20px;
+      padding-top: 18px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      text-align: left;
+    }
+
+    .queue-header {
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: #a5b4fc;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 10px;
+    }
+
+    .queue-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 190px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .queue-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(15, 15, 20, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 10px 14px;
+      gap: 10px;
+    }
+
+    .queue-meta {
+      overflow: hidden;
+    }
+
+    .queue-badges {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 3px;
+    }
+
+    .badge {
+      font-size: 0.65rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      padding: 2px 7px;
+      border-radius: 6px;
+      background: rgba(165, 180, 252, 0.15);
+      color: #a5b4fc;
+    }
+
+    .badge.persist {
+      background: rgba(52, 199, 89, 0.15);
+      color: #34c759;
+    }
+
+    .queue-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .queue-msg {
+      font-size: 0.78rem;
+      color: #9aa0b8;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .queue-del {
+      background: transparent;
+      border: none;
+      color: #64748b;
+      font-size: 1.25rem;
+      line-height: 1;
+      padding: 4px;
+      transition: color 0.2s;
+    }
+
+    .queue-del:hover {
+      color: #ff3b30;
+    }
+
     #dashboard { display: none; }
 
-    /* FLUID CURSOR */
+    /* FLUID CURSOR + GLASS TEXT SELECT CURSOR */
     .cursor {
       width: 20px;
       height: 20px;
       background: rgba(165, 180, 252, 0.6);
       backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
       border: 1px solid rgba(255,255,255,0.8);
       border-radius: 50%;
       position: fixed;
@@ -148,16 +344,53 @@
       pointer-events: none;
       z-index: 9999999;
       transform: translate3d(-50%, -50%, 0); 
-      transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
-                  height 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-                  background 0.5s ease; 
+      transition: width 0.25s cubic-bezier(0.16, 1, 0.3, 1), 
+                  height 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                  border-radius 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                  background 0.3s ease,
+                  border-color 0.3s ease; 
     }
+
+    .cursor::before,
+    .cursor::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      width: 10px;
+      height: 2px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 2px;
+      transform: translateX(-50%) scaleX(0);
+      opacity: 0;
+      transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+
+    .cursor::before { top: -3px; }
+    .cursor::after { bottom: -3px; }
 
     .cursor.hover {
       width: 60px;
       height: 60px;
       background: rgba(255, 255, 255, 0.15);
       border-color: rgba(165, 180, 252, 0.6);
+    }
+
+    /* Glass I-Beam Text Select Mode */
+    .cursor.text-select {
+      width: 4px !important;
+      height: 26px !important;
+      border-radius: 3px !important;
+      background: rgba(165, 180, 252, 0.35) !important;
+      backdrop-filter: blur(6px) !important;
+      -webkit-backdrop-filter: blur(6px) !important;
+      border: 1px solid rgba(255, 255, 255, 0.9) !important;
+      box-shadow: 0 0 10px rgba(165, 180, 252, 0.45);
+    }
+
+    .cursor.text-select::before,
+    .cursor.text-select::after {
+      transform: translateX(-50%) scaleX(1);
+      opacity: 1;
     }
   </style>
 </head>
@@ -176,21 +409,50 @@
   <!-- ADMIN DASHBOARD -->
   <div class="admin-container" id="dashboard">
     <h1>Broadcast</h1>
-    <p>Push a notification to all active clients.</p>
+    <p>Push notifications to all active clients.</p>
+
+    <!-- NOTIFICATION TYPE SELECTOR -->
+    <div class="options-row">
+      <div class="type-selector">
+        <button type="button" class="type-btn active" id="type-side" onclick="setNotifType('side')">Side Notification</button>
+        <button type="button" class="type-btn" id="type-popup" onclick="setNotifType('popup')">Center Popup</button>
+      </div>
+    </div>
+
+    <!-- TITLE INPUT -->
+    <input type="text" id="title-input" class="glass-input" placeholder="Small Title (default: System Broadcast)">
     
-    <textarea id="message-input" class="glass-input" style="min-height: 100px; resize: vertical;" placeholder="Type your message here..."></textarea>
+    <!-- MESSAGE INPUT -->
+    <textarea id="message-input" class="glass-input" style="min-height: 90px; resize: vertical;" placeholder="Type your message here..."></textarea>
+
+    <!-- PERSISTENT TOGGLE -->
+    <div class="persistent-toggle" id="persistent-toggle" onclick="togglePersistent()">
+      <div class="persistent-label">
+        <span>Persistent Notification</span>
+        <small>Ignores cookies and shows every time the site loads</small>
+      </div>
+      <div class="switch-pill"></div>
+    </div>
     
-    <button class="glass-btn" onclick="sendNotification()">Push Notification</button>
-    <button class="glass-btn btn-danger" onclick="clearNotification()">Send "Null" (Clear)</button>
+    <button class="glass-btn" onclick="sendNotification()">Add Notification</button>
+    <button class="glass-btn btn-danger" onclick="clearNotification()">Send "Null" (Clear All)</button>
     
-    <p id="status-text" style="color: #34c759; opacity: 0; margin-top: 15px; transition: opacity 0.3s; font-weight: 700;">Broadcast Sent!</p>
+    <p id="status-text" style="color: #34c759; opacity: 0; margin: 10px 0 0 0; transition: opacity 0.3s; font-weight: 700;">Broadcast Sent!</p>
+
+    <!-- LIVE ACTIVE QUEUE -->
+    <div class="active-queue">
+      <div class="queue-header">Active in JSONBin</div>
+      <div class="queue-list" id="queue-list">
+        <div style="color: #64748b; font-size: 0.85rem;">Loading active notifications...</div>
+      </div>
+    </div>
   </div>
 
   <!-- CUSTOM CURSOR -->
   <div class="cursor" id="cursor"></div>
 
   <script>
-    // --- 1. ASTRA CURSOR LOGIC ---
+    // --- 1. ASTRA CURSOR LOGIC (WITH GLASS TEXT SELECT) ---
     const astraCursor = document.getElementById('cursor');
     let mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
     let curPos = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
@@ -210,9 +472,25 @@
     }
     animateCursor();
 
-    document.querySelectorAll('button, input, textarea').forEach(el => {
-      el.addEventListener('mouseenter', () => astraCursor.classList.add('hover'));
-      el.addEventListener('mouseleave', () => astraCursor.classList.remove('hover'));
+    document.addEventListener('mouseover', e => {
+      const textTarget = e.target.closest('input, textarea, [contenteditable="true"], p, h1, .queue-title, .queue-msg');
+      const interactiveTarget = e.target.closest('button, .persistent-toggle');
+
+      if (textTarget && !interactiveTarget) {
+        astraCursor.classList.remove('hover');
+        astraCursor.classList.add('text-select');
+      } else if (interactiveTarget) {
+        astraCursor.classList.remove('text-select');
+        astraCursor.classList.add('hover');
+      }
+    });
+
+    document.addEventListener('mouseout', e => {
+      const textTarget = e.target.closest('input, textarea, [contenteditable="true"], p, h1, .queue-title, .queue-msg');
+      const interactiveTarget = e.target.closest('button, .persistent-toggle');
+
+      if (textTarget) astraCursor.classList.remove('text-select');
+      if (interactiveTarget) astraCursor.classList.remove('hover');
     });
 
     // --- 2. BACKGROUND STARS ---
@@ -249,21 +527,97 @@
     resize();
     drawStars();
 
-    // --- 3. DATABASE PUSH LOGIC ---
+    // --- 3. DATABASE & QUEUE LOGIC ---
     const API_KEY = "$2a$10$dmsG1/GXWAA5tim8ejcE8uKD75pB.KxZxZDzIAb4AdPcJAU93f9nK";
     const BIN_URL = "https://api.jsonbin.io/v3/b/6a0fb2fb6610dd3ae8858731";
+
+    let selectedType = 'side';
+    let isPersistent = false;
+    let activeNotifications = [];
+
+    function setNotifType(type) {
+      selectedType = type;
+      document.getElementById('type-side').classList.toggle('active', type === 'side');
+      document.getElementById('type-popup').classList.toggle('active', type === 'popup');
+      document.getElementById('title-input').placeholder = type === 'side' 
+        ? 'Small Title (default: System Broadcast)' 
+        : 'Popup Title (default: System Notice)';
+    }
+
+    function togglePersistent() {
+      isPersistent = !isPersistent;
+      document.getElementById('persistent-toggle').classList.toggle('active', isPersistent);
+    }
 
     function checkPasscode() {
       if (document.getElementById('passcode-input').value === 'superbut76') {
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('dashboard').style.display = 'block';
+        fetchCurrentNotifications();
       } else {
         alert('Access Denied.');
         document.getElementById('passcode-input').value = '';
       }
     }
 
-    async function pushToDatabase(messagePayload) {
+    async function fetchCurrentNotifications() {
+      try {
+        const response = await fetch(BIN_URL + "?meta=false&t=" + Date.now(), {
+          headers: { "X-Master-Key": API_KEY },
+          cache: 'no-store'
+        });
+        const data = await response.json();
+        if (Array.isArray(data.notifications)) {
+          activeNotifications = data.notifications;
+        } else if (data.message && data.message !== "null") {
+          activeNotifications = [{
+            id: "legacy-1",
+            type: "side",
+            title: "System Broadcast",
+            message: data.message,
+            persistent: false
+          }];
+        } else {
+          activeNotifications = [];
+        }
+        renderQueue();
+      } catch (e) {
+        document.getElementById('queue-list').innerHTML = `<div style="color: #ff3b30; font-size: 0.85rem;">Failed to load queue.</div>`;
+      }
+    }
+
+    function renderQueue() {
+      const list = document.getElementById('queue-list');
+      if (activeNotifications.length === 0) {
+        list.innerHTML = `<div style="color: #64748b; font-size: 0.85rem;">No active notifications.</div>`;
+        return;
+      }
+      list.innerHTML = '';
+      activeNotifications.forEach(item => {
+        const row = document.createElement('div');
+        row.className = 'queue-item';
+        row.innerHTML = `
+          <div class="queue-meta">
+            <div class="queue-badges">
+              <span class="badge">${item.type === 'popup' ? 'Center Popup' : 'Side Toast'}</span>
+              ${item.persistent ? '<span class="badge persist">Persistent</span>' : ''}
+            </div>
+            <div class="queue-title">${escapeHtml(item.title || 'System Broadcast')}</div>
+            <div class="queue-msg">${escapeHtml(item.message)}</div>
+          </div>
+          <button class="queue-del" title="Remove" onclick="removeNotification('${item.id}')">&times;</button>
+        `;
+        list.appendChild(row);
+      });
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    async function pushToDatabase(notificationsArray, statusLabel) {
       try {
         await fetch(BIN_URL, {
           method: "PUT",
@@ -271,25 +625,53 @@
             "Content-Type": "application/json",
             "X-Master-Key": API_KEY 
           },
-          body: JSON.stringify({ message: messagePayload })
+          body: JSON.stringify({
+            notifications: notificationsArray,
+            message: notificationsArray.length === 0 ? "null" : notificationsArray[notificationsArray.length - 1].message
+          })
         });
         
+        activeNotifications = notificationsArray;
+        renderQueue();
+
         const status = document.getElementById('status-text');
-        status.innerText = messagePayload === "null" ? "Cleared successfully." : "Broadcast Sent!";
+        status.innerText = statusLabel;
         status.style.opacity = 1;
         setTimeout(() => status.style.opacity = 0, 2500);
-
-      } catch (error) { alert("Failed to push to database."); }
+      } catch (error) {
+        alert("Failed to push to database.");
+      }
     }
 
     function sendNotification() {
       const msg = document.getElementById('message-input').value.trim();
+      const rawTitle = document.getElementById('title-input').value.trim();
       if (!msg) return alert("Cannot send an empty message.");
-      pushToDatabase(msg);
+
+      const defaultTitle = selectedType === 'popup' ? 'System Notice' : 'System Broadcast';
+      const newNotif = {
+        id: 'notif_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
+        type: selectedType,
+        title: rawTitle || defaultTitle,
+        message: msg,
+        persistent: isPersistent
+      };
+
+      const updated = [...activeNotifications, newNotif];
+      pushToDatabase(updated, "Broadcast Added!");
+
       document.getElementById('message-input').value = '';
+      document.getElementById('title-input').value = '';
     }
 
-    function clearNotification() { pushToDatabase("null"); }
+    function removeNotification(id) {
+      const updated = activeNotifications.filter(n => n.id !== id);
+      pushToDatabase(updated, "Notification Removed.");
+    }
+
+    function clearNotification() {
+      pushToDatabase([], "Cleared All Notifications.");
+    }
 
     document.getElementById('passcode-input').addEventListener('keypress', function(e) {
       if (e.key === 'Enter') checkPasscode();
