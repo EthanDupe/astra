@@ -1,7 +1,7 @@
 /* 1. CORE RESET & VARIABLES */
 :root {
   --cursor-size: 20px;
-  --cursor-hover-size: 60px;
+  --cursor-hover-size: 36px; /* Reduced from 60px */
   
   /* LIGHT THEME (Default) */
   --text-main: #1a1a2e;
@@ -12,7 +12,8 @@
   --glass-shadow: 0 16px 40px -10px rgba(100, 110, 140, 0.3);
   --nav-hover-bg: rgba(99, 102, 241, 0.8);
   --nav-hover-text: #ffffff;
-  --cursor-bg: rgba(99, 102, 241, 0.6);
+  --cursor-bg: rgba(99, 102, 241, 0.45);
+  --cursor-glow: rgba(99, 102, 241, 0.35);
   --loader-bg: rgba(255, 255, 255, 0.8);
 }
 
@@ -26,7 +27,8 @@
   --glass-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.7);
   --nav-hover-bg: rgba(165, 180, 252, 0.85);
   --nav-hover-text: #050505;
-  --cursor-bg: rgba(165, 180, 252, 0.6);
+  --cursor-bg: rgba(165, 180, 252, 0.45);
+  --cursor-glow: rgba(165, 180, 252, 0.35);
   --loader-bg: rgba(10, 10, 15, 0.85);
 }
 
@@ -38,7 +40,6 @@
 body {
   margin: 0;
   padding: 0;
-  /* Light theme liquid background */
   background: linear-gradient(-45deg, #e0e7ff, #f3e8ff, #ffffff, #c7d2fe);
   background-size: 400% 400%;
   animation: liquidBg 15s ease infinite;
@@ -52,7 +53,7 @@ body {
   justify-content: center;
   transition: color 0.5s ease;
   position: relative;
-  z-index: 1; /* Content sits here */
+  z-index: 1;
 }
 
 /* 2. THE SECRET CROSSFADE TRICK FOR DARK MODE */
@@ -65,11 +66,10 @@ body::before {
   animation: liquidBg 15s ease infinite;
   opacity: 0;
   transition: opacity 0.8s ease-in-out;
-  z-index: -2; /* Sits behind everything */
+  z-index: -2;
   pointer-events: none;
 }
 
-/* Fade in the dark background when theme is active */
 :root[data-theme="dark"] body::before {
   opacity: 1;
 }
@@ -86,7 +86,7 @@ body::before {
   inset: 0;
   width: 100%;
   height: 100%;
-  z-index: -1; /* Sits between backgrounds and content */
+  z-index: -1;
   opacity: 0.5;
   pointer-events: none;
 }
@@ -179,7 +179,6 @@ nav a, nav button {
   outline: none;
 }
 
-/* Toggle Button Specifics */
 #theme-toggle {
   font-size: 1.4rem; 
   padding: 8px 16px;
@@ -188,7 +187,6 @@ nav a, nav button {
   justify-content: center;
 }
 
-/* Fluid Liquid Hover Effect */
 nav a:hover, nav button:hover {
   color: var(--nav-hover-text);
   background: var(--nav-hover-bg);
@@ -196,27 +194,39 @@ nav a:hover, nav button:hover {
   transform: scale(1.05);
 }
 
-/* 7. CUSTOM FLUID CURSOR & GLASS TEXT SELECT CURSOR */
+/* 7. LIQUID GLASS CURSOR */
+@keyframes liquidWobble {
+  0%, 100% { border-radius: 50% 46% 52% 48% / 48% 52% 46% 50%; }
+  33% { border-radius: 46% 54% 48% 52% / 52% 46% 54% 48%; }
+  66% { border-radius: 53% 47% 51% 49% / 47% 53% 49% 51%; }
+}
+
 .cursor {
   width: var(--cursor-size);
   height: var(--cursor-size);
-  background: var(--cursor-bg);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  border: 1px solid rgba(255,255,255,0.8);
+  background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.55), var(--cursor-bg) 70%);
+  backdrop-filter: blur(8px) saturate(180%);
+  -webkit-backdrop-filter: blur(8px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 
+    inset 0 2px 5px rgba(255, 255, 255, 0.75),
+    inset 0 -2px 5px var(--cursor-glow),
+    0 6px 18px var(--cursor-glow);
   border-radius: 50%;
   position: fixed;
   top: 0;
   left: 0;
   pointer-events: none;
   z-index: 9999999;
-  will-change: transform, width, height; 
-  transform: translate3d(-50%, -50%, 0); 
-  transition: width 0.25s cubic-bezier(0.16, 1, 0.3, 1), 
-              height 0.25s cubic-bezier(0.16, 1, 0.3, 1),
-              border-radius 0.25s cubic-bezier(0.16, 1, 0.3, 1),
-              background 0.3s ease,
-              border-color 0.3s ease; 
+  will-change: transform, width, height, border-radius;
+  transform: translate3d(-50%, -50%, 0);
+  transition: 
+    width 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), 
+    height 0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
+    border-radius 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+    background 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 .cursor::before,
@@ -226,39 +236,53 @@ nav a:hover, nav button:hover {
   left: 50%;
   width: 10px;
   height: 2px;
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.95);
   border-radius: 2px;
+  box-shadow: 0 0 6px var(--cursor-glow);
   transform: translateX(-50%) scaleX(0);
   opacity: 0;
-  transition: transform 0.2s ease, opacity 0.2s ease;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s ease;
 }
 
 .cursor::before { top: -3px; }
 .cursor::after { bottom: -3px; }
 
+/* Smaller, Liquid Hover State (36px) */
 .cursor.hover {
   width: var(--cursor-hover-size);
   height: var(--cursor-hover-size);
-  background: rgba(255, 255, 255, 0.15);
-  border-color: var(--cursor-bg);
+  background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.4), rgba(165, 180, 252, 0.18) 75%);
+  border-color: rgba(255, 255, 255, 0.95);
+  box-shadow: 
+    inset 0 3px 8px rgba(255, 255, 255, 0.8),
+    inset 0 -3px 8px var(--cursor-glow),
+    0 8px 24px var(--cursor-glow);
+  animation: liquidWobble 3s ease-in-out infinite;
 }
 
+/* Pinpoint Shrink State */
 .cursor.shrink {
-  width: 12px !important;
-  height: 12px !important;
-  background: rgba(255, 255, 255, 0.9) !important;
+  width: 11px !important;
+  height: 11px !important;
+  background: radial-gradient(circle at 35% 35%, #ffffff, rgba(220, 230, 255, 0.95)) !important;
   border-color: transparent !important;
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.8) !important;
+  animation: none !important;
 }
 
+/* Liquid Glass I-Beam Text Select State */
 .cursor.text-select {
   width: 4px !important;
-  height: 26px !important;
-  border-radius: 3px !important;
-  background: var(--cursor-bg) !important;
-  backdrop-filter: blur(6px) !important;
-  -webkit-backdrop-filter: blur(6px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.9) !important;
-  box-shadow: 0 0 10px var(--cursor-bg);
+  height: 24px !important;
+  border-radius: 4px !important;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.7), var(--cursor-bg)) !important;
+  backdrop-filter: blur(8px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(8px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.95) !important;
+  box-shadow: 
+    inset 0 1px 3px rgba(255, 255, 255, 0.9),
+    0 0 12px var(--cursor-glow) !important;
+  animation: none !important;
 }
 
 .cursor.text-select::before,
