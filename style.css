@@ -196,31 +196,75 @@ nav a:hover, nav button:hover {
   transform: scale(1.05);
 }
 
-/* 7. CUSTOM FLUID CURSOR */
+/* 7. CUSTOM FLUID CURSOR & GLASS TEXT SELECT CURSOR */
 .cursor {
   width: var(--cursor-size);
   height: var(--cursor-size);
   background: var(--cursor-bg);
   backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   border: 1px solid rgba(255,255,255,0.8);
   border-radius: 50%;
   position: fixed;
   top: 0;
   left: 0;
   pointer-events: none;
-  z-index: 10000;
+  z-index: 9999999;
   will-change: transform, width, height; 
   transform: translate3d(-50%, -50%, 0); 
-  transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
-              height 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-              background 0.5s ease; 
+  transition: width 0.25s cubic-bezier(0.16, 1, 0.3, 1), 
+              height 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              border-radius 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              background 0.3s ease,
+              border-color 0.3s ease; 
 }
+
+.cursor::before,
+.cursor::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  width: 10px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 2px;
+  transform: translateX(-50%) scaleX(0);
+  opacity: 0;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.cursor::before { top: -3px; }
+.cursor::after { bottom: -3px; }
 
 .cursor.hover {
   width: var(--cursor-hover-size);
   height: var(--cursor-hover-size);
   background: rgba(255, 255, 255, 0.15);
   border-color: var(--cursor-bg);
+}
+
+.cursor.shrink {
+  width: 12px !important;
+  height: 12px !important;
+  background: rgba(255, 255, 255, 0.9) !important;
+  border-color: transparent !important;
+}
+
+.cursor.text-select {
+  width: 4px !important;
+  height: 26px !important;
+  border-radius: 3px !important;
+  background: var(--cursor-bg) !important;
+  backdrop-filter: blur(6px) !important;
+  -webkit-backdrop-filter: blur(6px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.9) !important;
+  box-shadow: 0 0 10px var(--cursor-bg);
+}
+
+.cursor.text-select::before,
+.cursor.text-select::after {
+  transform: translateX(-50%) scaleX(1);
+  opacity: 1;
 }
 
 /* Tracker styling */
@@ -240,8 +284,8 @@ nav a:hover, nav button:hover {
 
 /* Responsive Adjustments */
 @media (max-width: 768px) {
-    header { font-size: 4.5rem; }
-    nav { padding: 12px 20px; flex-wrap: wrap; justify-content: center;}
-    nav a, nav button { padding: 10px 16px; font-size: 0.85rem; }
-    #theme-toggle { padding: 6px 12px; font-size: 1.1rem; }
+  header { font-size: 4.5rem; }
+  nav { padding: 12px 20px; flex-wrap: wrap; justify-content: center; }
+  nav a, nav button { padding: 10px 16px; font-size: 0.85rem; }
+  #theme-toggle { padding: 6px 12px; font-size: 1.1rem; }
 }
