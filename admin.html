@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>KHub v2.6 — Deep Kindle Telemetry &amp; Cloud Admin</title>
+  <title>KHub v2.7 — Deep Kindle Telemetry &amp; Cloud Admin</title>
   <style>
     :root {
       --bg: #f6f6f4;
@@ -241,7 +241,7 @@
   <div class="container">
     <header>
       <div>
-        <h1>KHub v2.6 Deep Kindle Telemetry &amp; Admin</h1>
+        <h1>KHub v2.7 Deep Kindle Telemetry &amp; Admin</h1>
         <p>Worker Endpoint: <span class="mono" id="worker-url-label">https://khub-api.ethananaya351.workers.dev</span> &bull; <span id="last-sync-label">Connecting...</span></p>
       </div>
       <div class="header-actions">
@@ -255,7 +255,7 @@
       <div class="card">
         <div class="card-label">Online / Registered Kindles</div>
         <div class="card-value"><span id="sum-online-count">0</span> / <span id="sum-total-count">0</span></div>
-        <div class="card-sub" id="sum-active-now-sub">0 active in last 10m &bull; 0 on v2.6</div>
+        <div class="card-sub" id="sum-active-now-sub">0 active in last 10m &bull; 0 on v2.7</div>
       </div>
 
       <div class="card">
@@ -484,7 +484,7 @@
         const ageMs = Math.max(0, now - (Number(d.lastSeen) || 0));
         if (ageMs <= 45 * 60 * 1000) onlineCnt++;
         if (ageMs <= 10 * 60 * 1000) active10mCnt++;
-        if (String(d.version || "").indexOf("2.6") !== -1) v25Cnt++;
+        if (String(d.version || "").indexOf("2.7") !== -1) v25Cnt++;
         if (typeof d.batteryLevel === "number") {
           batSum += d.batteryLevel;
           batCnt++;
@@ -501,7 +501,7 @@
 
       document.getElementById("sum-online-count").textContent = String(onlineCnt);
       document.getElementById("sum-total-count").textContent = String(total);
-      document.getElementById("sum-active-now-sub").textContent = `${active10mCnt} active in last 10m • ${v25Cnt} on v2.6`;
+      document.getElementById("sum-active-now-sub").textContent = `${active10mCnt} active in last 10m • ${v25Cnt} on v2.7`;
 
       const avgBat = batCnt > 0 ? Math.round(batSum / batCnt) + "%" : "--%";
       document.getElementById("sum-avg-battery").textContent = avgBat;
@@ -539,7 +539,7 @@
         .map((d) => {
           const id = escapeHtml(d.id || d.trackingId || "KNDL-UNKNOWN");
           const name = escapeHtml(d.name || `Kindle (${id})`);
-          const ver = escapeHtml(d.version || "2.6");
+          const ver = escapeHtml(d.version || "2.7");
           const ip = escapeHtml(d.ip || "Unknown");
           const pubIp = escapeHtml(d.publicIp || "");
           const hw = d.hardwareInfo || {};
@@ -582,7 +582,7 @@
               ${hw.boardId ? `<div style="font-size:11px; color:var(--muted);">Board: ${escapeHtml(hw.boardId)}</div>` : ""}
             </td>
             <td>
-              <span class="tag ${ver.indexOf("2.6") !== -1 ? "tag-dark" : ""}">v${ver}</span>
+              <span class="tag ${ver.indexOf("2.7") !== -1 ? "tag-dark" : ""}">v${ver}</span>
               <div><small>Zoom: <b>${zoom}</b></small></div>
               ${d.hasAiKey ? `<div style="margin-top:3px;"><span class="tag">Key: ${escapeHtml(d.apiKeyPreview || "Active")}</span></div>` : `<div style="margin-top:3px;"><span class="tag">No AI Key</span></div>`}
             </td>
