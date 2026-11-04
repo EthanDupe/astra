@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>KHub v2.7 — Deep Kindle Telemetry &amp; Cloud Admin</title>
+  <title>KHub v2.8 — Deep Kindle Telemetry &amp; Cloud Admin</title>
   <style>
     :root {
       --bg: #f6f6f4;
@@ -241,7 +241,7 @@
   <div class="container">
     <header>
       <div>
-        <h1>KHub v2.7 Deep Kindle Telemetry &amp; Admin</h1>
+        <h1>KHub v2.8 Deep Kindle Telemetry &amp; Admin</h1>
         <p>Worker Endpoint: <span class="mono" id="worker-url-label">https://khub-api.ethananaya351.workers.dev</span> &bull; <span id="last-sync-label">Connecting...</span></p>
       </div>
       <div class="header-actions">
@@ -255,7 +255,7 @@
       <div class="card">
         <div class="card-label">Online / Registered Kindles</div>
         <div class="card-value"><span id="sum-online-count">0</span> / <span id="sum-total-count">0</span></div>
-        <div class="card-sub" id="sum-active-now-sub">0 active in last 10m &bull; 0 on v2.7</div>
+        <div class="card-sub" id="sum-active-now-sub">0 active in last 10m &bull; 0 on v2.8</div>
       </div>
 
       <div class="card">
@@ -294,6 +294,68 @@
       </div>
       <div style="display:flex; flex-direction:column; gap:8px; min-width:230px;">
         <button type="button" class="btn btn-primary" id="maint-toggle-btn" onclick="toggleMaintenanceMode()">Enable Maintenance Mode</button>
+      </div>
+    </div>
+
+    <!-- REMOTE POPUP NOTIFICATION MANAGER & FORCE UPDATE PANELS -->
+    <div class="summary-grid" style="grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));">
+      <!-- PANEL 1: POPUP NOTIFICATION BROADCASTER (CHECKED EVERY 35 MINS ON KINDLES) -->
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <strong style="font-size:16px; text-transform:uppercase;">Kindle Popup Notification Manager (35m Poll)</strong>
+          <span id="notif-status-badge" class="status-pill">No Active Popup</span>
+        </div>
+        <div style="font-size:12.5px; color:var(--muted); margin-bottom:10px;">
+          Send a popup message to all Kindles, a specific firmware / KHub version, or a single Kindle ID. One-time popups are remembered &amp; forgotten after the user sees them; Persistent popups show on every check until cleared.
+        </div>
+        <div class="input-row" style="margin-top:6px;">
+          <input type="text" id="notif-title-input" placeholder="Popup Title (e.g. Update Available!)" value="Update Available — KHub v2.8" style="min-width:180px;" />
+          <select id="notif-target-type" class="btn" style="padding:9px 10px;" onchange="updateNotifTargetPlaceholder()">
+            <option value="all">Target: All Kindles</option>
+            <option value="version">Target: KHub Version / Firmware</option>
+            <option value="device">Target: Specific Kindle ID</option>
+          </select>
+          <input type="text" id="notif-target-val" placeholder="All Kindles (leave blank)" style="min-width:150px;" />
+        </div>
+        <div class="input-row">
+          <input type="text" id="notif-msg-input" placeholder="Popup message body shown on Kindle..." value="A newer version of KHub is available! Open Settings -> System & Updates to update your Kindle." />
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px; flex-wrap:wrap; gap:8px;">
+          <label style="font-size:13px; font-weight:700; cursor:pointer;">
+            <input type="checkbox" id="notif-persistent-chk" style="transform:scale(1.2); margin-right:6px;" />
+            Persistent Notification (Do not auto-forget after user sees it)
+          </label>
+          <div style="display:flex; gap:8px;">
+            <button type="button" class="btn btn-primary" onclick="sendAdminNotification()">Send Popup</button>
+            <button type="button" class="btn" onclick="clearAdminNotification()">Clear</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PANEL 2: REMOTE FORCE UPDATE TRIGGER (10-SECOND COUNTDOWN) -->
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <strong style="font-size:16px; text-transform:uppercase;">&#9888;&#65039; Force Update Manager (10s Countdown)</strong>
+          <span id="force-status-badge" class="status-pill">Force Update: OFF</span>
+        </div>
+        <div style="font-size:12.5px; color:var(--muted); margin-bottom:10px;">
+          When enabled for a KHub version/firmware or Kindle ID, matching Kindles display <strong>&ldquo;Update required. &#9888;&#65039;&rdquo;</strong> with a mandatory <strong>10-second countdown</strong> and automatically start the wireless GitHub update.
+        </div>
+        <div class="input-row" style="margin-top:6px;">
+          <select id="force-target-type" class="btn" style="padding:9px 10px;">
+            <option value="version">Target: Kindles on Version / Firmware</option>
+            <option value="device">Target: Specific Kindle ID</option>
+            <option value="all">Target: All Kindles Below v2.8</option>
+          </select>
+          <input type="text" id="force-target-val" placeholder="Version (e.g. 2.7) or Kindle ID" value="2.7" style="min-width:160px;" />
+        </div>
+        <div class="input-row">
+          <input type="text" id="force-msg-input" placeholder="Forced update popup message..." value="Update required. ⚠️ Your Kindle will automatically update in 10 seconds." />
+        </div>
+        <div style="display:flex; justify-content:flex-end; align-items:center; margin-top:10px; gap:8px;">
+          <button type="button" class="btn btn-danger" onclick="triggerAdminForceUpdate()">&#9888;&#65039; Force Update</button>
+          <button type="button" class="btn" onclick="clearAdminForceUpdate()">Disable Force Update</button>
+        </div>
       </div>
     </div>
 
@@ -397,6 +459,9 @@
             currentMaintenance = devData.maintenance;
             updateMaintenanceUI();
           }
+          if (devData.activeNotification || devData.forceUpdate) {
+            updateNotifAndForceBadges(devData.activeNotification, devData.forceUpdate);
+          }
           let list = [];
           if (Array.isArray(devData.devicesList)) list = devData.devicesList;
           else if (devData.devices && typeof devData.devices === "object") list = Object.values(devData.devices);
@@ -484,7 +549,7 @@
         const ageMs = Math.max(0, now - (Number(d.lastSeen) || 0));
         if (ageMs <= 45 * 60 * 1000) onlineCnt++;
         if (ageMs <= 10 * 60 * 1000) active10mCnt++;
-        if (String(d.version || "").indexOf("2.7") !== -1) v25Cnt++;
+        if (String(d.version || "").indexOf("2.8") !== -1) v25Cnt++;
         if (typeof d.batteryLevel === "number") {
           batSum += d.batteryLevel;
           batCnt++;
@@ -501,7 +566,7 @@
 
       document.getElementById("sum-online-count").textContent = String(onlineCnt);
       document.getElementById("sum-total-count").textContent = String(total);
-      document.getElementById("sum-active-now-sub").textContent = `${active10mCnt} active in last 10m • ${v25Cnt} on v2.7`;
+      document.getElementById("sum-active-now-sub").textContent = `${active10mCnt} active in last 10m • ${v25Cnt} on v2.8`;
 
       const avgBat = batCnt > 0 ? Math.round(batSum / batCnt) + "%" : "--%";
       document.getElementById("sum-avg-battery").textContent = avgBat;
@@ -539,7 +604,7 @@
         .map((d) => {
           const id = escapeHtml(d.id || d.trackingId || "KNDL-UNKNOWN");
           const name = escapeHtml(d.name || `Kindle (${id})`);
-          const ver = escapeHtml(d.version || "2.7");
+          const ver = escapeHtml(d.version || "2.8");
           const ip = escapeHtml(d.ip || "Unknown");
           const pubIp = escapeHtml(d.publicIp || "");
           const hw = d.hardwareInfo || {};
@@ -582,7 +647,7 @@
               ${hw.boardId ? `<div style="font-size:11px; color:var(--muted);">Board: ${escapeHtml(hw.boardId)}</div>` : ""}
             </td>
             <td>
-              <span class="tag ${ver.indexOf("2.7") !== -1 ? "tag-dark" : ""}">v${ver}</span>
+              <span class="tag ${ver.indexOf("2.8") !== -1 ? "tag-dark" : ""}">v${ver}</span>
               <div><small>Zoom: <b>${zoom}</b></small></div>
               ${d.hasAiKey ? `<div style="margin-top:3px;"><span class="tag">Key: ${escapeHtml(d.apiKeyPreview || "Active")}</span></div>` : `<div style="margin-top:3px;"><span class="tag">No AI Key</span></div>`}
             </td>
@@ -633,7 +698,9 @@
               <div style="font-size:10.5px; color:var(--muted);">${escapeHtml(formatTimestamp(d.lastSeen))}</div>
             </td>
             <td style="white-space:nowrap;">
-              <button type="button" class="btn btn-sm" onclick="openTelemetryModal('${id}')">Deep Inspect</button>
+              <button type="button" class="btn btn-sm" onclick="openTelemetryModal('${id}')">Inspect</button>
+              <button type="button" class="btn btn-sm" onclick="quickNotifyDevice('${id}')">Notify</button>
+              <button type="button" class="btn btn-sm btn-danger" onclick="quickForceUpdateDevice('${id}', '${ver}')">&#9888;&#65039; Force Upd</button>
               <button type="button" class="btn btn-sm" onclick="renameDevicePrompt('${id}', '${name}')">Rename</button>
             </td>
           </tr>`;
@@ -758,6 +825,138 @@
       if (btn) btn.textContent = autoRefreshEnabled ? "Auto-Refresh: ON (10s)" : "Auto-Refresh: OFF";
       if (autoRefreshTimer) { clearInterval(autoRefreshTimer); autoRefreshTimer = null; }
       if (autoRefreshEnabled) autoRefreshTimer = setInterval(fetchStatusAndDevices, 10000);
+    }
+
+    function updateNotifTargetPlaceholder() {
+      const sel = document.getElementById("notif-target-type");
+      const inp = document.getElementById("notif-target-val");
+      if (!sel || !inp) return;
+      if (sel.value === "all") inp.placeholder = "All Kindles (leave blank)";
+      else if (sel.value === "version") inp.placeholder = "Enter Version or FW (e.g. 2.7 or 5.16)";
+      else inp.placeholder = "Enter Kindle ID (e.g. KNDL-XXXXXXXX)";
+    }
+
+    function updateNotifAndForceBadges(actNotif, forceUpd) {
+      const nb = document.getElementById("notif-status-badge");
+      if (nb) {
+        if (actNotif && actNotif.active && actNotif.message) {
+          nb.className = "status-pill status-online";
+          nb.textContent = `Active (${actNotif.targetType}: ${actNotif.targetValue || "All"}${actNotif.persistent ? " • Persistent" : " • One-Time"})`;
+        } else {
+          nb.className = "status-pill";
+          nb.textContent = "No Active Popup";
+        }
+      }
+      const fb = document.getElementById("force-status-badge");
+      if (fb) {
+        if (forceUpd && forceUpd.active) {
+          fb.className = "status-pill status-maint";
+          fb.textContent = `ACTIVE (${forceUpd.targetType}: ${forceUpd.targetValue || "All"})`;
+        } else {
+          fb.className = "status-pill";
+          fb.textContent = "Force Update: OFF";
+        }
+      }
+    }
+
+    async function sendAdminNotification() {
+      const title = document.getElementById("notif-title-input").value.trim() || "KHub Notice";
+      const message = document.getElementById("notif-msg-input").value.trim();
+      const targetType = document.getElementById("notif-target-type").value;
+      const targetValue = document.getElementById("notif-target-val").value.trim();
+      const persistent = document.getElementById("notif-persistent-chk").checked;
+      if (!message) { alert("Please enter a notification popup message."); return; }
+      try {
+        const res = await fetch(WORKER_BASE + "/notifications", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            activeNotification: {
+              id: "notif_" + Date.now(),
+              active: true,
+              title,
+              message,
+              targetType,
+              targetValue,
+              persistent
+            }
+          })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          updateNotifAndForceBadges(data.activeNotification, data.forceUpdate);
+        }
+      } catch (e) {
+        alert("Failed to send notification: " + e.message);
+      }
+    }
+
+    async function clearAdminNotification() {
+      try {
+        const res = await fetch(WORKER_BASE + "/notifications", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ clearNotification: true })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          updateNotifAndForceBadges(data.activeNotification, data.forceUpdate);
+        }
+      } catch (e) {}
+    }
+
+    async function triggerAdminForceUpdate() {
+      const targetType = document.getElementById("force-target-type").value;
+      const targetValue = document.getElementById("force-target-val").value.trim();
+      const message = document.getElementById("force-msg-input").value.trim() || "Update required. ⚠️";
+      try {
+        const res = await fetch(WORKER_BASE + "/notifications", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            forceUpdate: {
+              id: "force_" + Date.now(),
+              active: true,
+              targetType,
+              targetValue,
+              message
+            }
+          })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          updateNotifAndForceBadges(data.activeNotification, data.forceUpdate);
+        }
+      } catch (e) {
+        alert("Failed to trigger force update: " + e.message);
+      }
+    }
+
+    async function clearAdminForceUpdate() {
+      try {
+        const res = await fetch(WORKER_BASE + "/notifications", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ clearForceUpdate: true })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          updateNotifAndForceBadges(data.activeNotification, data.forceUpdate);
+        }
+      } catch (e) {}
+    }
+
+    function quickNotifyDevice(deviceId) {
+      document.getElementById("notif-target-type").value = "device";
+      document.getElementById("notif-target-val").value = deviceId;
+      document.getElementById("notif-msg-input").focus();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    async function quickForceUpdateDevice(deviceId, ver) {
+      document.getElementById("force-target-type").value = "device";
+      document.getElementById("force-target-val").value = deviceId;
+      await triggerAdminForceUpdate();
     }
 
     function refreshAllData() { fetchStatusAndDevices(); }
